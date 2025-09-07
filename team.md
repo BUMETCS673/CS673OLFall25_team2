@@ -13,3 +13,9 @@ Hi I'm Gopi, a software engineer who loves solving problems and learning new thi
 ### QI CHEN
 
 Hello I'm Qi Chen, pursuing master degree in METCS right now. I like challenge new things and enjoy the process of working with others. My dream is to build a private company one day. 
+
+
+### Stacey Burns
+
+My name is Stacey, and I work as an SDET. I am pursuing the Graduate Certificate in Software Engineering and hope to further my education with my Master's degree next year. I think I got hooked to the idea of becoming a developer the first time I debugged something successfully.
+When I'm not working or in school, I enjoy spending time with my family and trying to figure out how to keep my plants alive. 
