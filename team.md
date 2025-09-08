@@ -19,3 +19,8 @@ Hello I'm Qi Chen, pursuing master degree in METCS right now. I like challenge n
 
 My name is Stacey, and I work as an SDET. I am pursuing the Graduate Certificate in Software Engineering and hope to further my education with my Master's degree next year. I think I got hooked to the idea of becoming a developer the first time I debugged something successfully.
 When I'm not working or in school, I enjoy spending time with my family and trying to figure out how to keep my plants alive. 
+
+
+### Yongxiang Chen
+
+Hi, I’m Yongxiang Chen. I graduated from UC Irvine with a degree in Business Economics. I’m new to software engineering, but I’m eager to learn and collaborate with my team, and I hope to contribute while gaining experience from everyone. I like to listening to music and watching animation.
