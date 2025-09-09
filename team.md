@@ -24,3 +24,8 @@ When I'm not working or in school, I enjoy spending time with my family and tryi
 ### Yongxiang Chen
 
 Hi, I’m Yongxiang Chen. I graduated from UC Irvine with a degree in Business Economics. I’m new to software engineering, but I’m eager to learn and collaborate with my team, and I hope to contribute while gaining experience from everyone. I like to listening to music and watching animation.
+
+
+### James Rose 
+
+Hi, I'm James Rose but I usually go by Jimmy. I went to Stony Brook University and got my BS in physics. I did some research in neutrino oscillations during that time and found out that coding was quite important in the field. I am now persuing a degree in software development from BU. 
