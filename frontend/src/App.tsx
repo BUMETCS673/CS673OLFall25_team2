@@ -1,11 +1,15 @@
-import { Button, Container } from 'react-bootstrap';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Main from './pages/Main';
+import MyJobs from './pages/MyJobs';
 
 function App() {
   return (
-    <Container className="text-center mt-5">
-      <h1>Hello Bootstrap!</h1>
-      <Button variant="primary">Click Me</Button>
-    </Container>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Main />} />
+        <Route path="/my-jobs" element={<MyJobs />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
