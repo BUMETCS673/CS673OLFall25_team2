@@ -1,0 +1,61 @@
+# =====================================================
+# CareerForge Project - General .gitignore
+# Covers React (Vite) frontend + Java Spring Boot backend
+# =====================================================
+
+# ---- Node / React (frontend) ----
+node_modules/
+dist/
+build/
+.cache/
+.vite/
+*.local
+*.env
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Lock files (optional to ignore if team uses different managers)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ---- Java / Spring Boot (backend) ----
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# Spring Boot config (if sensitive)
+application.properties
+application.yml
+*.env
+
+# IDE / Build system metadata
+*.iml
+.idea/
+.vscode/
+.project
+.classpath
+.settings/
+.gradle/
+mvnw
+mvnw.cmd
+
+# ---- Docs / System files ----
+*.log
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ---- Coverage / Testing ----
+coverage/
+.junit/
+test-output/
