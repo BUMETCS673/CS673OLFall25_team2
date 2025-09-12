@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.cs673</groupId>
-	<artifactId>CurseForge</artifactId>
+	<artifactId>CareerForge</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>CurseForge</name>
-	<description>Springboot project for CurseForge application</description>
+	<name>CareerForge</name>
+	<description>Springboot project for CareerForge application</description>
 	<url/>
 	<licenses>
 		<license/>

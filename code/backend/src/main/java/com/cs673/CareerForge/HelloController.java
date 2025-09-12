@@ -1,4 +1,4 @@
-package com.cs673.CurseForge;
+package com.cs673.CareerForge;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
