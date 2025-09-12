@@ -1,4 +1,4 @@
-package com.cs673.CurseForge;
+package com.cs673.CareerForge;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
