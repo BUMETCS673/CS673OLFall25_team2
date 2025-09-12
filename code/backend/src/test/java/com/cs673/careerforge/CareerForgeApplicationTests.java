@@ -1,10 +1,10 @@
-package com.cs673.CurseForge;
+package com.cs673.careerforge;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CurseForgeApplicationTests {
+class CareerForgeApplicationTests {
 
 	@Test
 	void contextLoads() {
