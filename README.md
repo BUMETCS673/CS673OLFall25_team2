@@ -65,23 +65,6 @@ npm run dev
 
 > Backend and database setup instructions will be added when the Java service and schema are initialized. An `.env.example` will be included for DB credentials and any API keys.
 
-## Database connection Setup
-
-### Connecting remote database
-
-To connect to remote database, you will need to download access key `EC2 Access.pem` (ask Gopi for the file).
-
-1. Run the command `ssh -i "address_to_pem_file" -N -L 13306:careerforgedb.ckt4mmg2etgw.us-east-1.rds.amazonaws.com:3306 ubuntu@54.227.173.227`. Or you can run the script `aws_rds_connection.ps1` under `scripts` if you are using Windows. By running this command, you should put your pem file under `scripts` folder.
-2. Now you are all set.
-
-### Connecting local database
-
-Modify `application.properties`. **DO NOT** commit them. Only use these settings on your computer.
-
-1. Check the configuration in `spring.datasource.url`, current port is `13306`, and current database is `careerforge`.
-2. Check the username `spring.datasource.username` and password `spring.datasource.password`.
-3. Create a database on your local Mysql named `careerforge`. Run the initialization script `code/backend/src/main/resources/db/initialization.sql` for database setup.
-
 ## Project Structure (initial)
 
 ```
