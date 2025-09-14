@@ -62,7 +62,7 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
         // Update fields
         existingApplication.setApplicationStatus(application.getApplicationStatus());
         existingApplication.setNotes(application.getNotes());
-        existingApplication.setResumePath(application.getResumePath());
+//        existingApplication.setResumePath(application.getResumePath());
         existingApplication.setCoverLetter(application.getCoverLetter());
         existingApplication.setInterviewDate(application.getInterviewDate());
         existingApplication.setFollowUpDate(application.getFollowUpDate());
@@ -312,9 +312,9 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
         }
         
         // Validate resume path length
-        if (application.getResumePath() != null && application.getResumePath().length() > 255) {
-            throw new IllegalArgumentException("Resume path cannot exceed 255 characters");
-        }
+//        if (application.getResumePath() != null && application.getResumePath().length() > 255) {
+//            throw new IllegalArgumentException("Resume path cannot exceed 255 characters");
+//        }
         
         // Validate interview date
         if (application.getInterviewDate() != null && application.getInterviewDate().isBefore(application.getAppliedDate())) {
