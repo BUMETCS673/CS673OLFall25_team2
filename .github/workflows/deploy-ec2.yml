@@ -67,7 +67,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Deploy over SSH (no SSM)
-        uses: appleboy/ssh-action@[email protected]
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ vars.EC2_PUBLIC_IP }}
           username: ubuntu
@@ -121,7 +121,7 @@ jobs:
             sudo docker pull "$IMAGE"
             sudo docker run -d --restart unless-stopped --name "$SERVICE" -p 80:"$PORT" "$IMAGE"
 
-            # --- Health check w/ retries (avoid curl 56 during boot) ---
+            # --- Health check w/ retries ---
             for i in $(seq 1 30); do
               code=$(curl -sS -o /dev/null -w '%{http_code}' http://localhost/hello || true)
               [ "$code" = "200" ] && { echo "Health: OK (200)"; break; }
