@@ -44,9 +44,9 @@ public class ApplicationTracking {
     @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
     
-    @Size(max = 255, message = "Resume path must not exceed 255 characters")
-    @Column(name = "resume_path", length = 255)
-    private String resumePath;
+//    @Size(max = 255, message = "Resume path must not exceed 255 characters")
+//    @Column(name = "resume_path", length = 255)
+//    private String resumePath;
     
     @Size(max = 5000, message = "Cover letter must not exceed 5000 characters")
     @Column(name = "cover_letter", columnDefinition = "TEXT")
@@ -162,13 +162,13 @@ public class ApplicationTracking {
         this.notes = notes;
     }
     
-    public String getResumePath() {
-        return resumePath;
-    }
-    
-    public void setResumePath(String resumePath) {
-        this.resumePath = resumePath;
-    }
+//    public String getResumePath() {
+//        return resumePath;
+//    }
+//
+//    public void setResumePath(String resumePath) {
+//        this.resumePath = resumePath;
+//    }
     
     public String getCoverLetter() {
         return coverLetter;
@@ -195,9 +195,9 @@ public class ApplicationTracking {
     }
     
     // Utility methods
-    public boolean hasResume() {
-        return resumePath != null && !resumePath.trim().isEmpty();
-    }
+//    public boolean hasResume() {
+//        return resumePath != null && !resumePath.trim().isEmpty();
+//    }
     
     public boolean hasCoverLetter() {
         return coverLetter != null && !coverLetter.trim().isEmpty();

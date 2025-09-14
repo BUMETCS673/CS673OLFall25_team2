@@ -20,4 +20,4 @@ Write-Host "Press Ctrl+C to stop the tunnel"
 Write-Host ""
 
 # Establish SSH tunnel
-ssh -i "$PemFilePath" -N -L 13306:careerforgedb.ckt4mmg2etgw.us-east-1.rds.amazonaws.com:3306 ubuntu@54.87.43.199
+ssh -i "$PemFilePath" -N -L 13306:careerforgedb.ckt4mmg2etgw.us-east-1.rds.amazonaws.com:3306 ubuntu@54.227.173.227
