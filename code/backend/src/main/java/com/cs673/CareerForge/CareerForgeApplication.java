@@ -1,13 +1,13 @@
-package com.cs673.CareerForge;
+package com.cs673.careerforge;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
+@SpringBootApplication
 public class CareerForgeApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(CareerForgeApplication.class, args);
 	}
+
 }
