@@ -2,7 +2,7 @@ name: deploy-ec2
 
 on:
   push:
-    branches: [ gopi-dev ]
+    branches: [ dev ]
 
 permissions:
   id-token: write
