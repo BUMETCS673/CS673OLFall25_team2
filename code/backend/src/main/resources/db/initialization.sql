@@ -1,0 +1,166 @@
+-- =====================================================
+-- initialization.sql
+-- Initial database schema creation for Job Tracker
+-- =====================================================
+use careerforge;
+
+-- Create User table
+CREATE TABLE users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    user_type ENUM('EMPLOYEE', 'EMPLOYER') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    
+    -- Company owner fields (for employers)
+    company_name VARCHAR(100) NULL,
+    photo VARCHAR(500) NULL,
+    rating VARCHAR(10) NULL,
+    sector VARCHAR(100) NULL,
+    funding VARCHAR(50) NULL,
+    team_size INT NULL,
+    evaluated_size VARCHAR(50) NULL,
+    is_claimed BOOLEAN DEFAULT FALSE,
+    slug VARCHAR(100) NULL,
+    location_address VARCHAR(200) NULL,
+    lat DOUBLE NULL,
+    lon DOUBLE NULL,
+    benefits_title VARCHAR(200) NULL,
+    benefits_list TEXT NULL,
+    values_title VARCHAR(200) NULL,
+    values_list TEXT NULL,
+    badges TEXT NULL,
+    
+    -- Constraints
+    CONSTRAINT chk_username_length CHECK (CHAR_LENGTH(username) >= 3),
+    CONSTRAINT chk_email_format CHECK (email LIKE '%@%.%'),
+    CONSTRAINT chk_first_name_length CHECK (CHAR_LENGTH(first_name) >= 1),
+    CONSTRAINT chk_last_name_length CHECK (CHAR_LENGTH(last_name) >= 1),
+    CONSTRAINT chk_user_latitude_range CHECK (lat IS NULL OR (lat >= -90 AND lat <= 90)),
+    CONSTRAINT chk_user_longitude_range CHECK (lon IS NULL OR (lon >= -180 AND lon <= 180))
+);
+
+-- Create Job table
+CREATE TABLE jobs (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    posted_by BIGINT NOT NULL,
+    title VARCHAR(100) NOT NULL,
+    description TEXT NOT NULL,
+    company VARCHAR(100) NOT NULL,
+    location VARCHAR(100) NOT NULL,
+    employment_type ENUM('FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERNSHIP', 'REMOTE') NOT NULL,
+    salary_min DECIMAL(10,2) NULL,
+    salary_max DECIMAL(10,2) NULL,
+    requirements TEXT NULL,
+    benefits TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT TRUE,
+    application_deadline TIMESTAMP NULL,
+    
+    -- New fields from JSON structure
+    url VARCHAR(500) NULL,
+    type VARCHAR(50) NULL,
+    department VARCHAR(100) NULL,
+    seniority VARCHAR(50) NULL,
+    location_address VARCHAR(200) NULL,
+    lat DOUBLE NULL,
+    lon DOUBLE NULL,
+    
+    -- Foreign Key
+    FOREIGN KEY (posted_by) REFERENCES users(id) ON DELETE CASCADE,
+    
+    -- Constraints
+    CONSTRAINT chk_title_length CHECK (CHAR_LENGTH(title) >= 1),
+    CONSTRAINT chk_company_length CHECK (CHAR_LENGTH(company) >= 1),
+    CONSTRAINT chk_location_length CHECK (CHAR_LENGTH(location) >= 1),
+    CONSTRAINT chk_salary_range CHECK (salary_min IS NULL OR salary_max IS NULL OR salary_min <= salary_max),
+    CONSTRAINT chk_positive_salary CHECK (salary_min IS NULL OR salary_min >= 0),
+    CONSTRAINT chk_positive_salary_max CHECK (salary_max IS NULL OR salary_max >= 0),
+    CONSTRAINT chk_future_deadline CHECK (application_deadline IS NULL OR application_deadline > created_at),
+    CONSTRAINT chk_latitude_range CHECK (lat IS NULL OR (lat >= -90 AND lat <= 90)),
+    CONSTRAINT chk_longitude_range CHECK (lon IS NULL OR (lon >= -180 AND lon <= 180))
+);
+
+-- Create ApplicationTracking table
+CREATE TABLE application_tracking (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    applicant BIGINT NOT NULL,
+    job BIGINT NOT NULL,
+    application_status ENUM('APPLIED', 'UNDER_REVIEW', 'INTERVIEW_SCHEDULED', 'REJECTED', 'ACCEPTED', 'WITHDRAWN') NOT NULL,
+    applied_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    notes TEXT NULL,
+    resume_path VARCHAR(255) NULL,
+    cover_letter TEXT NULL,
+    interview_date TIMESTAMP NULL,
+    follow_up_date TIMESTAMP NULL,
+    
+    -- Foreign Keys
+    FOREIGN KEY (applicant) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (job) REFERENCES jobs(id) ON DELETE CASCADE,
+    
+    -- Unique constraint: one application per user per job
+    UNIQUE KEY uk_applicant_job (applicant, job),
+    
+    -- Constraints
+    CONSTRAINT chk_notes_length CHECK (notes IS NULL OR CHAR_LENGTH(notes) <= 2000),
+    CONSTRAINT chk_cover_letter_length CHECK (cover_letter IS NULL OR CHAR_LENGTH(cover_letter) <= 5000),
+    CONSTRAINT chk_future_interview CHECK (interview_date IS NULL OR interview_date > applied_date),
+    CONSTRAINT chk_future_followup CHECK (follow_up_date IS NULL OR follow_up_date > applied_date)
+);
+
+-- Create indexes for performance
+-- User table indexes
+CREATE INDEX idx_user_username ON users(username);
+CREATE INDEX idx_user_email ON users(email);
+CREATE INDEX idx_user_type ON users(user_type);
+CREATE INDEX idx_user_active ON users(is_active);
+CREATE INDEX idx_user_company_name ON users(company_name);
+CREATE INDEX idx_user_sector ON users(sector);
+CREATE INDEX idx_user_team_size ON users(team_size);
+CREATE INDEX idx_user_location_address ON users(location_address);
+
+-- Job table indexes
+CREATE INDEX idx_job_title ON jobs(title);
+CREATE INDEX idx_job_company ON jobs(company);
+CREATE INDEX idx_job_posted_by ON jobs(posted_by);
+CREATE INDEX idx_job_active ON jobs(is_active);
+CREATE INDEX idx_job_employment_type ON jobs(employment_type);
+CREATE INDEX idx_job_company_title ON jobs(company, title);
+CREATE INDEX idx_job_type ON jobs(type);
+CREATE INDEX idx_job_department ON jobs(department);
+CREATE INDEX idx_job_seniority ON jobs(seniority);
+CREATE INDEX idx_job_location_address ON jobs(location_address);
+
+-- ApplicationTracking table indexes
+CREATE INDEX idx_application_applicant ON application_tracking(applicant);
+CREATE INDEX idx_application_job ON application_tracking(job);
+CREATE INDEX idx_application_status ON application_tracking(application_status);
+CREATE INDEX idx_application_applied_date ON application_tracking(applied_date);
+CREATE INDEX idx_application_last_updated ON application_tracking(last_updated);
+
+# -- Insert sample data for testing
+# INSERT INTO users (username, email, password, first_name, last_name, user_type, company_name, photo, rating, sector, funding, team_size, evaluated_size, is_claimed, slug, location_address, lat, lon, benefits_title, benefits_list, values_title, values_list, badges) VALUES
+# ('john_doe', 'john.doe@email.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HSyK8m2', 'John', 'Doe', 'EMPLOYEE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+# ('jane_smith', 'jane.smith@email.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HSyK8m2', 'Jane', 'Smith', 'EMPLOYEE', NULL, NULL, NULL, NULL, NULL, NULL, NULL, FALSE, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+# ('hr_manager', 'hr@techcorp.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HSyK8m2', 'HR', 'Manager', 'EMPLOYER', 'TechCorp', 'https://example.com/techcorp-logo.png', '4.5', 'Technology', 'Series B', 500, 'enterprise', TRUE, 'techcorp', 'San Francisco, CA', 37.7749, -122.4194, 'Employee Benefits', '["Health Insurance", "401K", "Flexible Hours", "Remote Work"]', 'Company Values', '["Innovation", "Collaboration", "Growth"]', '["Tech Leader", "Great Place to Work"]'),
+# ('recruiter_abc', 'recruiter@abc.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj4J/HSyK8m2', 'Recruiter', 'ABC', 'EMPLOYER', 'ABC Corp', 'https://example.com/abc-logo.png', '4.2', 'Finance', 'Series A', 200, 'mid-size', FALSE, 'abc-corp', 'New York, NY', 40.7128, -74.0060, 'Benefits Package', '["Health Insurance", "Dental", "Vision", "PTO"]', 'Our Values', '["Integrity", "Excellence", "Teamwork"]', '["Fast Growing", "Innovative"]');
+# #
+# INSERT INTO jobs (posted_by, title, description, company, location, employment_type, salary_min, salary_max, requirements, benefits, url, type, department, seniority, location_address, lat, lon) VALUES
+# (3, 'Senior Software Engineer', 'We are looking for an experienced software engineer to join our team...', 'TechCorp', 'San Francisco, CA', 'FULL_TIME', 120000.00, 150000.00, '5+ years experience, Java, Spring Boot', 'Health insurance, 401k, flexible hours', 'https://techcorp.com/jobs/senior-software-engineer', 'Full-time', 'Engineering', 'Senior Level', 'San Francisco, CA', 37.7749, -122.4194),
+# (3, 'Frontend Developer', 'Join our frontend team to build amazing user experiences...', 'TechCorp', 'Remote', 'REMOTE', 80000.00, 110000.00, '3+ years React experience', 'Health insurance, 401k, remote work', 'https://techcorp.com/jobs/frontend-developer', 'Remote', 'Engineering', 'Mid Level', 'Anywhere', NULL, NULL),
+# (4, 'Data Scientist', 'Looking for a data scientist to work on machine learning projects...', 'ABC Corp', 'New York, NY', 'FULL_TIME', 100000.00, 130000.00, 'PhD in Data Science, Python, TensorFlow', 'Health insurance, 401k, stock options', 'https://abccorp.com/jobs/data-scientist', 'Full-time', 'Data Science', 'Senior Level', 'New York, NY', 40.7128, -74.0060),
+# (4, 'Product Manager', 'Lead product development for our flagship application...', 'ABC Corp', 'Seattle, WA', 'FULL_TIME', 110000.00, 140000.00, 'MBA preferred, 3+ years PM experience', 'Health insurance, 401k, equity', 'https://abccorp.com/jobs/product-manager', 'Full-time', 'Product', 'Senior Level', 'Seattle, WA', 47.6062, -122.3321);
+# #
+# INSERT INTO application_tracking (applicant, job, application_status, notes) VALUES
+# (1, 1, 'APPLIED', 'Very interested in this position. Have relevant Java experience.'),
+# (1, 2, 'UNDER_REVIEW', 'Applied last week, waiting for response.'),
+# (2, 1, 'INTERVIEW_SCHEDULED', 'Interview scheduled for next Friday at 2 PM.'),
+# (2, 3, 'APPLIED', 'Excited about the data science role.'),
+# (1, 4, 'REJECTED', 'Not selected after initial screening.');
