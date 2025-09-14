@@ -66,108 +66,68 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # ---- Final deploy step (fixes region expansion & non-TTY login; Ubuntu 24.04-safe) ----
-      - name: Deploy on EC2 via SSM
-        env:
-          IMAGE: ${{ steps.vars.outputs.image }}
-        run: |
-          set -euo pipefail
-          
-          # 1) Write a neutral script with placeholders so we can safely inject values
-          cat > deploy.sh <<'EOF'
-          #!/bin/sh
-          set -eu
-          
-          REGION="__REGION__"
-          IMAGE="__IMAGE__"
-          SERVICE_NAME="__SERVICE_NAME__"
-          APP_PORT="__APP_PORT__"
-          
-          # ---- Install Docker (Ubuntu path uses docker.asc; no gpg --dearmor / TTY) ----
-          if command -v apt-get >/dev/null 2>&1; then
-            export DEBIAN_FRONTEND=noninteractive
-            apt-get update -y
-          
-            # Remove conflicting Ubuntu docker/containerd packages (prevents "containerd.io : Conflicts: containerd")
-            for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
-              apt-get remove -y "$pkg" || true
+      - name: Deploy over SSH (no SSM)
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ vars.EC2_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script_stop: true
+          envs: AWS_REGION,APP_PORT,SERVICE_NAME
+          script: |
+            set -eu
+
+            REGION="${AWS_REGION}"
+            IMAGE="${{ steps.vars.outputs.image }}"
+            SERVICE="${SERVICE_NAME}"
+            PORT="${APP_PORT}"
+
+            # --- Ensure Docker (Ubuntu 24.04-safe: remove conflicts, use Docker repo .asc key) ---
+            if ! command -v docker >/dev/null 2>&1; then
+              if command -v apt-get >/dev/null 2>&1; then
+                sudo apt-get update -y
+                for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+                  sudo apt-get remove -y "$pkg" || true
+                done
+                sudo apt-get install -y ca-certificates curl unzip
+                sudo install -m 0755 -d /etc/apt/keyrings
+                curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/keyrings/docker.asc >/dev/null
+                sudo chmod a+r /etc/apt/keyrings/docker.asc
+                . /etc/os-release
+                echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $VERSION_CODENAME stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+                sudo apt-get update -y
+                sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+              elif command -v dnf >/dev/null 2>&1; then
+                sudo dnf -y update || true
+                sudo dnf -y install docker curl unzip || sudo yum -y install docker curl unzip
+              elif command -v yum >/dev/null 2>&1; then
+                sudo yum -y update || true
+                sudo yum -y install docker curl unzip
+              else
+                echo "no supported package manager found"; exit 1
+              fi
+            fi
+
+            sudo systemctl enable --now docker || true
+
+            # --- ECR login (non-TTY per AWS docs) ---
+            ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+            REGISTRY="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
+            aws ecr get-login-password --region "$REGION" | sudo docker login --username AWS --password-stdin "$REGISTRY"
+
+            # --- Pull & run: host 80 -> container ${PORT} ---
+            sudo docker rm -f "$SERVICE" || true
+            sudo docker pull "$IMAGE"
+            sudo docker run -d --restart unless-stopped --name "$SERVICE" -p 80:"$PORT" "$IMAGE"
+
+            # --- Health check w/ retries ---
+            for i in $(seq 1 30); do
+              code=$(curl -sS -o /dev/null -w '%{http_code}' http://localhost/hello || true)
+              [ "$code" = "200" ] && { echo "Health: OK (200)"; break; }
+              echo "Health: not ready (code=${code:-none}), retrying..."
+              sleep 3
             done
-          
-            apt-get install -y ca-certificates curl unzip
-            install -m 0755 -d /etc/apt/keyrings
-            curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-            chmod a+r /etc/apt/keyrings/docker.asc
-            . /etc/os-release
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $VERSION_CODENAME stable" > /etc/apt/sources.list.d/docker.list
-          
-            apt-get update -y
-            apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-          
-          elif command -v dnf >/dev/null 2>&1; then
-            dnf -y update || true
-            dnf -y install docker curl unzip || yum -y install docker curl unzip
-          elif command -v yum >/dev/null 2>&1; then
-            yum -y update || true
-            yum -y install docker curl unzip
-          else
-            echo "no supported package manager found"
-            exit 1
-          fi
-          
-          systemctl enable --now docker || true
-          
-          # ---- ECR login (non-interactive per AWS docs) ----
-          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
-          REGISTRY="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
-          
-          aws ecr get-login-password --region "${REGION}" \
-            | docker login --username AWS --password-stdin "${REGISTRY}"
-          
-          # ---- Pull & run on host 80 -> container ${APP_PORT} ----
-          docker rm -f "${SERVICE_NAME}" || true
-          docker pull "${IMAGE}"
-          docker run -d --restart unless-stopped --name "${SERVICE_NAME}" -p 80:"${APP_PORT}" "${IMAGE}"
-          
-          # ---- Evidence / health check ----
-          docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}'
-          curl -sS -o /dev/null -w '%{http_code}\n' http://localhost/hello
-          EOF
-          chmod +x deploy.sh
-          
-          # 2) Inject real values (this avoids single-quoted heredoc expansion issues)
-          sed -i "s|__REGION__|${{ env.AWS_REGION }}|g" deploy.sh
-          sed -i "s|__IMAGE__|${{ steps.vars.outputs.image }}|g" deploy.sh
-          sed -i "s|__SERVICE_NAME__|${{ env.SERVICE_NAME }}|g" deploy.sh
-          sed -i "s|__APP_PORT__|${{ env.APP_PORT }}|g" deploy.sh
-          
-          # 3) Send to SSM (no YAML/JSON quoting headaches) and execute
-          B64=$(base64 -w0 deploy.sh || base64 deploy.sh | tr -d '\n')
-          CMD_ID=$(aws ssm send-command \
-            --instance-ids "${EC2_INSTANCE_ID}" \
-            --document-name "AWS-RunShellScript" \
-            --comment "Deploy ${SERVICE_NAME}" \
-            --parameters "commands=[\"echo ${B64} | base64 -d > /tmp/deploy.sh\",\"sudo sh /tmp/deploy.sh\"]" \
-            --query "Command.CommandId" --output text)
-          echo "CommandId: ${CMD_ID}"
-          
-          # 4) Wait for completion and surface logs
-          for i in $(seq 1 30); do
-            STATUS=$(aws ssm get-command-invocation \
-              --command-id "$CMD_ID" \
-              --instance-id "${EC2_INSTANCE_ID}" \
-              --query "Status" --output text)
-            echo "SSM status: $STATUS"
-            case "$STATUS" in
-              Success) break ;;
-              Cancelled|Failed|TimedOut) break ;;
-            esac
-            sleep 5
-          done
-          
-          aws ssm get-command-invocation \
-            --command-id "$CMD_ID" \
-            --instance-id "${EC2_INSTANCE_ID}" \
-            --query "{Status:Status, StdOut:StandardOutputContent, StdErr:StandardErrorContent}" \
-            --output text
-          
-          [ "$STATUS" = "Success" ]
+
+            # Evidence
+            sudo docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}'
