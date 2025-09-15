@@ -9,7 +9,7 @@ public class RootController {
     // With server.servlet.context-path=/api this maps to GET /api/
     @GetMapping("/")
     public String home() {
-        return "CareerForge API is up ✅";
+        return "careerforge API is up ✅";
     }
 
     // No-auth test endpoint (your SecurityConfig permits /public/**)
