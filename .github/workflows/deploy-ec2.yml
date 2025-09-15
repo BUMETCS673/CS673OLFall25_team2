@@ -2,7 +2,7 @@ name: deploy-ec2
 
 on:
   push:
-    branches: [ fixIssue25 ]
+    branches: [ dev ]
 
 permissions:
   id-token: write
