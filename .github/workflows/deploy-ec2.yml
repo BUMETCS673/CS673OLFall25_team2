@@ -66,7 +66,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Deploy over SSH (no SSM)
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ vars.EC2_PUBLIC_IP }}
@@ -119,10 +119,10 @@ jobs:
             # --- Pull & run: host 80 -> container ${PORT} ---
             sudo docker rm -f "$SERVICE" || true
             sudo docker pull "$IMAGE"
-            sudo docker run -d --restart unless-stopped --name "$SERVICE" -p 80:"$PORT" "$IMAGE"
+            sudo docker run -d --restart unless-stopped --env-file /etc/careerforge.env --name "$SERVICE" -p 80:"$PORT" "$IMAGE" 
 
             # --- Health check w/ retries ---
-            for i in $(seq 1 30); do
+            for i in $(seq 1 10); do
               code=$(curl -sS -o /dev/null -w '%{http_code}' http://localhost/hello || true)
               [ "$code" = "200" ] && { echo "Health: OK (200)"; break; }
               echo "Health: not ready (code=${code:-none}), retrying..."
