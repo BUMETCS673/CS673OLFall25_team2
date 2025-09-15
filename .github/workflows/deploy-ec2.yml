@@ -1,0 +1,133 @@
+name: deploy-ec2
+
+on:
+  push:
+    branches: [ dev ]
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
+  ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'careerforge' }}
+  EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
+  APP_PORT: "8080"
+  SERVICE_NAME: "careerforge"
+
+jobs:
+  build-push-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Unit tests
+        working-directory: code/backend
+        run: mvn -B -ntp test
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Ensure ECR repo exists
+        run: |
+          set -e
+          aws ecr describe-repositories --repository-names "${ECR_REPOSITORY}" >/dev/null 2>&1 || \
+          aws ecr create-repository --repository-name "${ECR_REPOSITORY}"
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Compute image tag
+        id: vars
+        run: |
+          echo "image=${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: code/backend
+          file: code/backend/Dockerfile
+          push: true
+          tags: ${{ steps.vars.outputs.image }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy over SSH (no SSM)
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ vars.EC2_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script_stop: true
+          envs: AWS_REGION,APP_PORT,SERVICE_NAME
+          script: |
+            set -eu
+
+            REGION="${AWS_REGION}"
+            IMAGE="${{ steps.vars.outputs.image }}"
+            SERVICE="${SERVICE_NAME}"
+            PORT="${APP_PORT}"
+
+            # --- Ensure Docker (Ubuntu 24.04-safe: remove conflicts, use Docker repo .asc key) ---
+            if ! command -v docker >/dev/null 2>&1; then
+              if command -v apt-get >/dev/null 2>&1; then
+                sudo apt-get update -y
+                for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
+                  sudo apt-get remove -y "$pkg" || true
+                done
+                sudo apt-get install -y ca-certificates curl unzip
+                sudo install -m 0755 -d /etc/apt/keyrings
+                curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/keyrings/docker.asc >/dev/null
+                sudo chmod a+r /etc/apt/keyrings/docker.asc
+                . /etc/os-release
+                echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $VERSION_CODENAME stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
+                sudo apt-get update -y
+                sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+              elif command -v dnf >/dev/null 2>&1; then
+                sudo dnf -y update || true
+                sudo dnf -y install docker curl unzip || sudo yum -y install docker curl unzip
+              elif command -v yum >/dev/null 2>&1; then
+                sudo yum -y update || true
+                sudo yum -y install docker curl unzip
+              else
+                echo "no supported package manager found"; exit 1
+              fi
+            fi
+
+            sudo systemctl enable --now docker || true
+
+            # --- ECR login (non-TTY per AWS docs) ---
+            ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+            REGISTRY="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
+            aws ecr get-login-password --region "$REGION" | sudo docker login --username AWS --password-stdin "$REGISTRY"
+
+            # --- Pull & run: host 80 -> container ${PORT} ---
+            sudo docker rm -f "$SERVICE" || true
+            sudo docker pull "$IMAGE"
+            sudo docker run -d --restart unless-stopped --name "$SERVICE" -p 80:"$PORT" "$IMAGE"
+
+            # --- Health check w/ retries ---
+            for i in $(seq 1 30); do
+              code=$(curl -sS -o /dev/null -w '%{http_code}' http://localhost/hello || true)
+              [ "$code" = "200" ] && { echo "Health: OK (200)"; break; }
+              echo "Health: not ready (code=${code:-none}), retrying..."
+              sleep 3
+            done
+
+            # Evidence
+            sudo docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}'
