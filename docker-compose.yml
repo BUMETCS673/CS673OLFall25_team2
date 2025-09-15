@@ -1,0 +1,52 @@
+services:
+  app:
+    build:
+      context: ./code/backend
+      dockerfile: Dockerfile
+    container_name: careerforge-app
+    ports:
+      - '8080:8080'
+    environment:
+      # --- DB ---
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/careerforge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: cf_user
+      SPRING_DATASOURCE_PASSWORD: secret
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+      SPRING_PROFILES_ACTIVE: docker
+
+      # --- Login creds (ONLY here) ---
+      SPRING_SECURITY_USER_NAME: admin
+      SPRING_SECURITY_USER_PASSWORD: admin123
+      SPRING_SECURITY_USER_ROLES: ADMIN
+
+      # --- Actuator (so you can curl without auth if you want) ---
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: 'true'
+
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.4
+    container_name: careerforge-db
+    environment:
+      MYSQL_DATABASE: careerforge
+      MYSQL_USER: cf_user
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootpw
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '-prootpw']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
