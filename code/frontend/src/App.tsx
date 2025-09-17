@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginForm from './components/loginAndRegistration/LoginForm';
+import './index.css';
 
 export default function App() {
   return (
