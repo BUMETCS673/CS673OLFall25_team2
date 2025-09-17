@@ -1,6 +1,6 @@
 package com.cs673.careerforge.aspect;
 
-import com.cs673.careerforge.common.BaseResult;
+import com.cs673.careerforge.entity.BaseResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
