@@ -1,13 +1,13 @@
-package com.cs673.CurseForge;
+package com.cs673.careerforge;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CurseForgeApplication {
+public class CareerForgeApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CurseForgeApplication.class, args);
+		SpringApplication.run(CareerForgeApplication.class, args);
 	}
 
 }

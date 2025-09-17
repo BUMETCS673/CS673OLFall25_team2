@@ -1,0 +1,70 @@
+package com.cs673.careerforge.entity;
+
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+
+/**
+ * Embedded class representing location coordinates (latitude and longitude).
+ */
+@Embeddable
+public class LocationCoordinates {
+    
+    @DecimalMin(value = "-90.0", message = "Latitude must be between -90 and 90")
+    @DecimalMax(value = "90.0", message = "Latitude must be between -90 and 90")
+    @Column(name = "lat")
+    private Double lat;
+    
+    @DecimalMin(value = "-180.0", message = "Longitude must be between -180 and 180")
+    @DecimalMax(value = "180.0", message = "Longitude must be between -180 and 180")
+    @Column(name = "lon")
+    private Double lon;
+    
+    // Constructors
+    public LocationCoordinates() {}
+    
+    public LocationCoordinates(Double lat, Double lon) {
+        this.lat = lat;
+        this.lon = lon;
+    }
+    
+    // Getters and Setters
+    public Double getLat() {
+        return lat;
+    }
+    
+    public void setLat(Double lat) {
+        this.lat = lat;
+    }
+    
+    public Double getLon() {
+        return lon;
+    }
+    
+    public void setLon(Double lon) {
+        this.lon = lon;
+    }
+    
+    @Override
+    public String toString() {
+        return "LocationCoordinates{" +
+                "lat=" + lat +
+                ", lon=" + lon +
+                '}';
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LocationCoordinates that = (LocationCoordinates) o;
+        return java.util.Objects.equals(lat, that.lat) && 
+               java.util.Objects.equals(lon, that.lon);
+    }
+    
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(lat, lon);
+    }
+}

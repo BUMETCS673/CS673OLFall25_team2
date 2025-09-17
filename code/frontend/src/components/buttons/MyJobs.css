@@ -1,0 +1,19 @@
+.my-jobs-button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1.1rem;
+  font-family: serif;
+  text-align: center;
+  
+  color: black;
+  background-color: white;
+  border: 2px solid #D9534F;
+  border-radius: 15px;
+  cursor: pointer;
+  
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.my-jobs-button:hover {
+  background-color: #D9534F;
+  color: white;
+}

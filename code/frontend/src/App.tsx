@@ -1,17 +1,11 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Main from "./pages/Main";
-import MyJobs from "./pages/MyJobs";
-import LoginForm from "./components/loginAndRegistration/LoginForm";
-import RegisterForm from "./components/loginAndRegistration/RegisterForm";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/my-jobs" element={<MyJobs />} />
-        <Route path="/login" element={<LoginForm showSubmitButton />} />
-        <Route path="/register" element={<RegisterForm showSubmitButton />} />
+        <Route path="/myJobs" element={<div>My Jobs Page</div>} />
+        <Route path="/" element={<div>Main Page</div>} />
       </Routes>
     </BrowserRouter>
   );
