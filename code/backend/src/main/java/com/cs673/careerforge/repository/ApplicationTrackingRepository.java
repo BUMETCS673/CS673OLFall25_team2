@@ -248,12 +248,12 @@ public interface ApplicationTrackingRepository extends JpaRepository<Application
     @Query("SELECT a FROM ApplicationTracking a WHERE a.notes IS NOT NULL AND a.notes != ''")
     List<ApplicationTracking> findApplicationsWithNotes();
     
-    /**
-     * Find applications with resume.
-     * @return list of applications that have resume
-     */
-    @Query("SELECT a FROM ApplicationTracking a WHERE a.resumePath IS NOT NULL AND a.resumePath != ''")
-    List<ApplicationTracking> findApplicationsWithResume();
+//    /**
+//     * Find applications with resume.
+//     * @return list of applications that have resume
+//     */
+//    @Query("SELECT a FROM ApplicationTracking a WHERE a.resumePath IS NOT NULL AND a.resumePath != ''")
+//    List<ApplicationTracking> findApplicationsWithResume();
     
     /**
      * Find applications with cover letter.
