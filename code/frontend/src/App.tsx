@@ -1,8 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LoginForm from './components/loginAndRegistration/LoginForm';
+import './index.css';
 
-function App() {
+export default function App() {
   return (
     <BrowserRouter>
+      <LoginForm />
       <Routes>
         <Route path="/myJobs" element={<div>My Jobs Page</div>} />
         <Route path="/" element={<div>Main Page</div>} />
@@ -10,5 +13,3 @@ function App() {
     </BrowserRouter>
   );
 }
-
-export default App;
