@@ -1,13 +1,11 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Main from './pages/Main';
-import MyJobs from './pages/MyJobs';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Main />} />
-        <Route path="/my-jobs" element={<MyJobs />} />
+        <Route path="/myJobs" element={<div>My Jobs Page</div>} />
+        <Route path="/" element={<div>Main Page</div>} />
       </Routes>
     </BrowserRouter>
   );

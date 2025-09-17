@@ -1,0 +1,89 @@
+.filter-button {
+  padding: 0.6rem 1.2rem;
+  font-size: 1.1rem;
+  font-family: serif;
+  text-align: center;
+  color: black;
+  background-color: white;
+  border: 2px solid #D9534F;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.filter-button:hover {
+  background-color: #D9534F;
+  color: white;
+}
+.location-input-container {
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  width: 280px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.location-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.location-title {
+  font-weight: bold;
+  font-size: 1.1rem;
+  font-family: sans-serif;
+}
+.close-button {
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  color: #888;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+.close-button:hover {
+  color: #333;
+}
+.input-with-clear {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid #007bff;
+  border-radius: 6px;
+  padding-right: 25px;
+}
+.location-input {
+  width: 100%;
+  padding: 0.7rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+.clear-input-button {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 5px;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+.clear-input-button:hover {
+  color: #333;
+  opacity: 1;
+}
+
+.location-input:focus {
+  outline: none;
+  box-shadow: none;
+}
