@@ -1,6 +1,5 @@
 package com.cs673.careerforge.configs;
 
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,15 +12,21 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/h2-console/**", "/public/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults());
-        http.headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+            .csrf(csrf -> csrf.disable())
+            // allow H2 console to render in a frame
+            .headers(h -> h.frameOptions(f -> f.sameOrigin()))
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(
+                    "/actuator/health",
+                    "/h2-console/**",
+                    "/public/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .httpBasic(Customizer.withDefaults());
+
         return http.build();
     }
 
