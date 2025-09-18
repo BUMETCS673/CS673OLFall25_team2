@@ -94,6 +94,15 @@ server/               # Java backend (to be added)
 This project uses job data via the **Rise Jobs API**: [https://pitchwall.co/product/rise-jobs-api](https://pitchwall.co/product/rise-jobs-api).
 Please review and respect the provider’s terms of service and attribution guidelines.
 
+## Security
+
+We need a secret key in application.properties.
+In your terminal run mvn compile exec:java -Dexec.mainClass="com.cs673.careerforge.security.JwtKeyGenerator" to obtain a secret key.
+Copy the JWT secret key.
+Copy that to application.properties under app.jwt.secret.
+Do NOT commit this change.
+This will also need to be applied to the application-test.properties file for the unit test to pass.
+
 ## License
 
 For educational use as part of BU CS673 course project.
