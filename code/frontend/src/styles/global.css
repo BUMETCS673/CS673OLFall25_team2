@@ -12,3 +12,28 @@ body {
 .content-wrap {
   flex: 1;
 }
+
+/* Light and Dark Theme Variables */
+:root {
+  --bg: #ffffff;
+  --fg: #000000;
+
+  /* Bridge to Bootstrap so bg-body/text follow your theme */
+  --bs-body-bg: var(--bg);
+  --bs-body-color: var(--fg);
+}
+
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --fg: #ffffff;
+
+  /* Keep Bootstrap in sync in dark mode */
+  --bs-body-bg: var(--bg);
+  --bs-body-color: var(--fg);
+}
+
+/* Apply theme */
+body {
+  background: var(--bg);
+  color: var(--fg);
+}
