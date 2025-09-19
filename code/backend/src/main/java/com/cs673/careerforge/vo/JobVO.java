@@ -38,9 +38,9 @@ public class JobVO {
 
     private String benefits;
 
-    private LocalDateTime createdAt;
+    private long createdAt;
 
-    private LocalDateTime updatedAt;
+    private long updatedAt;
 
     private Boolean isActive = true;
 

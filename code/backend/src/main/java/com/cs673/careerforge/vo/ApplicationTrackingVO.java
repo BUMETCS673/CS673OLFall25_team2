@@ -28,9 +28,9 @@ public class ApplicationTrackingVO {
 
     private ApplicationStatus applicationStatus;
 
-    private LocalDateTime appliedDate;
+    private long appliedDate;
 
-    private LocalDateTime lastUpdated;
+    private long lastUpdated;
 
     private String notes;
 
@@ -38,7 +38,7 @@ public class ApplicationTrackingVO {
 
     private String coverLetter;
 
-    private LocalDateTime interviewDate;
+    private long interviewDate;
 
-    private LocalDateTime followUpDate;
+    private long followUpDate;
 }
