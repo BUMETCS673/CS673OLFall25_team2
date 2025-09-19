@@ -1,7 +1,13 @@
 package com.cs673.careerforge.vo;
 
 import com.cs673.careerforge.common.ApplicationStatus;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
@@ -18,7 +24,7 @@ public class ApplicationTrackingVO {
 
     private UserVO applicant;
 
-    private com.cs673.careerforge.domain.Job job;
+    private JobVO job;
 
     private ApplicationStatus applicationStatus;
 
