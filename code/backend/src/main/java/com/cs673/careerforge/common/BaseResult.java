@@ -1,4 +1,4 @@
-package com.cs673.careerforge.entity;
+package com.cs673.careerforge.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;

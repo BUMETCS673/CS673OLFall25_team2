@@ -1,5 +1,6 @@
-package com.cs673.careerforge.entity;
+package com.cs673.careerforge.domain;
 
+import com.cs673.careerforge.common.EmploymentType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 

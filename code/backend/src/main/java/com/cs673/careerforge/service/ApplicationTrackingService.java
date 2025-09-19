@@ -1,9 +1,9 @@
 package com.cs673.careerforge.service;
 
-import com.cs673.careerforge.entity.ApplicationStatus;
-import com.cs673.careerforge.entity.ApplicationTracking;
-import com.cs673.careerforge.entity.Job;
-import com.cs673.careerforge.entity.User;
+import com.cs673.careerforge.common.ApplicationStatus;
+import com.cs673.careerforge.domain.ApplicationTracking;
+import com.cs673.careerforge.domain.Job;
+import com.cs673.careerforge.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

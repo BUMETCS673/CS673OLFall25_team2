@@ -1,4 +1,4 @@
-package com.cs673.careerforge.entity;
+package com.cs673.careerforge.common;
 
 /**
  * Enum representing the status of a job application.
