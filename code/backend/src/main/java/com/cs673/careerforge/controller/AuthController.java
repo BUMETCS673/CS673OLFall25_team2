@@ -29,7 +29,8 @@ public class AuthController {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
             );
-            System.out.println(">>> /authenticate called with: " + authRequest.getUsername());
+            //For debugging below
+            //System.out.println(">>> /authenticate called with: " + authRequest.getUsername());
         } catch (BadCredentialsException e) {
             throw new Exception("Incorrect username or password", e);
         }

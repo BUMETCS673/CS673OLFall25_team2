@@ -2,13 +2,22 @@ package com.cs673.careerforge.controllers;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+
 
 @RestController
 public class SecureController {
 
     @GetMapping("/secure")
-    public String secureEndpoint() {
-        return "This is a SECURED endpoint. You must be authenticated to see this.";
+    public String secureEndpoint(Authentication authentication) {
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (isAdmin) {
+            return "Hello Admin: " + authentication.getName();
+        } else {
+            return "Hello User: " + authentication.getName();
+        }
     }
 
     @GetMapping("/public/hello")

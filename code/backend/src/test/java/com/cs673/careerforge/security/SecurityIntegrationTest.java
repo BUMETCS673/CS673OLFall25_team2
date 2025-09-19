@@ -1,44 +1,88 @@
 package com.cs673.careerforge.security;
 
-import com.cs673.careerforge.controllers.SecureController;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.context.ActiveProfiles;
 
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.io.Encoders;
 
-@WebMvcTest(SecureController.class)
-@Import(TestSecurityConfig.class) // lightweight security for tests
+import java.util.UUID;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
 class SecurityIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private JwtUtil jwtUtil; // <== MOCKED, no real secret needed
+    @Value("${app.security.user.name}")
+    private String userName;
+
+    @Value("${app.security.user.password}")
+    private String userPass;
+
+    @Value("${app.security.admin.name}")
+    private String adminName;
+
+    @Value("${app.security.admin.password}")
+    private String adminPass;
+
+    @DynamicPropertySource
+    static void registerJwtSecret(DynamicPropertyRegistry registry) {
+        byte[] key = Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded();
+        registry.add("app.jwt.secret", () -> Encoders.BASE64.encode(key));
+    }
 
     @Test
-    void accessSecureEndpoint_withValidToken_shouldPass() throws Exception {
+    void accessSecureEndpoint_withUser_shouldPass() throws Exception {
+        String token = obtainToken(userName, userPass);
         mockMvc.perform(get("/secure")
-                        .header("Authorization", "Bearer valid-token"))
+                        .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
     }
 
     @Test
-    void accessSecureEndpoint_withInvalidToken_shouldFail() throws Exception {
-        mockMvc.perform(get("/secure")
-                        .header("Authorization", "Bearer invalidtoken"))
-                .andExpect(status().isForbidden()); // 403, not 401
+    void accessAdminEndpoint_withAdmin_shouldPass() throws Exception {
+        String token = obtainToken(adminName, adminPass);
+        mockMvc.perform(get("/admin/dashboard")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void accessSecureEndpoint_withoutToken_shouldFail() throws Exception {
-        mockMvc.perform(get("/secure"))
-                .andExpect(status().isForbidden()); // 403, not 401
+    void accessAdminEndpoint_withUser_shouldFail() throws Exception {
+        String token = obtainToken(userName, userPass);
+        mockMvc.perform(get("/admin/dashboard")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden());
+    }
+
+    private String obtainToken(String username, String password) throws Exception {
+        String requestBody = String.format("{\"username\":\"%s\", \"password\":\"%s\"}", username, password);
+
+        MvcResult result = mockMvc.perform(post("/authenticate")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        // Extract token from response JSON
+        return JsonPath.read(result.getResponse().getContentAsString(), "$.jwt");
+
     }
 }

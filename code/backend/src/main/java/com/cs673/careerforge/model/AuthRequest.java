@@ -1,6 +1,6 @@
 package com.cs673.careerforge.model;
 
-//*For testing to hold login credentials from the request
+//For testing to hold login credentials from the request
 
 public class AuthRequest {
     private String username;
