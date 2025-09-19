@@ -22,6 +22,11 @@ public class JobController {
         return true;
     }
 
+    @PostMapping("/jobs/apply")
+    public Boolean applyJob(@RequestBody JobRequest request, HttpServletRequest httpServletRequest) {
+        return true;
+    }
+
     @PostMapping("/jobs/all")
     public ListJobResponse listJob(HttpServletRequest httpServletRequest) {
         return ListJobResponse.builder().build();
