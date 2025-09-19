@@ -42,14 +42,20 @@ public class LoggingAspect {
         }
 
         String argsJson;
-        try { argsJson = om.writeValueAsString(pjp.getArgs()); }
-        catch (Exception e) { argsJson = "[unserializable args]"; }
+        try {
+            argsJson = om.writeValueAsString(pjp.getArgs());
+        } catch (Exception e) {
+            argsJson = "[unserializable args]";
+        }
 
         try {
             Object ret = pjp.proceed();
             String retJson;
-            try { retJson = om.writeValueAsString(ret); }
-            catch (Exception e) { retJson = "[unserializable return]"; }
+            try {
+                retJson = om.writeValueAsString(ret);
+            } catch (Exception e) {
+                retJson = "[unserializable return]";
+            }
 
             long costMs = System.currentTimeMillis() - start;
             System.out.printf("[REQ] %s %s %s args=%s | [RESP] %s | %dms%n",
