@@ -39,9 +39,9 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job applyJob(long id, JobRequest request) {
+    public boolean applyJob(long uid, long id) {
         // TODO: applyJob
-        return null;
+        return true;
     }
 
     @Override

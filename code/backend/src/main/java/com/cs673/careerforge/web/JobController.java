@@ -35,7 +35,7 @@ public class JobController {
 
     @PostMapping("/jobs/{id}/apply")
     public Boolean applyJob(@PathVariable Long id, @RequestBody JobRequest request, HttpServletRequest httpServletRequest) {
-        return Objects.nonNull(jobService.applyJob(id, request));
+        return jobService.applyJob(request.getUid(), id);
     }
 
     @DeleteMapping("/jobs/{id}")

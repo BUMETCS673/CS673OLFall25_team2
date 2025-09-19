@@ -1,14 +1,15 @@
 package com.cs673.careerforge.request;
 
 import com.cs673.careerforge.common.EmploymentType;
-import com.cs673.careerforge.vo.ApplicationTrackingVO;
 import com.cs673.careerforge.vo.LocationCoordinatesVO;
-import com.cs673.careerforge.vo.UserVO;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class JobRequest extends BaseRequest {
 
     private Long id;
 
-    private UserVO postedBy;
+    private Long postedBy;
 
     private String title;
 
@@ -40,13 +41,13 @@ public class JobRequest extends BaseRequest {
 
     private String benefits;
 
-    private LocalDateTime createdAt;
+    private long createdAt;
 
-    private LocalDateTime updatedAt;
+    private long updatedAt;
 
     private Boolean isActive = true;
 
-    private LocalDateTime applicationDeadline;
+    private long applicationDeadline;
 
     private String url;
 
@@ -59,6 +60,4 @@ public class JobRequest extends BaseRequest {
     private String locationAddress;
 
     private LocationCoordinatesVO locationCoordinates;
-
-    private List<ApplicationTrackingVO> applications;
 }
