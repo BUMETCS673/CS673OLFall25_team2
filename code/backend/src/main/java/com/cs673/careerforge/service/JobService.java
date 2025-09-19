@@ -3,6 +3,7 @@ package com.cs673.careerforge.service;
 import com.cs673.careerforge.common.EmploymentType;
 import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.domain.User;
+import com.cs673.careerforge.vo.JobVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,6 +16,14 @@ import java.util.Optional;
  */
 public interface JobService {
     
+    /**
+     * Create a new job posting.
+     * @param job the job to create
+     * @return the created job
+     * @throws IllegalArgumentException if validation fails
+     */
+    Job saveJob(JobVO job);
+
     /**
      * Create a new job posting.
      * @param job the job to create
