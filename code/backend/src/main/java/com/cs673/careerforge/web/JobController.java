@@ -2,6 +2,7 @@ package com.cs673.careerforge.web;
 
 import com.cs673.careerforge.request.JobRequest;
 import com.cs673.careerforge.request.ListJobRequest;
+import com.cs673.careerforge.response.ListJobResponse;
 import com.cs673.careerforge.service.JobService;
 import com.cs673.careerforge.vo.JobVO;
 import jakarta.annotation.Resource;
@@ -23,7 +24,7 @@ public class JobController {
     private JobService jobService;
 
     @GetMapping("/jobs")
-    public Page<JobVO> listJob(@RequestBody ListJobRequest request, HttpServletRequest httpServletRequest) {
+    public ListJobResponse listJob(@RequestBody ListJobRequest request, HttpServletRequest httpServletRequest) {
         return jobService.findAllJobs(request);
     }
 

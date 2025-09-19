@@ -7,6 +7,7 @@ import com.cs673.careerforge.mapper.JobMapper;
 import com.cs673.careerforge.repository.JobRepository;
 import com.cs673.careerforge.request.JobRequest;
 import com.cs673.careerforge.request.ListJobRequest;
+import com.cs673.careerforge.response.ListJobResponse;
 import com.cs673.careerforge.service.JobService;
 import com.cs673.careerforge.vo.JobVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,9 +117,14 @@ public class JobServiceImpl implements JobService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<JobVO> findAllJobs(ListJobRequest request) {
+    public ListJobResponse findAllJobs(ListJobRequest request) {
         Page<Job> page = findAllJobs(PageRequest.of(request.getPage(), request.getSize()));
-        return page.map(JobMapper.INSTANCE::toVO);
+        return ListJobResponse.builder()
+                .page(page.getTotalPages())
+                .size(page.getSize())
+                .total(page.getTotalElements())
+                .jobs(page.map(JobMapper.INSTANCE::toVO).toList())
+                .build();
     }
 
     @Override
