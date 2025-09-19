@@ -35,10 +35,6 @@ public class UserVO {
 
     private UserType userType;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime updatedAt;
-
     private Boolean isActive = true;
 
     private String companyName;
