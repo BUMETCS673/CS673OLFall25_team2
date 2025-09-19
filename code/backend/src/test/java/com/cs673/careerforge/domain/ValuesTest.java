@@ -1,4 +1,4 @@
-package com.cs673.careerforge.entity;
+package com.cs673.careerforge.domain;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
