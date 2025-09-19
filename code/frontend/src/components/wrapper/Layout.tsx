@@ -1,15 +1,13 @@
 // Layout.tsx
-import type { ReactNode, CSSProperties } from 'react';
+import type { ReactNode } from 'react';
 
 type LayoutProps = {
   header?: ReactNode;
   aside?: ReactNode;
-  mainContent?: ReactNode; // preferred slot for main content
+  mainContent?: ReactNode;
   footer?: ReactNode;
-  children?: ReactNode; // fallback if mainContent not provided
+  children?: ReactNode;
 };
-
-const PANEL_MAX_HEIGHT = '75vh'; // tweak as you like
 
 export default function Layout({
   header,
@@ -21,45 +19,35 @@ export default function Layout({
   const main = mainContent ?? children;
 
   return (
-    <div className="d-flex flex-column min-vh-100 w-100">
+    <div className="d-flex flex-column min-vh-100">
       {/* Header: full width */}
       <header className="w-100 mb-2 bg-body">{header}</header>
 
-      {/* Content: full width */}
-      <main className="w-100 container-fluid my-3">
-        {/* Stack on mobile, row on lg+. Aside stays on top for mobile */}
-        <div
-          className="d-flex flex-column flex-lg-row gap-3"
-          style={{ minHeight: 0 }}
-        >
-          {/* Aside */}
+      {/* Content */}
+      <main className="container-fluid w-100 flex-grow-1 d-flex min-h-0">
+        {/* Grid handles gutters so we don't overflow */}
+        <div className="row g-3 flex-grow-1 min-h-0">
+          {/* Aside: full width on mobile, fixed width on lg+ */}
           <aside
             role="complementary"
-            className="order-0 order-lg-2 bg-body rounded p-3 overflow-auto"
+            className="col-12 order-0 order-lg-2 col-lg-auto bg-body overflow-auto"
             style={{
-              // 100% width when stacked (mobile/tablet)
-              flexBasis: '100%',
-              // 10% at lg+ (row)
-              flex: '0 0 10%',
-              maxHeight: PANEL_MAX_HEIGHT,
+              // fixed column on lg+, responsive clamp so it never pushes main off-screen
+              width: 'clamp(260px, 22vw, 320px)',
               minHeight: 0,
             }}
           >
-            <div className="d-lg-none mb-2 fw-semibold">Filters</div>
+            <div className="fw-semibold mb-3">FILTERS</div>
             {aside}
           </aside>
 
-          {/* Main */}
+          {/* Main: takes the remaining width */}
           <section
             role="main"
-            className="order-1 order-lg-1 bg-body rounded p-3 flex-grow-1 overflow-auto"
+            className="col-12 order-1 order-lg-1 col-lg bg-body rounded d-flex flex-column min-h-0"
             style={{
-              // 100% width when stacked
-              flexBasis: '100%',
-              // 90% at lg+
-              flex: '1 1 90%',
-              maxHeight: PANEL_MAX_HEIGHT,
-              minHeight: 0,
+              // allow shrinking; prevents horizontal overflow from long content
+              minWidth: 0,
             }}
           >
             {main}
@@ -67,8 +55,8 @@ export default function Layout({
         </div>
       </main>
 
-      {/* Footer: full width */}
-      <footer className="w-100 mt-auto bg-body">{footer}</footer>
+      {/* Footer */}
+      <footer className="w-100 mt-0 bg-body">{footer}</footer>
     </div>
   );
 }
