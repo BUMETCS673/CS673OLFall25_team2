@@ -31,11 +31,11 @@ public interface JobService {
     /**
      * Create a new job posting.
      *
-     * @param request the job to create
+     * @param id the job to apply
      * @return the created job
      * @throws IllegalArgumentException if validation fails
      */
-    Job applyJob(long id, JobRequest request);
+    boolean applyJob(long uid, long id);
 
     /**
      * Create a new job posting.

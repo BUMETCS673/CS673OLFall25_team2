@@ -10,5 +10,5 @@ import lombok.*;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class BaseRequest {
-    private int uid;
+    private long uid;
 }

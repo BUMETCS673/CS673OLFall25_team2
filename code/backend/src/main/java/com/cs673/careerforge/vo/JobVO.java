@@ -44,7 +44,7 @@ public class JobVO {
 
     private Boolean isActive = true;
 
-    private LocalDateTime applicationDeadline;
+    private long applicationDeadline;
 
     private String url;
 
