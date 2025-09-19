@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-/** 
+/**
  * Location filter component used in the Aside panel.
  * Clicking the button opens an inline input prompt.
  */
@@ -10,17 +10,23 @@ interface LocationProps {
 }
 
 export default function Location({ onChange }: LocationProps) {
-  const [open, setOpen] = useState(false);                 // controls the input panel
+  const [open, setOpen] = useState(false); // controls the input panel
   const [value, setValue] = useState<string | null>(null); // committed selection
-  const [draft, setDraft] = useState("");                  // text typed before Apply
+  const [draft, setDraft] = useState(''); // text typed before Apply
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const anchorRef = useRef<HTMLButtonElement>(null);       // anchor for positioning
+  const anchorRef = useRef<HTMLButtonElement>(null); // anchor for positioning
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Track computed position for the floating panel
-  const [coords, setCoords] = useState<{ top: number; left: number; width: number }>({
-    top: 0, left: 0, width: 0,
+  const [coords, setCoords] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  }>({
+    top: 0,
+    left: 0,
+    width: 0,
   });
 
   // Close when clicking outside the component (works for both the button container and the floating panel)
@@ -36,8 +42,8 @@ export default function Location({ onChange }: LocationProps) {
         setOpen(false);
       }
     };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
   }, []);
 
   // Compute and update panel position relative to the button
@@ -53,8 +59,8 @@ export default function Location({ onChange }: LocationProps) {
       const maxWidth = Math.min(520, window.innerWidth - 32); // keep 16px margins
       // Align the panel's RIGHT edge to the button's right so it extends LEFT
       const left = Math.min(
-        Math.max(rect.right - maxWidth, 16),            // not past left gutter
-        window.innerWidth - maxWidth - 16               // not past right gutter
+        Math.max(rect.right - maxWidth, 16), // not past left gutter
+        window.innerWidth - maxWidth - 16 // not past right gutter
       );
       const top = Math.min(rect.bottom + 8, window.innerHeight - 16); // small offset below button
 
@@ -63,11 +69,11 @@ export default function Location({ onChange }: LocationProps) {
 
     updatePosition();
     // Reposition on resize/scroll to stay anchored
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
     return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
     };
   }, [open]);
 
@@ -77,8 +83,8 @@ export default function Location({ onChange }: LocationProps) {
   }, [open]);
 
   const toggleOpen = () => {
-    setDraft(value ?? "");  // start from current selection
-    setOpen(o => !o);
+    setDraft(value ?? ''); // start from current selection
+    setOpen((o) => !o);
   };
 
   const apply = () => {
@@ -89,7 +95,7 @@ export default function Location({ onChange }: LocationProps) {
   };
 
   const clear = () => {
-    setDraft("");
+    setDraft('');
     setValue(null);
     onChange?.(null);
     setOpen(false);
@@ -106,7 +112,7 @@ export default function Location({ onChange }: LocationProps) {
           aria-haspopup="dialog"
           ref={anchorRef}
         >
-          {value ?? "Location"}
+          {value ?? 'Location'}
         </button>
       </div>
 
@@ -119,12 +125,12 @@ export default function Location({ onChange }: LocationProps) {
             // Render outside the Aside so it can extend left; fixed so it anchors to viewport coords
             className="shadow rounded border bg-body p-3"
             style={{
-              position: "fixed",
-              zIndex: 1060,           // above dropdowns/headers
+              position: 'fixed',
+              zIndex: 1060, // above dropdowns/headers
               top: coords.top,
               left: coords.left,
               width: coords.width,
-              maxWidth: "100vw",
+              maxWidth: '100vw',
             }}
           >
             {/* Faded "X" close control in the corner */}
@@ -150,17 +156,25 @@ export default function Location({ onChange }: LocationProps) {
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") apply();   // commit
-                  if (e.key === "Escape") setOpen(false); // cancel/close
+                  if (e.key === 'Enter') apply(); // commit
+                  if (e.key === 'Escape') setOpen(false); // cancel/close
                 }}
               />
               <div className="d-flex justify-content-end gap-2">
                 {draft && (
-                  <button type="button" className="btn btn-outline-secondary btn-sm" onClick={clear}>
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary btn-sm"
+                    onClick={clear}
+                  >
                     Clear
                   </button>
                 )}
-                <button type="button" className="btn btn-primary btn-sm" onClick={apply}>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={apply}
+                >
                   Apply
                 </button>
               </div>

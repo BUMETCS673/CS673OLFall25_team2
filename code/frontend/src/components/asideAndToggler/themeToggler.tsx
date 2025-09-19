@@ -1,5 +1,6 @@
-import React from "react";
-import { useTheme } from "../../theme/ThemeContext";
+import { useTheme } from '../../theme/ThemeContext';
+import sunImage from '../../assets/sun.png';
+import moonImage from '../../assets/moon.jpg';
 
 /**
  * Theme toggle button for switching between light and dark mode.
@@ -9,12 +10,20 @@ export default function ThemeToggler() {
   const { theme, toggle } = useTheme();
 
   return (
-    <button
-      className="btn btn-outline-secondary w-100"
-      onClick={toggle}
-      aria-label="Toggle color theme"
-    >
-      {theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
-    </button>
+    <div className="w-100" onClick={toggle} aria-label="Toggle color theme">
+      {theme === 'light' ? (
+        <img
+          src={moonImage}
+          alt="Switch to dark mode"
+          style={{ width: '40px', height: '40px' }}
+        />
+      ) : (
+        <img
+          src={sunImage}
+          alt="Switch to light mode"
+          style={{ width: '40px', height: '40px' }}
+        />
+      )}
+    </div>
   );
 }
