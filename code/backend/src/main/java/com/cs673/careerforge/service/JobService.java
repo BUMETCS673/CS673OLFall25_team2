@@ -5,6 +5,7 @@ import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.domain.User;
 import com.cs673.careerforge.request.JobRequest;
 import com.cs673.careerforge.request.ListJobRequest;
+import com.cs673.careerforge.response.ListJobResponse;
 import com.cs673.careerforge.vo.JobVO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -91,7 +92,7 @@ public interface JobService {
      *
      * @return list of all jobs
      */
-    Page<JobVO> findAllJobs(ListJobRequest request);
+    ListJobResponse findAllJobs(ListJobRequest request);
 
     /**
      * Find all jobs with pagination.
