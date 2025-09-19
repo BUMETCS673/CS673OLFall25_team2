@@ -1,7 +1,7 @@
 package com.cs673.careerforge.aspect;
 
-import com.cs673.careerforge.entity.BaseResult;
-import com.cs673.careerforge.entity.ResultEnum;
+import com.cs673.careerforge.common.BaseResult;
+import com.cs673.careerforge.common.ResultEnum;
 import com.cs673.careerforge.exceptions.BizException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,7 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * Also marks a request attribute so ResponseBodyAdvice won't wrap again.
  */
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionAdvice {
 
     private static final String EX_FLAG = "EX_FROM_HANDLER";
 
