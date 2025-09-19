@@ -18,7 +18,7 @@ public class JobVO {
 
     private Long id;
 
-    private UserVO postedBy;
+    private Long postedBy;
 
     private String title;
 

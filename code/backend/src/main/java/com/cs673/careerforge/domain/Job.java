@@ -20,9 +20,8 @@ public class Job {
     private Long id;
     
     @NotNull(message = "Posted by user is required")
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "posted_by", nullable = false)
-    private User postedBy;
+    private Long postedBy;
     
     @NotBlank(message = "Job title is required")
     @Size(min = 1, max = 100, message = "Job title must be between 1 and 100 characters")
@@ -111,7 +110,7 @@ public class Job {
         this.updatedAt = LocalDateTime.now();
     }
     
-    public Job(User postedBy, String title, String description, String company, 
+    public Job(Long postedBy, String title, String description, String company,
                String location, EmploymentType employmentType) {
         this();
         this.postedBy = postedBy;
@@ -159,15 +158,15 @@ public class Job {
     public void setId(Long id) {
         this.id = id;
     }
-    
-    public User getPostedBy() {
+
+    public Long getPostedBy() {
         return postedBy;
     }
-    
-    public void setPostedBy(User postedBy) {
+
+    public void setPostedBy(Long postedBy) {
         this.postedBy = postedBy;
     }
-    
+
     public String getTitle() {
         return title;
     }
