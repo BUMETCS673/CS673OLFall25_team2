@@ -5,6 +5,7 @@ import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.domain.User;
 import com.cs673.careerforge.repository.JobRepository;
 import com.cs673.careerforge.service.JobService;
+import com.cs673.careerforge.vo.JobVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +26,12 @@ public class JobServiceImpl implements JobService {
     
     @Autowired
     private JobRepository jobRepository;
-    
+
+    @Override
+    public Job saveJob(JobVO job) {
+        return null;
+    }
+
     @Override
     public Job createJob(Job job) {
         validateJob(job);
