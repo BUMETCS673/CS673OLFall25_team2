@@ -27,7 +27,7 @@ class JobTest {
         employer.setUserType(UserType.EMPLOYER);
         
         job = new Job();
-        job.setPostedBy(employer);
+        job.setPostedBy(employer.getId());
         job.setTitle("Software Engineer");
         job.setDescription("We are looking for a software engineer...");
         job.setCompany("TechCorp");
@@ -157,7 +157,7 @@ class JobTest {
     @Test
     @DisplayName("Should set timestamps on creation")
     void shouldSetTimestampsOnCreation() {
-        Job newJob = new Job(employer, "New Job", "Description", 
+        Job newJob = new Job(employer.getId(), "New Job", "Description",
                            "Company", "Location", EmploymentType.PART_TIME);
         
         assertNotNull(newJob.getCreatedAt());

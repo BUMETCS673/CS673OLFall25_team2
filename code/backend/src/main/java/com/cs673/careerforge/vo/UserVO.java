@@ -1,7 +1,13 @@
 package com.cs673.careerforge.vo;
 
 import com.cs673.careerforge.common.UserType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -63,7 +69,7 @@ public class UserVO {
 
     private String badges;
 
-    private List<com.cs673.careerforge.domain.Job> postedJobs;
+    private List<JobVO> postedJobs;
 
     private List<ApplicationTrackingVO> applications;
 
