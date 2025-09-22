@@ -92,7 +92,7 @@ export default function Field({ onChange }: FieldProps) {
         {/* Button opens/closes dropdown */}
         <button
           type="button"
-          className="btn btn-outline-secondary w-100 text-truncate"
+          className="btn btn-outline-secondary w-100 text-truncate filter-button"
           onClick={() => {
             setDraft(value ?? '');
             setOpen((o) => !o);

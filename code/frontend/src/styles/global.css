@@ -20,10 +20,10 @@ body {
 
 /* Light Theme Variables (restored to original) */
 :root {
-  --bg: #ffffff;          /* Page main background */
-  --fg: #000000;          /* Main font */
-  --surface: #f8f9fa;     /* Card/section background (restored to light gray) */
-  --border: #dee2e6;      /* Border color */
+  --bg: #ffffff; /* Page main background */
+  --fg: #000000; /* Main font */
+  --surface: #f8f9fa; /* Card/section background (restored to light gray) */
+  --border: #dee2e6; /* Border color */
 
   /* Unified background for Header and Footer (restored to pure white) */
   --header-footer-bg: #ffffff;
@@ -32,21 +32,21 @@ body {
   --bs-body-bg: var(--bg);
   --bs-body-color: var(--fg);
   --bs-border-color: var(--border);
-  --bs-link-color: #0d6efd;
-  --bs-link-hover-color: #0a58ca;
+  --bs-link-color: #0000ff;
+  --bs-link-hover-color: #0066ff;
 
   /* Selected Card */
-  --selected-border: #ff6600;
-  --selected-bg: rgba(255, 102, 0, 0.1);
+  --selected-border: rgba(0, 0, 255);
+  --selected-bg: rgb(0, 0, 255);
   --selected-color: #000000;
 }
 
 /* Dark Theme Variables (keep the new color scheme) */
 :root[data-theme='dark'] {
-  --bg: #343541;          /* Page main background */
-  --fg: #ececf1;          /* Font color */
-  --surface: #282828;     /* Card/content/aside background */
-  --border: #565869;      /* Border color (slightly darker than surface) */
+  --bg: #343541; /* Page main background */
+  --fg: #ececf1; /* Font color */
+  --surface: #282828; /* Card/content/aside background */
+  --border: #565869; /* Border color (slightly darker than surface) */
 
   /* Header and Footer dark mode background */
   --header-footer-bg: #141414;
@@ -64,11 +64,11 @@ body {
   --selected-color: #ffffff;
 
   /* Override Bootstrap dropdown background and text color */
-  --bs-dropdown-bg: #282828;         /* Dropdown background */
-  --bs-dropdown-color: #7c7070;      /* Dropdown text color */
+  --bs-dropdown-bg: #282828; /* Dropdown background */
+  --bs-dropdown-color: #7c7070; /* Dropdown text color */
   --bs-dropdown-link-color: #ffffff; /* Dropdown option text */
   --bs-dropdown-link-hover-bg: #3a3a3a; /* Hover background */
-  --bs-border-color: #444;           /* Border color */
+  --bs-border-color: #444; /* Border color */
 
   /* Override form input colors */
   --bs-form-control-bg: #212529;
@@ -82,19 +82,12 @@ body {
 }
 
 :root {
-  --header-border-color: red;
+  --header-border-color: rgb(0, 0, 255);
 }
 
 /* Updated for dark mode */
 :root[data-theme='dark'] {
   --header-border-color: var(--border); /* Uses theme gray (#565869) */
-}
-
-.header-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid var(--header-border-color) !important;
 }
 
 /* Dark mode: make Filter buttons border more visible */
@@ -185,32 +178,24 @@ header,
 header.bg-body,
 footer,
 footer.bg-body {
-    background-color: var(--header-footer-bg) !important;
-    color: var(--fg) !important;
+  background-color: var(--header-footer-bg) !important;
+  color: var(--fg) !important;
 }
 
 header,
 header.bg-body {
-    border-bottom: 1px solid var(--bs-border-color) !important;
-    border-top: none; /* Ensure no top border for header */
+  border-bottom: 1px solid var(--bs-border-color) !important;
+  border-top: none; /* Ensure no top border for header */
 }
 
 footer,
 footer.bg-body {
-    border-top: 1px solid var(--bs-border-color) !important;
-    border-bottom: none; /* Ensure no bottom border for footer */
-}
-
-/* Global border color override */
-*,
-*::before,
-*::after {
-  border-color: var(--bs-border-color) !important;
+  border-top: 1px solid var(--bs-border-color) !important;
+  border-bottom: none; /* Ensure no bottom border for footer */
 }
 
 /* Selected list-group-item */
 .list-group-item.active {
-  border: 2px solid var(--selected-border) !important;
   background-color: var(--selected-bg) !important;
   color: var(--selected-color) !important;
   border-radius: 0.5rem;
@@ -279,4 +264,10 @@ footer.bg-body {
 .dropdown-panel {
   scrollbar-width: thin;
   scrollbar-color: #555 var(--surface);
+}
+
+.filter-button:hover {
+  background-color: rgba(0, 0, 255) !important;
+  color: rgb(255, 255, 255);
+  transition: all 0.2s ease;
 }

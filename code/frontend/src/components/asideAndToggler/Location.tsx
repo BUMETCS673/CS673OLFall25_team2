@@ -18,22 +18,21 @@ export default function Location({ onChange }: LocationProps) {
   const anchorRef = useRef<HTMLButtonElement>(null); // anchor for positioning
   const overlayRef = useRef<HTMLDivElement>(null);
 
-    // Track computed position for the floating panel
+  // Track computed position for the floating panel
   const [coords, setCoords] = useState({
     top: 0,
     left: 0,
     width: 0,
   });
 
-
-    // Close when clicking outside the component (works for both the button container and the floating panel)
+  // Close when clicking outside the component (works for both the button container and the floating panel)
   useEffect(() => {
     const onDoc = (e: MouseEvent) => {
       const t = e.target as Node;
       if (
-        containerRef.current && 
-        !containerRef.current.contains(t) && 
-        overlayRef.current && 
+        containerRef.current &&
+        !containerRef.current.contains(t) &&
+        overlayRef.current &&
         !overlayRef.current.contains(t)
       ) {
         setOpen(false);
@@ -43,7 +42,7 @@ export default function Location({ onChange }: LocationProps) {
     return () => document.removeEventListener('mousedown', onDoc);
   }, []);
 
-    // Compute and update panel position relative to the button
+  // Compute and update panel position relative to the button
   useEffect(() => {
     if (!open) return;
 
@@ -54,7 +53,7 @@ export default function Location({ onChange }: LocationProps) {
 
       // Desired max width; still responsive on very small screens
       const maxWidth = Math.min(520, window.innerWidth - 32); // keep 16px margins
-            // Align the panel's RIGHT edge to the button's right so it extends LEFT
+      // Align the panel's RIGHT edge to the button's right so it extends LEFT
       const left = Math.min(
         Math.max(rect.right - maxWidth, 16), // not past left gutter
         window.innerWidth - maxWidth - 16 // not past right gutter
@@ -103,7 +102,7 @@ export default function Location({ onChange }: LocationProps) {
       <div className="position-relative" ref={containerRef}>
         <button
           type="button"
-          className="btn btn-outline-secondary w-100 text-truncate"
+          className="btn btn-outline-secondary w-100 text-truncate filter-button"
           onClick={toggleOpen}
           aria-expanded={open}
           aria-haspopup="dialog"
@@ -118,16 +117,23 @@ export default function Location({ onChange }: LocationProps) {
           <div
             ref={overlayRef}
             className="shadow rounded border dropdown-panel p-3"
-            style={{ position: 'fixed', zIndex: 1060, top: coords.top, left: coords.left, width: coords.width, maxWidth: '100vw' }}
+            style={{
+              position: 'fixed',
+              zIndex: 1060,
+              top: coords.top,
+              left: coords.left,
+              width: coords.width,
+              maxWidth: '100vw',
+            }}
             role="dialog"
             aria-label="Location input"
           >
-            <button 
+            <button
               type="button"
-              className="btn-close position-absolute top-0 end-0 m-2" 
-              aria-label="Close" 
-              onClick={() => setOpen(false)} 
-              />
+              className="btn-close position-absolute top-0 end-0 m-2"
+              aria-label="Close"
+              onClick={() => setOpen(false)}
+            />
 
             <label htmlFor="locationInput" className="form-label small mb-1">
               Location
@@ -143,24 +149,24 @@ export default function Location({ onChange }: LocationProps) {
                 placeholder="City, state, or country"
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
-                onKeyDown={(e) => { 
+                onKeyDown={(e) => {
                   if (e.key === 'Enter') apply(); // commit
                   if (e.key === 'Escape') setOpen(false); // cancel/close
                 }}
               />
               <div className="d-flex justify-content-end gap-2">
-                {draft && 
+                {draft && (
                   <button
-                    type="button" 
-                    className="btn btn-outline-secondary btn-sm" 
+                    type="button"
+                    className="btn btn-outline-secondary btn-sm"
                     onClick={clear}
                   >
                     Clear
                   </button>
-                }
+                )}
                 <button
-                  type="button" 
-                  className="btn btn-primary btn-sm" 
+                  type="button"
+                  className="btn btn-primary btn-sm"
                   onClick={apply}
                 >
                   Apply
