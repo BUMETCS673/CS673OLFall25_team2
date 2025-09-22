@@ -36,7 +36,13 @@ export default function JobCard({
   );
 
   return (
-    <div className="card shadow-sm">
+    <div
+      className="card job-card shadow-sm"
+      style={{
+        background: 'var(--surface-bg)',
+        border: '1px solid var(--surface-border)',
+      }}
+    >
       <div className="card-body">
         {/* Header: logo + title/company */}
         <div className="d-flex align-items-start gap-3">
@@ -101,7 +107,7 @@ export default function JobCard({
           <div className="mt-3">
             {summary && <p className="fst-italic">{summary}</p>}
 
-            <div className="row row-cols-1 row-cols-md-2 g-2 small mb-3">
+            <div className="row row-cols-1 row-cols-md-2 g-2 small mb-3">              
               {/* {
                 <p className="card-text text-muted mb-2">
                   {mapHref ? (

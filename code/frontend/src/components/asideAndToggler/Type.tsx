@@ -36,14 +36,10 @@ export default function Type({ onChange }: TypeProps) {
   }, []);
 
   // Track computed position for the floating panel (align right edge to button; extend left)
-  const [coords, setCoords] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  }>({
-    top: 0,
-    left: 0,
-    width: 0,
+  const [coords, setCoords] = useState({ 
+    top: 0, 
+    left: 0, 
+    width: 0 
   });
 
   useEffect(() => {
@@ -54,10 +50,10 @@ export default function Type({ onChange }: TypeProps) {
       if (!el) return;
       const rect = el.getBoundingClientRect();
 
-      // ~half the previous length (was 520px). Use 260px max, keep 16px gutters.
+            // ~half the previous length (was 520px). Use 260px max, keep 16px gutters.
       const maxWidth = Math.min(260, window.innerWidth - 32);
       const left = Math.min(
-        Math.max(rect.right - maxWidth, 16),
+        Math.max(rect.right - maxWidth, 16), 
         window.innerWidth - maxWidth - 16
       );
       const top = Math.min(rect.bottom + 8, window.innerHeight - 16);
@@ -83,8 +79,8 @@ export default function Type({ onChange }: TypeProps) {
   return (
     <>
       <div className="position-relative" ref={ref}>
-        {/* Note: using button+dropdown here instead of <select>
-            so styling is consistent with Field/Location */}
+          {/* Note: using button+dropdown here instead of <select>
+              so styling is consistent with Field/Location */}
         <button
           type="button"
           className="btn btn-outline-secondary w-100 text-truncate"
@@ -102,7 +98,7 @@ export default function Type({ onChange }: TypeProps) {
         createPortal(
           <div
             ref={overlayRef}
-            className="shadow rounded border bg-body p-3"
+            className="shadow rounded border dropdown-panel p-3"
             style={{
               position: 'fixed',
               zIndex: 1060,

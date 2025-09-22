@@ -76,16 +76,24 @@ const JobsViewList = () => {
       <div className="d-flex w-100 flex-column flex-lg-row flex-grow-1 min-h-0">
         {/* Left: list (30% on lg+, full width on mobile) */}
         <div
-          className="jobs-list border-0 bg-body flex-shrink-0 overflow-auto p-0"
+          className="jobs-list flex-shrink-0 overflow-auto p-0"
           style={{
             flexBasis: '100%', // full width when stacked
             flex: '0 0 30%', // ~30% on lg+ row layout
             maxHeight: PANEL_MAX_HEIGHT,
             minHeight: 0,
+            background: 'var(--surface-bg)',
+            borderRight: '1px solid var(--surface-border-color)',
           }}
         >
           {/* Sticky header */}
-          <div className="position-sticky top-0 bg-body p-3 border-bottom">
+          <div
+            className="position-sticky top-0 p-3 border-bottom"
+            style={{
+              background: 'var(--surface-bg)',
+              borderBottom: '1px solid var(--surface-border-color)',
+            }}
+          >
             <h2 className="m-0">Job Listings</h2>
           </div>
 
@@ -124,6 +132,10 @@ const JobsViewList = () => {
                       isActive ? 'active' : ''
                     }`}
                     aria-selected={isActive}
+                    style={{
+                      background: 'var(--surface-bg)',
+                      borderBottom: '1px solid var(--surface-border-color)',
+                    }}
                   >
                     <JobCard job={job} />
                   </button>
@@ -138,12 +150,14 @@ const JobsViewList = () => {
 
         {/* Right: details (70% on lg+, hidden on mobile) */}
         <div
-          className="job-details d-none d-lg-block border-0 p-3 bg-body flex-grow-1 overflow-auto"
+          className="job-details d-none d-lg-block flex-grow-1 overflow-auto p-3"
           style={{
             flexBasis: '100%',
             flex: '1 1 70%',
             maxHeight: PANEL_MAX_HEIGHT,
             minHeight: 0,
+            background: 'var(--surface-bg)',
+            borderLeft: '1px solid var(--surface-border-color)',
           }}
         >
           {selectedJob ? (
@@ -174,10 +188,22 @@ const JobsViewList = () => {
         >
           <div className="d-flex align-items-center justify-content-center h-100 p-3">
             <div
-              className="bg-white shadow rounded w-100"
-              style={{ maxWidth: 640, maxHeight: '90vh', overflow: 'auto' }}
+              className="shadow rounded w-100"
+              style={{
+                maxWidth: 640,
+                maxHeight: '90vh',
+                overflow: 'auto',
+                background: 'var(--surface-bg)',
+                border: '1px solid var(--surface-border-color)',
+              }}
             >
-              <div className="d-flex align-items-center justify-content-between p-2 border-bottom sticky-top bg-white">
+              <div
+                className="d-flex align-items-center justify-content-between p-2 border-bottom sticky-top"
+                style={{
+                  background: 'var(--surface-bg)',
+                  borderBottom: '1px solid var(--surface-border-color)',
+                }}
+              >
                 <strong>Job Details</strong>
                 <button
                   type="button"

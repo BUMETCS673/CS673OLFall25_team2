@@ -2,6 +2,7 @@
   width: 100%;
   box-sizing: border-box;
   padding: 1rem 2rem;
+  background-color: var(--bg);
 }
 
 .header-inner {

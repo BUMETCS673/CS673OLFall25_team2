@@ -3,4 +3,6 @@
   padding: 1rem;
   color: #6c757d;
   margin-top: 0;
+  /* Use the correct variable for the header/footer background */
+  background-color: var(--header-footer-bg);
 }

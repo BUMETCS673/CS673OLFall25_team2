@@ -13,27 +13,152 @@ body {
   background-color: #f8f9fa;
 }
 
+/* Center root for debugging only */
 #root {
   text-align: center;
 }
 
-/* Light and Dark Theme Variables */
+/* Light Theme Variables (restored to original) */
 :root {
-  --bg: #ffffff;
-  --fg: #000000;
+  --bg: #ffffff;          /* Page main background */
+  --fg: #000000;          /* Main font */
+  --surface: #f8f9fa;     /* Card/section background (restored to light gray) */
+  --border: #dee2e6;      /* Border color */
 
-  /* Bridge to Bootstrap so bg-body/text follow your theme */
+  /* Unified background for Header and Footer (restored to pure white) */
+  --header-footer-bg: #ffffff;
+
+  /* Bootstrap adaptation */
   --bs-body-bg: var(--bg);
   --bs-body-color: var(--fg);
+  --bs-border-color: var(--border);
+  --bs-link-color: #0d6efd;
+  --bs-link-hover-color: #0a58ca;
+
+  /* Selected Card */
+  --selected-border: #ff6600;
+  --selected-bg: rgba(255, 102, 0, 0.1);
+  --selected-color: #000000;
+}
+
+/* Dark Theme Variables (keep the new color scheme) */
+:root[data-theme='dark'] {
+  --bg: #343541;          /* Page main background */
+  --fg: #ececf1;          /* Font color */
+  --surface: #282828;     /* Card/content/aside background */
+  --border: #565869;      /* Border color (slightly darker than surface) */
+
+  /* Header and Footer dark mode background */
+  --header-footer-bg: #141414;
+
+  /* Bootstrap adaptation */
+  --bs-body-bg: var(--bg);
+  --bs-body-color: var(--fg);
+  --bs-border-color: var(--border);
+  --bs-link-color: #10a37f;
+  --bs-link-hover-color: #1ec997;
+
+  /* Selected Card */
+  --selected-border: #b1b1b1;
+  --selected-bg: rgba(30, 118, 205, 0.1);
+  --selected-color: #ffffff;
+
+  /* Override Bootstrap dropdown background and text color */
+  --bs-dropdown-bg: #282828;         /* Dropdown background */
+  --bs-dropdown-color: #7c7070;      /* Dropdown text color */
+  --bs-dropdown-link-color: #ffffff; /* Dropdown option text */
+  --bs-dropdown-link-hover-bg: #3a3a3a; /* Hover background */
+  --bs-border-color: #444;           /* Border color */
+
+  /* Override form input colors */
+  --bs-form-control-bg: #212529;
+  --bs-form-control-color: var(--fg);
+}
+
+/* Placeholder color in dark mode */
+:root[data-theme='dark'] input::placeholder,
+:root[data-theme='dark'] textarea::placeholder {
+  color: rgba(255, 255, 255, 0.6); /* Semi-transparent white */
+}
+
+:root {
+  --header-border-color: red;
+}
+
+/* Updated for dark mode */
+:root[data-theme='dark'] {
+  --header-border-color: var(--border); /* Uses theme gray (#565869) */
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--header-border-color) !important;
+}
+
+/* Dark mode: make Filter buttons border more visible */
+:root[data-theme='dark'] .btn {
+  border: 1.5px solid var(--fg) !important;
+  color: var(--fg) !important;
+}
+
+/* Highlight border on hover */
+:root[data-theme='dark'] .btn:hover {
+  border-color: #ffffff !important;
+}
+
+:root {
+  --surface-bg: #ffffff;
+  --surface-border: #dee2e6;
+  --surface-border-color: var(--surface-border);
 }
 
 :root[data-theme='dark'] {
-  --bg: #0f1115;
-  --fg: #ffffff;
+  --surface-bg: #1e1e1e;
+  --surface-border: #444;
+  --surface-border-color: var(--surface-border);
+}
 
-  /* Keep Bootstrap in sync in dark mode */
-  --bs-body-bg: var(--bg);
-  --bs-body-color: var(--fg);
+/* Dark mode only */
+:root[data-theme='dark'] {
+  /* Scrollbar width */
+  --scrollbar-width: 12px;
+}
+
+/* Scrollbars inside JobsViewList and JobCard */
+:root[data-theme='dark'] .jobs-list,
+:root[data-theme='dark'] .job-details,
+:root[data-theme='dark'] .card.job-card {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #555 #1e1e1e; /* Firefox: thumb / track color */
+}
+
+/* Webkit browsers */
+:root[data-theme='dark'] .jobs-list::-webkit-scrollbar,
+:root[data-theme='dark'] .job-details::-webkit-scrollbar,
+:root[data-theme='dark'] .card.job-card::-webkit-scrollbar {
+  width: var(--scrollbar-width);
+}
+
+:root[data-theme='dark'] .jobs-list::-webkit-scrollbar-track,
+:root[data-theme='dark'] .job-details::-webkit-scrollbar-track,
+:root[data-theme='dark'] .card.job-card::-webkit-scrollbar-track {
+  background: #1e1e1e;
+}
+
+:root[data-theme='dark'] .jobs-list::-webkit-scrollbar-thumb,
+:root[data-theme='dark'] .job-details::-webkit-scrollbar-thumb,
+:root[data-theme='dark'] .card.job-card::-webkit-scrollbar-thumb {
+  background-color: #555;
+  border-radius: 6px;
+  border: 3px solid #1e1e1e;
+}
+
+:root[data-theme='dark'] .jobs-list::-webkit-scrollbar-thumb:hover,
+:root[data-theme='dark'] .job-details::-webkit-scrollbar-thumb:hover,
+:root[data-theme='dark'] .card.job-card::-webkit-scrollbar-thumb:hover {
+  background-color: #777;
 }
 
 /* Apply theme */
@@ -42,6 +167,116 @@ body {
   color: var(--fg);
 }
 
+/* Content area uses surface color */
+aside.bg-body,
+main.bg-body,
+section.bg-body,
+.joblist-container {
+  background-color: var(--surface) !important;
+  color: var(--fg) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+/*
+  Set unified background and border for header and footer.
+  Use tag + .bg-body to ensure highest priority
+*/
+header,
+header.bg-body,
+footer,
+footer.bg-body {
+    background-color: var(--header-footer-bg) !important;
+    color: var(--fg) !important;
+}
+
+header,
+header.bg-body {
+    border-bottom: 1px solid var(--bs-border-color) !important;
+    border-top: none; /* Ensure no top border for header */
+}
+
+footer,
+footer.bg-body {
+    border-top: 1px solid var(--bs-border-color) !important;
+    border-bottom: none; /* Ensure no bottom border for footer */
+}
+
+/* Global border color override */
+*,
+*::before,
+*::after {
+  border-color: var(--bs-border-color) !important;
+}
+
+/* Selected list-group-item */
+.list-group-item.active {
+  border: 2px solid var(--selected-border) !important;
+  background-color: var(--selected-bg) !important;
+  color: var(--selected-color) !important;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
 .min-h-0 {
   min-height: 0 !important;
+}
+
+/* New rule for welcome text in dark mode */
+:root[data-theme='dark'] .welcome-text {
+  color: var(--fg);
+}
+
+/* Universal floating panel: Light/Dark switch automatically */
+.dropdown-panel {
+  background-color: var(--surface) !important; /* light: white, dark: dark */
+  color: var(--fg) !important;
+  border-color: var(--surface-border-color) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-height: 80vh;
+  overflow: auto;
+  z-index: 1060;
+}
+
+/* Inputs inside dropdown */
+.dropdown-panel input.form-control {
+  background-color: var(--bs-form-control-bg) !important;
+  color: var(--bs-form-control-color) !important;
+  border-color: var(--bs-border-color) !important;
+}
+
+/* List items inside dropdown */
+.dropdown-panel .list-group-item {
+  background-color: var(--surface) !important;
+  color: var(--fg) !important;
+  border-color: var(--surface-border-color) !important;
+}
+
+/* List item hover */
+.dropdown-panel .list-group-item:hover {
+  background-color: rgba(255, 255, 255, 0.05); /* Dark mode highlight */
+}
+
+/* Scrollbar */
+.dropdown-panel::-webkit-scrollbar {
+  width: 12px;
+}
+
+.dropdown-panel::-webkit-scrollbar-track {
+  background: var(--surface) !important;
+}
+
+.dropdown-panel::-webkit-scrollbar-thumb {
+  background-color: #555 !important;
+  border-radius: 6px;
+  border: 3px solid var(--surface) !important;
+}
+
+.dropdown-panel::-webkit-scrollbar-thumb:hover {
+  background-color: #777 !important;
+}
+
+/* Firefox scrollbar */
+.dropdown-panel {
+  scrollbar-width: thin;
+  scrollbar-color: #555 var(--surface);
 }

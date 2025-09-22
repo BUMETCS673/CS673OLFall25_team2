@@ -110,7 +110,7 @@ export default function Field({ onChange }: FieldProps) {
         createPortal(
           <div
             ref={overlayRef}
-            className="shadow rounded border bg-body p-3"
+            className="shadow rounded border dropdown-panel p-3"
             style={{
               position: 'fixed',
               zIndex: 1060,
