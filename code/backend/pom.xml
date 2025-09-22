@@ -16,20 +16,8 @@
          If you prefer, set this to 21 to match your container JDK. -->
     <java.version>17</java.version>
   </properties>
-
+  <dependencyManagement>
   <dependencies>
-    <!-- Database Dependencies -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <version>9.4.0</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Web / Security / JPA -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -111,7 +99,8 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
+  </dependencyManagement>
+  
   <build>
     <plugins>
       <plugin>
