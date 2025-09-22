@@ -36,11 +36,7 @@ export default function Type({ onChange }: TypeProps) {
   }, []);
 
   // Track computed position for the floating panel (align right edge to button; extend left)
-  const [coords, setCoords] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  }>({
+  const [coords, setCoords] = useState({
     top: 0,
     left: 0,
     width: 0,
@@ -84,10 +80,10 @@ export default function Type({ onChange }: TypeProps) {
     <>
       <div className="position-relative" ref={ref}>
         {/* Note: using button+dropdown here instead of <select>
-            so styling is consistent with Field/Location */}
+              so styling is consistent with Field/Location */}
         <button
           type="button"
-          className="btn btn-outline-secondary w-100 text-truncate"
+          className="btn btn-outline-secondary w-100 text-truncate filter-button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-haspopup="listbox"
@@ -102,7 +98,7 @@ export default function Type({ onChange }: TypeProps) {
         createPortal(
           <div
             ref={overlayRef}
-            className="shadow rounded border bg-body p-3"
+            className="shadow rounded border dropdown-panel p-3"
             style={{
               position: 'fixed',
               zIndex: 1060,

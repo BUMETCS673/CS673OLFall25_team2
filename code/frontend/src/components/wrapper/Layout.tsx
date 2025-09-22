@@ -28,18 +28,22 @@ export default function Layout({
         {/* Grid handles gutters so we don't overflow */}
         <div className="row g-3 flex-grow-1 min-h-0">
           {/* Aside: full width on mobile, fixed width on lg+ */}
-          <aside
-            role="complementary"
-            className="col-12 order-0 order-lg-2 col-lg-auto bg-body overflow-auto"
-            style={{
-              // fixed column on lg+, responsive clamp so it never pushes main off-screen
-              width: 'clamp(260px, 22vw, 320px)',
-              minHeight: 0,
-            }}
-          >
-            <div className="fw-semibold mb-3">FILTERS</div>
-            {aside}
-          </aside>
+
+          {/* Only render the entire aside area if the `aside` prop exists */}
+          {aside && (
+            <aside
+              role="complementary"
+              className="col-12 order-0 order-lg-2 col-lg-auto bg-body overflow-auto p-3"
+              style={{
+                // fixed column on lg+, responsive clamp so it never pushes main off-screen
+                width: 'clamp(260px, 22vw, 320px)',
+                minHeight: 0,
+              }}
+            >
+              <div className="fw-semibold mb-3">FILTERS</div>
+              {aside}
+            </aside>
+          )}
 
           {/* Main: takes the remaining width */}
           <section

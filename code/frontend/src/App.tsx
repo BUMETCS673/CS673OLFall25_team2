@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LoginForm from './components/loginAndRegistration/LoginForm';
-import RegisterForm from './components/loginAndRegistration/RegisterForm';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import MyJobs from './pages/MyJobs';
 import Content from './pages/Content';
 import './styles/global.css';
 
@@ -8,10 +9,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginForm />} />
-        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/content" element={<Content />} />
-        <Route path="/myJobs" element={<div>My Jobs Page</div>} />
+        <Route path="/myJobs" element={<MyJobs />} />
       </Routes>
     </BrowserRouter>
   );

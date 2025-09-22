@@ -125,7 +125,8 @@ const RegisterForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) =
           {/* Small footer text with link to Login page */}
           <p className="text-center mt-3 mb-0 small">
             Already have an account?{" "}
-            <Link to="/login">Login</Link>
+            {/*modified the website from /login to /*/}
+            <Link to="/">Login</Link>
           </p>
         </div>
       </div>
