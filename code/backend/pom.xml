@@ -4,17 +4,18 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.5</version>
+    <relativePath/>
+  </parent>
+
   <groupId>com.cs673</groupId>
   <artifactId>CareerForge</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>CareerForge</name>
   <description>Springboot project for CareerForge application</description>
-
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.3.4</version> <!-- or the version your project is using -->
-    <relativePath/> <!-- lookup parent from the repository -->
   </parent>
 
   <properties>
@@ -24,12 +25,6 @@
   </properties>
 
   <dependencies>
-    <!-- Database Dependencies -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>runtime</scope>
-    </dependency>
     <!-- Web / Security / JPA -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -78,13 +73,10 @@
       <version>0.11.5</version>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
+
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-jackson</artifactId>
       <version>0.11.5</version>
-      <scope>runtime</scope>
-    </dependency>
-
 
     <!-- Flyway migrations -->
     <dependency>
