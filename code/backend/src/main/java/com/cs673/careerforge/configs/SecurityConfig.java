@@ -1,3 +1,4 @@
+// src/main/java/com/cs673/careerforge/configs/SecurityConfig.java
 package com.cs673.careerforge.configs;
 
 import org.springframework.context.annotation.Bean;
@@ -14,19 +15,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            // allow H2 console to render in a frame
-            .headers(h -> h.frameOptions(f -> f.sameOrigin()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/actuator/health",
-                    "/h2-console/**",
-                    "/public/**"
-                ).permitAll()
-                .anyRequest().authenticated()
-            )
-            .httpBasic(Customizer.withDefaults());
-
+                .csrf(c -> c.disable())
+                .headers(h -> h.frameOptions(f -> f.sameOrigin()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/public/**", "/auth/login", "/h2-console/**", "/actuator/health", "/error").permitAll()
+                        // TODO: once JWT lands, switch this to `.anyRequest().authenticated()`
+                        .anyRequest().permitAll()
+                )
+                .httpBasic(Customizer.withDefaults()); // harmless; useful for quick tests
         return http.build();
     }
 

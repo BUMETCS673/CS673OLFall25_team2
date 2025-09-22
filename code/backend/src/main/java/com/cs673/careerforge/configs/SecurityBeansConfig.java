@@ -1,14 +1,17 @@
+// src/main/java/com/cs673/careerforge/configs/SecurityBeansConfig.java
 package com.cs673.careerforge.configs;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.cs673.careerforge.entity.User;
+import com.cs673.careerforge.entity.UserType;
+import com.cs673.careerforge.repository.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.List;
 
 @Configuration
 public class SecurityBeansConfig {
@@ -18,18 +21,19 @@ public class SecurityBeansConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public UserDetailsService users(
-            @Value("${spring.security.user.name}") String username,
-            @Value("${spring.security.user.password}") String password,
-            @Value("${spring.security.user.roles:ADMIN}") String rolesCsv) {
-
-        String[] roles = rolesCsv.split("\\s*,\\s*");
-        UserDetails user = User.withUsername(username)
-                .password(passwordEncoder().encode(password))
-                .roles(roles)
-                .build();
-
-        return new InMemoryUserDetailsManager(user);
+    @Bean  // use DB users for authentication
+    public UserDetailsService userDetailsService(UserRepository repo) {
+        return username -> {
+            User u = repo.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+            String role = (u.getUserType() == UserType.EMPLOYER) ? "ROLE_EMPLOYER" : "ROLE_EMPLOYEE";
+            boolean enabled = Boolean.TRUE.equals(u.getIsActive());
+            return new org.springframework.security.core.userdetails.User(
+                    u.getUsername(),
+                    u.getPassword(), // already BCrypt-encoded at registration
+                    enabled, true, true, true,
+                    List.of(new SimpleGrantedAuthority(role), new SimpleGrantedAuthority("ROLE_USER"))
+            );
+        };
     }
 }
