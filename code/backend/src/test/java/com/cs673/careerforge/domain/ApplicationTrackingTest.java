@@ -34,7 +34,7 @@ class ApplicationTrackingTest {
         job = new Job();
         job.setId(1L);
         job.setTitle("Software Engineer");
-        job.setPostedBy(employer);
+        job.setPostedBy(employer.getId());
         
         application = new ApplicationTracking();
         application.setApplicant(applicant);
