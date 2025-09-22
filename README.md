@@ -94,6 +94,17 @@ server/               # Java backend (to be added)
 This project uses job data via the **Rise Jobs API**: [https://pitchwall.co/product/rise-jobs-api](https://pitchwall.co/product/rise-jobs-api).
 Please review and respect the provider’s terms of service and attribution guidelines.
 
+## Security
+### JWT Secret Setup
+- **Development:** No setup required!  
+  The app auto-generates a secure secret on first run and saves it to `~/.jwt-secret`.
+
+- **Production:** You must provide a real secret via
+    - Environment variable: `APP_JWT_SECRET`, or
+    - Spring property: `app.jwt.secret`
+
+If no secret is provided in production, the app will fail to start.
+
 ## License
 
 For educational use as part of BU CS673 course project.
