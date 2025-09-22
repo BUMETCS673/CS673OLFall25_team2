@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react';
 import JobCard from './JobCard';
 import type { Job, JobsApiEnvelope } from '../../types/job';
 
-const PANEL_MAX_HEIGHT = '75vh'; // adjust if you like
+const PANEL_MAX_HEIGHT = '100vh'; // adjust if you like
 const LG_QUERY = '(min-width: 992px)'; // Bootstrap "lg"
 
 const JobsViewList = () => {
@@ -72,11 +72,8 @@ const JobsViewList = () => {
   const handleCloseMobile = useCallback(() => setSelectedJobId(null), []);
 
   return (
-    <div className="container-fluid w-100">
-      <div
-        className="d-flex w-100 gap-3 flex-column flex-lg-row"
-        style={{ minHeight: 0 }}
-      >
+    <div className="container-fluid w-100 d-flex flex-column flex-grow-1 min-h-0">
+      <div className="d-flex w-100 flex-column flex-lg-row flex-grow-1 min-h-0">
         {/* Left: list (30% on lg+, full width on mobile) */}
         <div
           className="jobs-list border-0 bg-body flex-shrink-0 overflow-auto p-0"

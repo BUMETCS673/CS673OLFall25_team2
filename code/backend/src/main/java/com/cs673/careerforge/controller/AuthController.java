@@ -1,48 +1,43 @@
-// src/main/java/com/cs673/careerforge/web/AuthController.java
-package com.cs673.careerforge.web;
+package com.cs673.careerforge.model;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.*;
+import com.cs673.careerforge.model.AuthRequest;
+import com.cs673.careerforge.model.AuthResponse;
+import com.cs673.careerforge.security.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 @RestController
-@RequestMapping("/auth")
 public class AuthController {
 
-    private final AuthenticationManager authManager;
-    private final UserDetailsService users;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    public AuthController(AuthenticationManager authManager, UserDetailsService users) {
-        this.authManager = authManager;
-        this.users = users;
-    }
+    @Autowired
+    private JwtUtil jwtUtil;
 
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest req) {
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @PostMapping("/authenticate")
+    public AuthResponse createAuthToken(@RequestBody AuthRequest authRequest) throws Exception {
         try {
-            authManager.authenticate(new UsernamePasswordAuthenticationToken(req.username(), req.password()));
-            UserDetails user = users.loadUserByUsername(req.username());
-
-            // TODAY: return a simple OK + user info
-            // LATER (with JWT): generate token and return it here.
-            return ResponseEntity.ok(Map.of(
-                    "status", "OK",
-                    "username", user.getUsername(),
-                    "roles", user.getAuthorities().stream().map(a -> a.getAuthority()).toArray()
-            ));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
+            );
+            //For debugging below
+            //System.out.println(">>> /authenticate called with: " + authRequest.getUsername());
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Map.of("status", "UNAUTHORIZED", "message", "Invalid username or password"));
-        } catch (DisabledException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("status", "FORBIDDEN", "message", "User is disabled"));
+            throw new Exception("Incorrect username or password", e);
         }
-    }
 
-    public record LoginRequest(String username, String password) {}
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+        final String jwt = jwtUtil.generateToken(userDetails);
+
+        return new AuthResponse(jwt);
+    }
 }
