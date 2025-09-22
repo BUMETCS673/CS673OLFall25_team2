@@ -16,7 +16,6 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>CareerForge</name>
   <description>Springboot project for CareerForge application</description>
-  </parent>
 
   <properties>
     <!-- You’re running on Java 21 in Docker; compiling for 17 is fine.
@@ -55,6 +54,13 @@
       <artifactId>spring-boot-starter-mail</artifactId>
     </dependency>
 
+    <!-- Databases -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
     <!-- Use the modern MySQL driver artifact; let Boot manage the version -->
     <dependency>
       <groupId>com.mysql</groupId>
@@ -73,11 +79,11 @@
       <version>0.11.5</version>
       <scope>runtime</scope>
     </dependency>
-
+    <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-jackson</artifactId>
       <version>0.11.5</version>
-
+    </dependency>
     <!-- Flyway migrations -->
     <dependency>
       <groupId>org.flywaydb</groupId>
@@ -113,6 +119,11 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>mysql</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
