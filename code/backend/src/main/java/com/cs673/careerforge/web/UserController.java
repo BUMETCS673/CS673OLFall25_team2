@@ -1,13 +1,12 @@
 package com.cs673.careerforge.web;
 
-import com.cs673.careerforge.entity.User;
-import com.cs673.careerforge.exception.ConflictException;
+import com.cs673.careerforge.domain.User;
+import com.cs673.careerforge.exceptions.ConflictException;
 import com.cs673.careerforge.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;

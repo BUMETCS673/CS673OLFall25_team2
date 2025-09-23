@@ -1,4 +1,4 @@
-package com.cs673.careerforge.exception;
+package com.cs673.careerforge.exceptions;
 
 import java.util.List;
 
