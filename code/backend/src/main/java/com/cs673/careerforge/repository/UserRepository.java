@@ -1,7 +1,7 @@
 package com.cs673.careerforge.repository;
 
-import com.cs673.careerforge.entity.User;
-import com.cs673.careerforge.entity.UserType;
+import com.cs673.careerforge.domain.User;
+import com.cs673.careerforge.common.UserType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
