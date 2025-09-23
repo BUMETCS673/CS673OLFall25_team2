@@ -65,6 +65,23 @@ npm run dev
 
 > Backend and database setup instructions will be added when the Java service and schema are initialized. An `.env.example` will be included for DB credentials and any API keys.
 
+## Database connection Setup
+
+### Connecting remote database
+
+To connect to remote database, you will need to download access key `EC2 Access.pem` (ask Gopi for the file).
+
+1. Run the command `ssh -i "address_to_pem_file" -N -L 13306:careerforgedb.ckt4mmg2etgw.us-east-1.rds.amazonaws.com:3306 ubuntu@54.227.173.227`. Or you can run the script `aws_rds_connection.ps1` under `scripts` if you are using Windows. By running this command, you should put your pem file under `scripts` folder.
+2. Now you are all set.
+
+### Connecting local database
+
+Modify `application.properties`. **DO NOT** commit them. Only use these settings on your computer.
+
+1. Check the configuration in `spring.datasource.url`, current port is `13306`, and current database is `careerforge`.
+2. Check the username `spring.datasource.username` and password `spring.datasource.password`.
+3. Create a database on your local Mysql named `careerforge`. Run the initialization script `code/backend/src/main/resources/db/initialization.sql` for database setup.
+
 ## Project Structure (initial)
 
 ```
@@ -76,6 +93,17 @@ server/               # Java backend (to be added)
 
 This project uses job data via the **Rise Jobs API**: [https://pitchwall.co/product/rise-jobs-api](https://pitchwall.co/product/rise-jobs-api).
 Please review and respect the provider’s terms of service and attribution guidelines.
+
+## Security
+### JWT Secret Setup
+- **Development:** No setup required!  
+  The app auto-generates a secure secret on first run and saves it to `~/.jwt-secret`.
+
+- **Production:** You must provide a real secret via
+    - Environment variable: `APP_JWT_SECRET`, or
+    - Spring property: `app.jwt.secret`
+
+If no secret is provided in production, the app will fail to start.
 
 ## License
 

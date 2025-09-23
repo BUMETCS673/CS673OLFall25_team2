@@ -1,0 +1,18 @@
+.apply-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem; 
+  font-weight: bold;
+  cursor: pointer; 
+  text-align: center;
+  
+  background-color: #ff4136;
+  color: white; 
+  border: none;
+  border-radius: 8px;
+
+  transition: background-color 0.2s ease;
+}
+
+.apply-button:hover {
+  background-color: #e02f23;
+}
