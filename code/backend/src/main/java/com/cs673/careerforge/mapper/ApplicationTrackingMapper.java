@@ -8,6 +8,10 @@ import com.cs673.careerforge.vo.JobVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+/**
+ * Written by human.
+ */
+
 @Mapper(componentModel = "spring", uses = {JobMapper.class, UserMapper.class, DateTimeConvertor.class})
 public interface ApplicationTrackingMapper {
     ApplicationTrackingMapper INSTANCE = Mappers.getMapper(ApplicationTrackingMapper.class);

@@ -2,6 +2,7 @@ package com.cs673.careerforge.common;
 
 /**
  * Enum representing the status of a job application.
+ * Written by human.
  */
 public enum ApplicationStatus {
     APPLIED("Applied"),

@@ -1,12 +1,20 @@
 package com.cs673.careerforge.vo;
 
 import com.cs673.careerforge.common.EmploymentType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Written by human.
+ */
 @Getter
 @Setter
 @Builder

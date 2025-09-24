@@ -6,6 +6,7 @@ import java.io.Serializable;
 /**
  * Unified outer response wrapper.
  * Always used as the top-level envelope for any controller response.
+ * Written by human.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseResult<T> implements Serializable {

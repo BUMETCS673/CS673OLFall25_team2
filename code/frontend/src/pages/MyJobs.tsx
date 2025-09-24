@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 20% Formatting help with GPT
+
+ Human code: 80% functions/classes: MyJobs component
+
+ Framework-generated code: 0%
+*/
+
+
 import Header from '../components/headerAndFooter/Header';
 import Layout from '../components/wrapper/Layout';
 import Aside from '../components/asideAndToggler/Aside';

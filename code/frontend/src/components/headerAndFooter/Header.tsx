@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 20% Formatting help with GPT
+
+ Human code: 80% functions/classes: Header component
+
+ Framework-generated code: 0%
+*/
+
+
 import React from 'react';
 import './Header.css';
 import logo from '../../assets/logo.png';

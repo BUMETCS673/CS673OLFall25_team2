@@ -1,13 +1,11 @@
-package com.cs673.careerforge.web;
+package com.cs673.careerforge.controller;
 
 import com.cs673.careerforge.request.JobRequest;
 import com.cs673.careerforge.request.ListJobRequest;
 import com.cs673.careerforge.response.ListJobResponse;
 import com.cs673.careerforge.service.JobService;
-import com.cs673.careerforge.vo.JobVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Objects;
 
+/**
+ * Written by human.
+ */
 @RestController
 public class JobController {
 
