@@ -2,6 +2,19 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Link to navigate to Register page
 import { isRequired, isEmail } from "./validation"; // keep path simple (no .ts extension)
 
+/*
+ AI-generated code: ~70% 
+   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
+   - Modified and adapted by human
+   - Functions/classes: LoginForm component structure, validation logic integration, JSX layout
+ Human code: ~30% 
+   - Adjustments: added centering fixes, styled footer text, ensured responsive Bootstrap card
+   - Functions/classes: final layout tweaks, style adjustments, props handling refinements
+ Framework-generated code: 0%
+   - (React/Bootstrap boilerplate is used but not auto-generated)
+*/
+
+
 /**
  * @typedef {Object} LoginValues
  * @property {string} email
