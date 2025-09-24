@@ -1,5 +1,9 @@
 package com.cs673.careerforge.security;
 
+/*
+ AI-generated code: 90% (tool: ChatGPT)
+*/
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

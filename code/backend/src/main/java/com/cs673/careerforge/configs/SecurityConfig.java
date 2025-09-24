@@ -1,5 +1,11 @@
 package com.cs673.careerforge.configs;
 
+/*
+ Stacey contributed to this class, but didn't create it. What I added is as follows:
+ AI-generated code: 90% (tool: ChatGPT, modified and adapted, functions: filterChain, users)
+*/
+
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,5 +1,10 @@
 package com.cs673.careerforge.security;
 
+
+/*
+ AI-generated code: 90% (tool: ChatGPT, modified and adapted)
+*/
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
