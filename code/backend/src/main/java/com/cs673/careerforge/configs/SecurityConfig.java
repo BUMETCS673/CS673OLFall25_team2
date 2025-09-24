@@ -3,6 +3,7 @@ package com.cs673.careerforge.configs;
 /*
  Stacey contributed to this class, but didn't create it. What I added is as follows:
  AI-generated code: 90% (tool: ChatGPT, modified and adapted, functions: filterChain, users)
+ Human code: 10%
 */
 
 
