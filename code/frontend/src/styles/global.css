@@ -1,3 +1,16 @@
+/*
+ AI-generated code: 40%
+   tool: Gmini
+   functions/classes: scrollbar parts, initial structure and logic
+   AI chat links: https://gemini.google.com/app/2a81e11db0eaa308
+
+ Human code: 50%
+   classes/selectors: html, body, #root, :root, header, footer, .dropdown-panel, .filter-button, .jobs-list, .job-details, .card.job-card, aside.bg-body, main.bg-body, section.bg-body, .joblist-container, .welcome-text, .min-h-0, .list-group-item.active
+
+ Framework-generated code: 0%
+*/
+
+
 html,
 body {
   height: 100%;

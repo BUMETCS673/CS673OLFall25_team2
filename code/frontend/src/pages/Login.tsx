@@ -1,7 +1,7 @@
 /*
- AI-generated code: 0%
+ AI-generated code: 20% Formatting help with GPT
 
- Human code: 100% functions/classes: Login component
+ Human code: 80% functions/classes: Login component
 
  Framework-generated code: 0%
 */

@@ -1,11 +1,7 @@
-/*
- AI-generated code: 0%
-
- Human code: 100% functions/classes: Content component
-
- Framework-generated code: 0%
-*/
-
+// Content.tsx
+// Author: Pedro Ramirez
+// Pedro wrote this component to compose the main layout using the Layout component
+// and include Header, Footer, Aside, and JobList components
 
 import Header from '../components/headerAndFooter/Header';
 import Layout from '../components/wrapper/Layout';

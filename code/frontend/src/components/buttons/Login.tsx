@@ -1,7 +1,7 @@
 /*
- AI-generated code: 0%
+ AI-generated code: 20% Formatting help with GPT
 
- Human code: 100% functions/classes: LoginButtonProps interface, Apply React functional component
+ Human code: 80% functions/classes: LoginButtonProps interface, Apply React functional component
 
  Framework-generated code: 0%
 */
