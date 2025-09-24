@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 0%
+
+ Human code: 100% functions/classes: Footer component
+
+ Framework-generated code: 0%
+*/
+
+
 import './Footer.css';
 
 const Footer: React.FC = () => {

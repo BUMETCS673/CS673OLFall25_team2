@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 0%
+
+ Human code: 100% functions/classes: Header component
+
+ Framework-generated code: 0%
+*/
+
+
 import React from 'react';
 import './Header.css';
 import logo from '../../assets/logo.png';

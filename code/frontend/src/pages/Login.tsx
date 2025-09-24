@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 0%
+
+ Human code: 100% functions/classes: Login component
+
+ Framework-generated code: 0%
+*/
+
+
 import Header from '../components/headerAndFooter/Header';
 import Footer from '../components/headerAndFooter/Footer';
 import Layout from '../components/wrapper/Layout';

@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 0%
+
+ Human code: 100% functions/classes: Location component, handleInputChange function, handleClearInput function
+
+ Framework-generated code: 0%
+*/
+
+
 import React, { useState } from 'react';
 import './Location.css';
 

@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 0%
+
+ Human code: 100% functions/classes: DeleteButtonProps interface, Apply React functional component
+
+ Framework-generated code: 0%
+*/
+
+
 import React from 'react';
 import './Delete.css';
 

@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 0%
+
+ Human code: 100% functions/classes: Type component
+
+ Framework-generated code: 0%
+*/
+
+
 import React from 'react';
 import './Type.css';
 
