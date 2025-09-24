@@ -13,6 +13,7 @@ import java.util.Optional;
 
 /**
  * Service interface for ApplicationTracking com.cs673.careerforge.entity operations.
+ * Written by human.
  */
 public interface ApplicationTrackingService {
     

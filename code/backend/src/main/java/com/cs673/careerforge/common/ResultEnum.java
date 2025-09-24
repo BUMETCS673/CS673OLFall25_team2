@@ -2,6 +2,7 @@ package com.cs673.careerforge.common;
 
 /**
  * Standard result codes and messages.
+ * Written by human.
  */
 public enum ResultEnum {
     OK(0, "OK", "Request succeeded"),

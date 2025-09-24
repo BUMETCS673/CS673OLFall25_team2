@@ -2,6 +2,7 @@ package com.cs673.careerforge.common;
 
 /**
  * Enum representing the type of user in the job tracking system.
+ * Written by human.
  */
 public enum UserType {
     EMPLOYEE("Employee"),

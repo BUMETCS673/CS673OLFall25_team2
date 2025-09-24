@@ -13,6 +13,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  * - BizException: use enum code/message
  * - Other exceptions: 500 / "Please try again later"
  * Also marks a request attribute so ResponseBodyAdvice won't wrap again.
+ * Written by human.
  */
 @RestControllerAdvice
 public class GlobalExceptionAdvice {

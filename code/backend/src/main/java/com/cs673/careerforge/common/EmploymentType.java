@@ -2,6 +2,7 @@ package com.cs673.careerforge.common;
 
 /**
  * Enum representing the type of employment for job postings.
+ * Written by human.
  */
 public enum EmploymentType {
     FULL_TIME("Full Time"),

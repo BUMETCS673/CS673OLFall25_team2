@@ -17,6 +17,7 @@ import java.util.UUID;
 
 /**
  * Service implementation for User com.cs673.careerforge.entity operations.
+ * Written by human.
  */
 @Service
 @Transactional

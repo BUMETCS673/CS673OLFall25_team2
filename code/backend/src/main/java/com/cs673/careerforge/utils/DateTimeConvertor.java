@@ -6,6 +6,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+/**
+ * Written by human.
+ */
 @Component
 public class DateTimeConvertor {
     public static long asLong(LocalDateTime dateTime) {
