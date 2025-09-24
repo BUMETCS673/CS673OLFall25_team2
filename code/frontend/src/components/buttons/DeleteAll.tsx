@@ -1,3 +1,11 @@
+/*
+ AI-generated code: 20% Formatting help with GPT
+
+ Human code: 80% functions/classes: DeleteAll component, handleClick function
+
+ Framework-generated code: 0%
+*/
+
 import React from 'react';
 import './DeleteAll.css';
 

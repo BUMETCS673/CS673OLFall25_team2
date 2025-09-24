@@ -1,3 +1,12 @@
+/*
+ AI-generated code: 20% Formatting help with GPT
+
+ Human code: 80% functions/classes: SaveProps interface, Save component, handleClick function
+
+ Framework-generated code: 0%
+*/
+
+
 import React, { useState } from 'react';
 import './Save.css';
 
