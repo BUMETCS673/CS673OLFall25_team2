@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-/**
- * Type filter component used in the Aside panel.
- * Provides a dropdown for selecting job types (e.g., full-time, part-time).
- */
+/*
+ AI-generated code: 80% (tool: ChatGPT, modified and adapted,
+   functions: Type (dropdown/popup variants, shorter fitted panel),
+   classes: none,
+   AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
+ Human code: 15% (functions: constraints, removing search, comments; classes: none)
+ Framework-generated code: 5% (tool: Vite/React)
+*/
 
 const TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship'];
 

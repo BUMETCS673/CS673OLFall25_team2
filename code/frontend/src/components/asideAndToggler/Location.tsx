@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-/**
- * Location filter component used in the Aside panel.
- * Clicking the button opens an inline input prompt.
- */
+/*
+ AI-generated code: 85% (tool: ChatGPT, modified and adapted,
+   functions: Location (inline panel, later portal version, centering, close button, keyboard handling),
+   classes: none,
+   AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
+ Human code: 10% (functions: copy/fit tweaks, comments; classes: none)
+ Framework-generated code: 5% (tool: Vite/React)
+*/
+
 interface LocationProps {
   onChange?: (value: string | null) => void;
 }
