@@ -1,4 +1,9 @@
 package com.cs673.careerforge.web;
+/*
+ AI-generated code:   100% (tool: ChatGPT)
+ Human code: 0%
+ Framework-generated code: 0%
+*/
 
 import com.cs673.careerforge.domain.User;
 import com.cs673.careerforge.exceptions.ConflictException;

@@ -1,5 +1,13 @@
 package com.cs673.careerforge.exceptions;
+/*
 
+ AI-generated code:  100% (tool: ChatGPT)
+
+ Human code: 0%
+
+ Framework-generated code: 0%
+
+*/
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
