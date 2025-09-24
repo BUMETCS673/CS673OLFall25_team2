@@ -1,5 +1,10 @@
 package com.cs673.careerforge.security;
 
+/*
+ AI-generated code: 90% (tool: ChatGPT, modified and adapted)
+ Human code: 10%
+*/
+
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
