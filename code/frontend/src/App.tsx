@@ -1,3 +1,7 @@
+// App.tsx
+// Author: Pedro Ramirez
+// Pedro wrote this component to define the main application structure and routing
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';

@@ -1,3 +1,8 @@
+// JobCard.tsx
+// Authors: Pedro Ramirez and Copilot
+// Pedro wrote the entire component and logic
+// Copilot assisted with formatting, some JSX structure, and utility functions
+
 import type { Job, DescriptionBreakdown } from '../../types/job';
 import defaultCompanyLogo from '../../assets/default-company-logo.jpg';
 
@@ -8,13 +13,15 @@ export default function JobCard({
   job: Job;
   detailed?: boolean;
 }) {
-  // ✅ Safe fallback so reads like db.oneSentenceJobSummary never crash
+  // Pedro's written code with some ChatGPT formatting help
   const db: DescriptionBreakdown =
     job.descriptionBreakdown ?? ({} as DescriptionBreakdown);
 
+  // Pedro's written code with some ChatGPT formatting help
   const fmtMoney = (n?: number) =>
     typeof n === 'number' ? `$${n.toLocaleString()}` : undefined;
 
+  // Pedro's written code with some ChatGPT formatting help
   const postedDate = job.createdAt
     ? new Date(job.createdAt).toLocaleDateString()
     : undefined;
@@ -22,6 +29,7 @@ export default function JobCard({
     ? new Date(job.updatedAt).toLocaleDateString()
     : undefined;
 
+  // Pedro's written code with some ChatGPT formatting help
   const mapHref = job.locationCoordinates
     ? `https://www.google.com/maps/search/?api=1&query=${job.locationCoordinates.lat},${job.locationCoordinates.lon}`
     : undefined;
@@ -30,11 +38,12 @@ export default function JobCard({
   const employment = db.employmentType;
   const workModel = db.workModel;
 
-  // Combine tags safely
   const techTags = Array.from(
     new Set([...(db.keywords ?? []), ...(job.skills_suggest ?? [])])
   );
 
+  // Pedro wrote most of this JSX structure with some Copilot formatting help
+  // logic and utility functions are Pedro's
   return (
     <div
       className="card job-card shadow-sm"
@@ -68,12 +77,7 @@ export default function JobCard({
             </div>
           </div>
         </div>
-        {/* Location
-        <div className="mt-2">
-         
-        </div> */}
 
-        {/* Compact badges */}
         {!detailed && (
           <div className="card-text mb-1">
             {job.department && (
@@ -95,37 +99,17 @@ export default function JobCard({
           </div>
         )}
 
-        {/* Compact summary */}
         {!detailed && summary && (
           <p className="card-text text-truncate" style={{ maxWidth: 520 }}>
             {summary}
           </p>
         )}
 
-        {/* Detailed view */}
         {detailed && (
           <div className="mt-3">
             {summary && <p className="fst-italic">{summary}</p>}
 
-            <div className="row row-cols-1 row-cols-md-2 g-2 small mb-3">              
-              {/* {
-                <p className="card-text text-muted mb-2">
-                  {mapHref ? (
-                    <a
-                      href={mapHref}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="link-secondary"
-                      title="Open in Google Maps"
-                    >
-                      {job.locationAddress}
-                    </a>
-                  ) : (
-                    job.locationAddress ||
-                    'Description is available on employer website (click Apply button).'
-                  )}
-                </p>
-              } */}
+            <div className="row row-cols-1 row-cols-md-2 g-2 small mb-3">
               {job.locationAddress && (
                 <div className="col">
                   <strong>Location: </strong>
@@ -209,7 +193,6 @@ export default function JobCard({
               )}
             </div>
 
-            {/* Required Skills */}
             {db.skillRequirements?.length ? (
               <div className="mb-3">
                 <strong>Required Skills:</strong>
@@ -223,7 +206,6 @@ export default function JobCard({
               </div>
             ) : null}
 
-            {/* Technologies & Keywords (combined) */}
             {techTags.length > 0 && (
               <div className="mb-3">
                 <strong>Technologies & Keywords:</strong>
@@ -240,7 +222,6 @@ export default function JobCard({
               </div>
             )}
 
-            {/* Company benefits */}
             {job.owner?.benefits?.benefits?.length ? (
               <div className="mb-3">
                 <strong>{job.owner.benefits.title || 'Benefits'}:</strong>
@@ -252,7 +233,6 @@ export default function JobCard({
               </div>
             ) : null}
 
-            {/* Apply / external links */}
             <div className="d-flex gap-2">
               {job.url && (
                 <a
