@@ -1,0 +1,125 @@
+// --- API client for MyJobs (Saved & Applied) ---
+// Each function sends the correct request and includes JWT if available.
+// Errors are normalized into { status, message } for consistency.
+
+export interface ApiError {
+  status: number;
+  message: string;
+}
+
+// Utility to get token from localStorage (or your auth store if different)
+function getAuthHeader(): Record<string, string> {
+  const token = localStorage.getItem("token");
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+// Normalize errors into a consistent shape
+async function handleError(res: Response): Promise<ApiError> {
+  let message = "Unknown error";
+  try {
+    const data = await res.json();
+    message = data.message || res.statusText;
+  } catch {
+    message = res.statusText;
+  }
+  return { status: res.status, message };
+}
+
+/* === ADDED: safe JSON helpers === */
+function isJson(res: Response) {
+  return (res.headers.get("content-type") || "")
+    .toLowerCase()
+    .includes("application/json");
+}
+
+// Safely parse JSON; returns null for 204, empty body, or non-JSON
+async function safeJson<T = any>(res: Response): Promise<T | null> {
+  if (res.status === 204) return null;
+  const text = await res.text();
+  if (!text.trim()) return null;
+  if (!isJson(res)) return null;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return null;
+  }
+}
+/* === end helpers === */
+
+// --- Fetch saved jobs ---
+export async function getMySaved() {
+  const res = await fetch("/api/users/me/saved", {
+    headers: {
+      ...getAuthHeader(), // no Content-Type on GET
+    },
+  });
+
+  if (!res.ok) throw await handleError(res);
+  const data = await safeJson<any[]>(res);
+  return Array.isArray(data) ? data : [];
+}
+
+// --- Fetch applied jobs ---
+export async function getMyApplied() {
+  const res = await fetch("/api/users/me/applied", {
+    headers: {
+      ...getAuthHeader(), // no Content-Type on GET
+    },
+  });
+
+  if (!res.ok) throw await handleError(res);
+  const data = await safeJson<any[]>(res);
+  return Array.isArray(data) ? data : [];
+}
+
+// --- Delete a single saved job ---
+export async function deleteSavedJob(jobId: string) {
+  const res = await fetch(`/api/users/myjobs/saved/${jobId}`, {
+    method: "DELETE",
+    headers: getAuthHeader(),
+  });
+
+  if (!res.ok) throw await handleError(res);
+  return (await safeJson(res)) ?? { ok: true };
+}
+
+// --- Delete a single applied job ---
+export async function deleteAppliedJob(jobId: string) {
+  const res = await fetch(`/api/users/myjobs/applied/${jobId}`, {
+    method: "DELETE",
+    headers: getAuthHeader(),
+  });
+
+  if (!res.ok) throw await handleError(res);
+  return (await safeJson(res)) ?? { ok: true };
+}
+
+// --- Bulk delete saved jobs ---
+export async function deleteAllSaved() {
+  const res = await fetch("/api/users/myjobs/saved", {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeader(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ all: true }),
+  });
+
+  if (!res.ok) throw await handleError(res);
+  return (await safeJson(res)) ?? { ok: true };
+}
+
+// --- Bulk delete applied jobs ---
+export async function deleteAllApplied() {
+  const res = await fetch("/api/users/myjobs/applied", {
+    method: "DELETE",
+    headers: {
+      ...getAuthHeader(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ all: true }),
+  });
+
+  if (!res.ok) throw await handleError(res);
+  return (await safeJson(res)) ?? { ok: true };
+}

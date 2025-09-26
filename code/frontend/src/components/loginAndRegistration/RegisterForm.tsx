@@ -7,7 +7,7 @@ import { isRequired, isEmail } from "./validation"; // keep path simple (no .ts 
    - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
    - Modified and adapted by human
    - Functions/classes: RegisterForm component structure, validation integration, JSX layout
- Human code: ~35% 
+ Human code (James Rose): ~35% 
    - Adjustments: footer text "Already have an account?", fixed link targets, applied centering card layout
    - Functions/classes: human refinements for props, consistent styling with LoginForm
  Framework-generated code: 0%
