@@ -1,5 +1,5 @@
 // This is just for testing if jest works correctly, you can delete it after testing.
-function sum(a, b) {
+function sum(a: number, b: number): number {
   return a + b;
 }
 
