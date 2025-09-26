@@ -18,6 +18,7 @@ import java.util.Optional;
 
 /**
  * Service implementation for ApplicationTracking com.cs673.careerforge.entity operations.
+ * Written by human.
  */
 @Service
 @Transactional

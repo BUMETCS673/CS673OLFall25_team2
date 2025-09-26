@@ -1,5 +1,10 @@
 package com.cs673.careerforge.model;
 
+/*
+ AI-generated code: 90% (tool: ChatGPT, modified and adapted)
+ Human code: 10%
+*/
+
 import com.cs673.careerforge.model.AuthRequest;
 import com.cs673.careerforge.model.AuthResponse;
 import com.cs673.careerforge.security.JwtUtil;

@@ -1,6 +1,9 @@
 package com.cs673.careerforge.model;
 
 //To return the JWT back to the client
+/*
+ AI-generated code: 100% (tool: ChatGPT)
+*/
 
 public class AuthResponse {
     private String jwt;

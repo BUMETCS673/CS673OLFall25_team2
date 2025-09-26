@@ -11,6 +11,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 
+/**
+ * Written by human.
+ */
 @Aspect
 @Component
 public class GlobalRequestAdvice {

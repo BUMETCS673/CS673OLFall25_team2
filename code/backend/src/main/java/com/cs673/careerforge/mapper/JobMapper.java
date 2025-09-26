@@ -6,6 +6,9 @@ import com.cs673.careerforge.vo.JobVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+/**
+ * Written by human.
+ */
 @Mapper(componentModel = "spring", uses = {DateTimeConvertor.class})
 public interface JobMapper {
     JobMapper INSTANCE = Mappers.getMapper(JobMapper.class);

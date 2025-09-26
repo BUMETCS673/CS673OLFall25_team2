@@ -8,6 +8,9 @@ import com.cs673.careerforge.vo.UserVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+/**
+ * Written by human.
+ */
 @Mapper(componentModel = "spring", uses =  {JobMapper.class, UserMapper.class, DateTimeConvertor.class})
 public interface LocationCoordinatesMapper {
     LocationCoordinatesMapper INSTANCE = Mappers.getMapper(LocationCoordinatesMapper.class);

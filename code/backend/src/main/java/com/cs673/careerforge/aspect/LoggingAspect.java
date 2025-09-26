@@ -16,6 +16,7 @@ import java.util.Set;
 /**
  * Logs URI, HTTP method, args, return, and elapsed time for all @RestController methods,
  * except excluded URIs.
+ * Written by human.
  */
 @Aspect
 @Component

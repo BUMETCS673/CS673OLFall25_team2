@@ -19,6 +19,7 @@ import java.util.Set;
 /**
  * Wrap all successful controller returns in BaseResult(success=true),
  * but skip wrapping for excluded paths.
+ * Written by human.
  */
 @RestControllerAdvice
 public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {

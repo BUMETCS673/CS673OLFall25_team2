@@ -11,6 +11,9 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 
+/**
+ * Written by Human.
+ */
 @Getter
 @Setter
 @ToString

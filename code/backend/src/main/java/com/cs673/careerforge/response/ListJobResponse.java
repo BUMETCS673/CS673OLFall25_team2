@@ -12,6 +12,9 @@ import lombok.ToString;
 
 import java.util.List;
 
+/**
+ * Written by Human.
+ */
 @Getter
 @Setter
 @Builder

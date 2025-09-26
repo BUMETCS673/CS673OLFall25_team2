@@ -10,6 +10,7 @@ import java.util.Optional;
 
 /**
  * Service interface for User com.cs673.careerforge.entity operations.
+ * Written by human.
  */
 public interface UserService {
     
