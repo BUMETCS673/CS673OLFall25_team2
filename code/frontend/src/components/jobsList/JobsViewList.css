@@ -1,0 +1,23 @@
+/* JobsViewList.css */
+/* Styling for the jobs view list component */
+
+/* Ensure panels don't exceed viewport height */
+.jobs-list,
+.job-details {
+  max-height: calc(100vh - 180px);
+}
+
+/* Ensure scrolling works correctly */
+.jobs-list {
+  overflow-y: auto;
+}
+
+.job-details {
+  overflow-y: auto;
+}
+
+/* Modal for mobile */
+.job-modal {
+  z-index: 1050;
+  position: fixed !important;
+}
