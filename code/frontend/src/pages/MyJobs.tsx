@@ -31,7 +31,7 @@ export default function MyJobs() {
           </div>
         </div>
       }
-      aside={<Aside /* no myJobsView props so the dropdown is hidden */ />}
+      aside={<Aside />}
       footer={<Footer />}
     />
   );
