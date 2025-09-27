@@ -1,14 +1,19 @@
 package com.cs673.careerforge.controller;
 
+import com.cs673.careerforge.common.BaseResult;
+import com.cs673.careerforge.request.DeleteJobRequest;
 import com.cs673.careerforge.request.JobRequest;
 import com.cs673.careerforge.request.ListJobRequest;
 import com.cs673.careerforge.response.ListJobResponse;
+import com.cs673.careerforge.service.ApplicationTrackingService;
 import com.cs673.careerforge.service.JobService;
+import com.cs673.careerforge.service.SavedJobService;
+import com.cs673.careerforge.vo.ApplicationTrackingVO;
+import com.cs673.careerforge.vo.JobVO;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,23 +29,45 @@ public class JobController {
     @Resource
     private JobService jobService;
 
-    @GetMapping("/jobs")
-    public ListJobResponse listJob(@RequestBody ListJobRequest request, HttpServletRequest httpServletRequest) {
-        return jobService.findAllJobs(request);
+    @Autowired
+    private SavedJobService savedJobService;
+
+    @Autowired
+    private ApplicationTrackingService applicationTrackingService;
+
+    // saved jobs
+    @PostMapping("/jobs/saved/list")
+    public ListJobResponse listSavedJobs(@RequestBody ListJobRequest request, HttpServletRequest httpServletRequest) {
+        return jobService.findAllSavedJobs(request);
     }
 
-    @PostMapping("/jobs/{id}/save")
-    public Boolean saveJob(@PathVariable Long id, @RequestBody JobRequest request, HttpServletRequest httpServletRequest) {
-        return Objects.nonNull(jobService.saveJob(id, request));
+    @PostMapping("/jobs/saved/save")
+    public BaseResult<JobVO> saveJob(@RequestBody JobRequest request, HttpServletRequest httpServletRequest) {
+        return BaseResult.ok(JobVO.builder()
+                .id(savedJobService.saveJob(request).getId())
+                .build());
     }
 
-    @PostMapping("/jobs/{id}/apply")
-    public Boolean applyJob(@PathVariable Long id, @RequestBody JobRequest request, HttpServletRequest httpServletRequest) {
-        return jobService.applyJob(request.getUid(), id);
+    @PostMapping("/jobs/saved/delete")
+    public Boolean deleteSavedJob(@RequestBody DeleteJobRequest request, HttpServletRequest httpServletRequest) {
+        return savedJobService.deleteSavedJobBatch(request);
     }
 
-    @DeleteMapping("/jobs/{id}")
-    public Boolean deleteJob(@PathVariable Long id, HttpServletRequest httpServletRequest) {
-        return jobService.deleteJob(id);
+    // applied jobs
+    @PostMapping("/jobs/applied/list")
+    public ListJobResponse listAppliedJobs(@RequestBody ListJobRequest request, HttpServletRequest httpServletRequest) {
+        return applicationTrackingService.findApplicationsByApplicant(request);
+    }
+
+    @PostMapping("/jobs/applied/apply")
+    public BaseResult<JobVO> applyJob(@RequestBody JobRequest request, HttpServletRequest httpServletRequest) {
+        return BaseResult.ok(JobVO.builder()
+                .id(applicationTrackingService.createApplication(request).getId())
+                .build());
+    }
+
+    @PostMapping("/jobs/applied/delete")
+    public Boolean deleteAppliedJob(@RequestBody DeleteJobRequest request, HttpServletRequest httpServletRequest) {
+        return applicationTrackingService.deleteApplicationBatch(request);
     }
 }
