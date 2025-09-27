@@ -69,7 +69,7 @@ export default function JobCard({
             />
           )}
           <div className="flex-grow-1">
-            <h5 className="card-title mb-1 font-weight-bold text-primary">
+            <h5 className="card-title mb-1 fw-light text-primary">
               {job.title}
             </h5>
             <div className="text-muted">
