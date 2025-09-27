@@ -20,7 +20,12 @@ export default function MyJobs() {
       header={<Header />}
       mainContent={
         <div className="container py-4">
-          <h1 className="mb-3">My Jobs</h1>
+          <h2
+            className="mb-3"
+            style={{ fontWeight: 700, textAlign: 'left', marginLeft: '1rem' }}
+          >
+            My Jobs
+          </h2>
           <div className="mt-3">
             <MyJobsViewList view={view} onChangeView={setView} />
           </div>
