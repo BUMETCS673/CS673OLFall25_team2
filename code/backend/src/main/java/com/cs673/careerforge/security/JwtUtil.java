@@ -2,7 +2,7 @@ package com.cs673.careerforge.security;
 
 /*
  AI-generated code: 90% (tool: CHatGPT, modified and adapted)
- Human code: 10%
+ Human code: 20% (Updated validateToken())
 */
 
 import io.jsonwebtoken.Claims;
@@ -25,6 +25,7 @@ import java.util.function.Function;
 import java.util.Base64;
 import java.security.Key;
 import java.util.Date;
+import com.cs673.careerforge.security.JwtErrorHandlerFactory;
 
 /**This class will check if we are on prod or dev,
 * if dev it will auto generate a key and persist it,
@@ -145,8 +146,9 @@ If missing → generate a key, append/persist it into application-dev.properties
         try {
             final String username = extractUsername(token);
             return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            return false; // token is expired
+        } catch (io.jsonwebtoken.JwtException | IllegalArgumentException e) {
+            JwtErrorHandlerFactory.getHandler(e).handle(e);
+            return false;
         }
     }
 

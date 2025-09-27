@@ -12,7 +12,8 @@ RUN --mount=type=cache,target=/root/.m2 mvn -q -B -DskipTests dependency:go-offl
 # Now copy sources and build
 COPY src ./src
 # Skip compiling and running tests (fixes build errors from broken test sources)
-RUN --mount=type=cache,target=/root/.m2 mvn -q -B -Dmaven.test.skip=true package
+CMD ["mvn", "spring-boot:run", "-Dspring-boot.run.profiles=docker"]
+RUN --mount=type=cache,target=/root/.m2 mvn test
 
 # ---- Runtime image ----
 FROM eclipse-temurin:21-jre
@@ -29,4 +30,4 @@ EXPOSE 8080
 RUN useradd -ms /bin/bash spring && chown -R spring:spring /app
 USER spring
 
-ENTRYPOINT ["java","-XX:MaxRAMPercentage=75","-jar","/app/app.jar"]
+ENTRYPOINT ["java","-jar","app.jar","--spring.profiles.active=docker"]
