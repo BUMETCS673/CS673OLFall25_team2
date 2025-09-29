@@ -68,3 +68,4 @@ Desktop.ini
 coverage/
 .junit/
 test-output/
+EC2 Access.pem
