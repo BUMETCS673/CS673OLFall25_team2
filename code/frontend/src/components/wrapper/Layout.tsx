@@ -26,19 +26,15 @@ export default function Layout({
   // initial structure and logic by ChatGPT
   // Pedro refined the layout, added responsiveness (Boostrap classes), and ensured accessibility
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <header className="w-100 mb-2 bg-body">{header}</header>
-
+    <div className="d-flex flex-column vh-100">
+      <header className="w-100 mb-0 bg-body">{header}</header>
       <main className="container-fluid w-100 flex-grow-1 d-flex min-h-0">
-        <div className="row g-3 flex-grow-1 min-h-0">
+        <div className="row g-3 flex-grow-1 min-h-0 w-100">
           {aside && (
             <aside
               role="complementary"
               className="col-12 order-0 order-lg-2 col-lg-auto bg-body overflow-auto p-3"
-              style={{
-                width: 'clamp(260px, 22vw, 320px)',
-                minHeight: 0,
-              }}
+              style={{ width: 'clamp(260px, 22vw, 320px)', minHeight: 0 }}
             >
               <div className="fw-semibold mb-3">FILTERS</div>
               {aside}
@@ -48,9 +44,7 @@ export default function Layout({
           <section
             role="main"
             className="col-12 order-1 order-lg-1 col-lg bg-body rounded d-flex flex-column min-h-0"
-            style={{
-              minWidth: 0,
-            }}
+            style={{ minWidth: 0 }}
           >
             {main}
           </section>

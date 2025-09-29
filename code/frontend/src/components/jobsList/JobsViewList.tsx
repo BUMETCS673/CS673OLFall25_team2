@@ -9,8 +9,8 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import JobCard from './JobCard';
 import type { Job, JobsApiEnvelope } from '../../types/job';
+import './JobsViewList.css';
 
-const PANEL_MAX_HEIGHT = '100vh';
 const LG_QUERY = '(min-width: 992px)';
 
 const JobsViewList = () => {
@@ -97,7 +97,6 @@ const JobsViewList = () => {
           style={{
             flexBasis: '100%',
             flex: '0 0 30%',
-            maxHeight: PANEL_MAX_HEIGHT,
             minHeight: 0,
             background: 'var(--surface-bg)',
             borderRight: '1px solid var(--surface-border-color)',
@@ -163,12 +162,12 @@ const JobsViewList = () => {
             </div>
           )}
         </div>
+
         <div
           className="job-details d-none d-lg-block flex-grow-1 overflow-auto p-3"
           style={{
             flexBasis: '100%',
             flex: '1 1 70%',
-            maxHeight: PANEL_MAX_HEIGHT,
             minHeight: 0,
             background: 'var(--surface-bg)',
             borderLeft: '1px solid var(--surface-border-color)',
@@ -190,7 +189,7 @@ const JobsViewList = () => {
 
       {selectedJob && (
         <div
-          className="d-lg-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50"
+          className="d-lg-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 job-modal"
           style={{ zIndex: 1050 }}
           role="dialog"
           aria-modal="true"

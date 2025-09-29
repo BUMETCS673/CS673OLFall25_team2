@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +52,7 @@ public interface ApplicationTrackingRepository extends JpaRepository<Application
      * @param pageable pagination information
      * @return page of applications by the applicant
      */
-    Page<ApplicationTracking> findByApplicant(User applicant, Pageable pageable);
+    Page<ApplicationTracking> findByApplicantOrderByLastUpdatedDesc(User applicant, Pageable pageable);
     
     /**
      * Find applications by job.
@@ -261,4 +262,6 @@ public interface ApplicationTrackingRepository extends JpaRepository<Application
      */
     @Query("SELECT a FROM ApplicationTracking a WHERE a.coverLetter IS NOT NULL AND a.coverLetter != ''")
     List<ApplicationTracking> findApplicationsWithCoverLetter();
+
+    int deleteByApplicant_IdAndJob_IdIn(Long applicant, Collection<Long> jobs);
 }

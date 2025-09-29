@@ -7,7 +7,7 @@ import moonImage from '../../assets/moon.jpg';
    functions: ThemeToggler,
    classes: none,
    AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
- Human code: 15% (functions: casing/paths, comments; classes: none)
+ Human code (James Rose): 15% (functions: casing/paths, comments; classes: none)
  Framework-generated code: 5% (tool: Vite/React)
 */
 

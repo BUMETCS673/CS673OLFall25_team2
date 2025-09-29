@@ -1,0 +1,361 @@
+{
+	"info": {
+		"_postman_id": "62f50f87-77f1-4582-b9ad-3fc003f9fcbc",
+		"name": "cs673",
+		"description": "### Welcome to Postman! This is your first collection. \n\nCollections are your starting point for building and testing APIs. You can use this one to:\n\n• Group related requests\n• Test your API in real-world scenarios\n• Document and share your requests\n\nUpdate the name and overview whenever you’re ready to make it yours.\n\n[Learn more about Postman Collections.](https://learning.postman.com/docs/collections/collections-overview/)\n\n---\n\n**Authorization**: This collection uses Bearer Token authentication at the collection level. All requests will inherit this unless overridden. Set the token variable as `{{authToken}}` in your environment.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48617130",
+		"_collection_link": "https://szdyesheng1221-2025989.postman.co/workspace/Qi-Chen's-Workspace~4d868870-b217-4a4a-8fec-f07c48b1f0ce/collection/48617130-62f50f87-77f1-4582-b9ad-3fc003f9fcbc?action=share&source=collection_link&creator=48617130"
+	},
+	"item": [
+		{
+			"name": "test ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/public/ping",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"public",
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"test1234\",\r\n  \"email\": \"test@test.com\",\r\n  \"password\": \"test1234\",\r\n  \"firstName\": \"test\",\r\n  \"userType\": \"EMPLOYEE\",\r\n  \"lastName\": \"test\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/public/users/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"public",
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "authenticat(login)",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"blair02\",\r\n  \"password\": \"test1234\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/authenticate",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"authenticate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "list saved jobs",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"size\": 10,\r\n  \"page\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/jobs/saved/list",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"jobs",
+						"saved",
+						"list"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request GET '{{baseUrl}}/jobs/saved/list' \\\r\n--header 'Authorization: Bearer {{authToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n  \"size\": 10,\r\n  \"page\": 0\r\n}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "save job",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"postedBy\": 1,\r\n  \"title\": \"Software Engineer I\",\r\n  \"description\": \"Build features in a cross-functional team.\",\r\n  \"company\": \"Acme Corp\",\r\n  \"location\": \"Boston, MA\",\r\n  \"employmentType\": \"FULL_TIME\",\r\n  \"salaryMin\": 70000,\r\n  \"salaryMax\": 95000,\r\n  \"requirements\": \"Java, SQL\",\r\n  \"benefits\": \"Health, 401k\",\r\n  \"applicationDeadline\": 1837689600000,\r\n  \"url\": \"https://acme.example/jobs/1\",\r\n  \"type\": \"Engineering\",\r\n  \"department\": \"Platform\",\r\n  \"seniority\": \"Junior\",\r\n  \"locationAddress\": \"1 Main St, Boston, MA\",\r\n  \"locationCoordinates\": { \"lat\": 42.3601, \"lon\": -71.0589 }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/jobs/saved/save",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"jobs",
+						"saved",
+						"save"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/jobs/saved/save' \\\r\n--header 'Authorization: Bearer {{authToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n  \"postedBy\": 1,\r\n  \"title\": \"Software Engineer I\",\r\n  \"description\": \"Build features in a cross-functional team.\",\r\n  \"company\": \"Acme Corp\",\r\n  \"location\": \"Boston, MA\",\r\n  \"employmentType\": \"FULL_TIME\",\r\n  \"salaryMin\": 70000,\r\n  \"salaryMax\": 95000,\r\n  \"requirements\": \"Java, SQL\",\r\n  \"benefits\": \"Health, 401k\",\r\n  \"applicationDeadline\": 1735689600000,\r\n  \"url\": \"https://acme.example/jobs/1\",\r\n  \"type\": \"Engineering\",\r\n  \"department\": \"Platform\",\r\n  \"seniority\": \"Junior\",\r\n  \"locationAddress\": \"1 Main St, Boston, MA\",\r\n  \"locationCoordinates\": { \"lat\": 42.3601, \"lon\": -71.0589 }\r\n}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "detele saved job(s)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"jobIds\": [31,11,12,13]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/jobs/saved/delete",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"jobs",
+						"saved",
+						"delete"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/jobs/saved/delete' \\\r\n--header 'Authorization: Bearer {{authToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n  \"jobIds\": [1,2,3]\r\n}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "list applied jobs",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"size\": 10,\r\n  \"page\": 0\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/jobs/applied/list",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"jobs",
+						"applied",
+						"list"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request GET '{{baseUrl}}/jobs/applied/list' \\\r\n--header 'Authorization: Bearer {{authToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n  \"size\": 10,\r\n  \"page\": 0\r\n}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "apply job",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"postedBy\": 1,\r\n  \"title\": \"Data Analyst\",\r\n  \"description\": \"Analyze product metrics and dashboards.\",\r\n  \"company\": \"Beta Analytics\",\r\n  \"location\": \"New York, NY\",\r\n  \"employmentType\": \"FULL_TIME\",\r\n  \"salaryMin\": 65000,\r\n  \"salaryMax\": 90000,\r\n  \"requirements\": \"SQL, Python, BI\",\r\n  \"benefits\": \"Dental, PTO\",\r\n  \"applicationDeadline\": 1836208000000,\r\n  \"url\": \"https://beta.example/jobs/2\",\r\n  \"type\": \"Analytics\",\r\n  \"department\": \"BI\",\r\n  \"seniority\": \"Junior\",\r\n  \"locationAddress\": \"200 Broadway, NY\",\r\n  \"locationCoordinates\": { \"lat\": 40.7128, \"lon\": -74.0060 }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/jobs/applied/apply",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"jobs",
+						"applied",
+						"apply"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request GET '{{baseUrl}}/jobs/applied/apply' \\\r\n--header 'Authorization: Bearer {{authToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n  \"postedBy\": 1,\r\n  \"title\": \"Data Analyst\",\r\n  \"description\": \"Analyze product metrics and dashboards.\",\r\n  \"company\": \"Beta Analytics\",\r\n  \"location\": \"New York, NY\",\r\n  \"employmentType\": \"FULL_TIME\",\r\n  \"salaryMin\": 65000,\r\n  \"salaryMax\": 90000,\r\n  \"requirements\": \"SQL, Python, BI\",\r\n  \"benefits\": \"Dental, PTO\",\r\n  \"applicationDeadline\": 1736208000000,\r\n  \"url\": \"https://beta.example/jobs/2\",\r\n  \"type\": \"Analytics\",\r\n  \"department\": \"BI\",\r\n  \"seniority\": \"Junior\",\r\n  \"locationAddress\": \"200 Broadway, NY\",\r\n  \"locationCoordinates\": { \"lat\": 40.7128, \"lon\": -74.0060 }\r\n}'\r\n"
+			},
+			"response": []
+		},
+		{
+			"name": "delete applied job(s)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"jobIds\": [32,14,13,15]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}/jobs/applied/delete",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"jobs",
+						"applied",
+						"delete"
+					]
+				},
+				"description": "Generated from cURL: curl --location --request POST '{{baseUrl}}/jobs/applied/delete' \\\r\n--header 'Authorization: Bearer {{authToken}}' \\\r\n--header 'Content-Type: application/json' \\\r\n--data-raw '{\r\n  \"jobIds\": [1,2,3]\r\n}'\r\n"
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJibGFpcjAyIiwiaWF0IjoxNzU5MDAzMzU1LCJleHAiOjE3NTkwODk3NTV9.Mccsjh4ZhgqqbcJvlwJ4ye7kn0zNqzguZmIFxCMyO3o",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": ""
+		}
+	]
+}
