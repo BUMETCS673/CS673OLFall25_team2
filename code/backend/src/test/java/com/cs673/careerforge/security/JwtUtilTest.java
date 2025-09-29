@@ -124,7 +124,6 @@ class JwtUtilTest {
                 .roles("USER")
                 .build();
 
-        // Build token with a different signing key than jwtUtil uses
         Key otherKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         String token = Jwts.builder()
                 .setSubject(testUser.getUsername())

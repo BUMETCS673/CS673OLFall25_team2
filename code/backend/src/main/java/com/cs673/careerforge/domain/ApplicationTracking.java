@@ -65,17 +65,19 @@ public class ApplicationTracking {
     public ApplicationTracking() {
         this.appliedDate = LocalDateTime.now();
         this.lastUpdated = LocalDateTime.now();
-        this.applicationStatus = ApplicationStatus.APPLIED;
     }
     
     public ApplicationTracking(User applicant, Job job) {
         this();
         this.applicant = applicant;
         this.job = job;
+        this.applicationStatus = ApplicationStatus.APPLIED;
     }
     
     public ApplicationTracking(User applicant, Job job, ApplicationStatus status) {
-        this(applicant, job);
+        this();
+        this.applicant = applicant;
+        this.job = job;
         this.applicationStatus = status;
     }
     
@@ -252,9 +254,9 @@ public class ApplicationTracking {
         ApplicationTracking that = (ApplicationTracking) o;
         return id != null && id.equals(that.id);
     }
-    
+
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return (id != null ? id.hashCode() : super.hashCode());
     }
 }
