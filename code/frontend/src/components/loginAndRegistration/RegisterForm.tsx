@@ -1,18 +1,19 @@
+// ADDED: useNavigate to handle redirection after a successful registration.
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Link to navigate to Login page
+import { Link, useNavigate } from 'react-router-dom'; // Link to navigate to Login page
 import { isRequired, isEmail } from './validation'; // keep path simple (no .ts extension)
 import logo from '../../assets/logo.png'; // Import logo image
 
 /*
- AI-generated code: ~65% 
-   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
-   - Modified and adapted by human
-   - Functions/classes: RegisterForm component structure, validation integration, JSX layout
- Human code: ~35% 
-   - Adjustments: footer text "Already have an account?", fixed link targets, applied centering card layout
-   - Functions/classes: human refinements for props, consistent styling with LoginForm
- Framework-generated code: 0%
-   - (React/Bootstrap boilerplate is used but not auto-generated)
+ AI-generated code: ~65% 
+   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
+   - Modified and adapted by human
+   - Functions/classes: RegisterForm component structure, validation integration, JSX layout
+ Human code: ~35% 
+   - Adjustments: footer text "Already have an account?", fixed link targets, applied centering card layout
+   - Functions/classes: human refinements for props, consistent styling with LoginForm
+ Framework-generated code: 0%
+   - (React/Bootstrap boilerplate is used but not auto-generated)
 */
 
 type RegisterValues = { name: string; email: string; password: string };
@@ -42,6 +43,12 @@ const RegisterForm: React.FC<Props> = ({
     }
   );
 
+  // ADDED: State to manage the API loading status (for disabling the button)
+  // and to store any errors returned from the API.
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const navigate = useNavigate(); // ADDED: Hook for navigation
+
   // Validation: all fields required, email must match format
   const errors = {
     name: !isRequired(values.name) ? 'Name is required' : '',
@@ -64,11 +71,49 @@ const RegisterForm: React.FC<Props> = ({
     setTouched({ ...touched, [e.target.name]: true as any });
   };
 
+  /*
+  // DELETED: The original handleSubmit function was removed.
+  // It only handled client-side validation and called an external onSubmit prop.
   const handleSubmit = (e: React.FormEvent) => {
+     e.preventDefault();
+     setTouched({ name: true, email: true, password: true });
+     const valid = !errors.name && !errors.email && !errors.password;
+     if (valid && onSubmit) onSubmit(values);
+  };
+  */
+
+  // ADDED: A new, asynchronous handleSubmit function to replace the old one.
+  // This function now handles the complete submission flow: API calls, loading states, and error handling.
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({ name: true, email: true, password: true });
+    setApiError(null);
+
     const valid = !errors.name && !errors.email && !errors.password;
-    if (valid && onSubmit) onSubmit(values);
+    if (!valid) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      // On success, navigate to the login page as per task requirements.
+      navigate('/');
+
+    } catch (error: any) {
+      setApiError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -89,6 +134,14 @@ const RegisterForm: React.FC<Props> = ({
           />
 
           <h2 className="h4 text-center mb-4">Register</h2>
+
+          {/* ADDED: A conditional alert to display API errors.
+              This element has role="alert" which the test looks for. */}
+          {apiError && (
+            <div className="alert alert-danger" role="alert">
+              {apiError}
+            </div>
+          )}
 
           <form className="w-100" noValidate onSubmit={handleSubmit}>
             <div className="mb-3">
@@ -157,10 +210,11 @@ const RegisterForm: React.FC<Props> = ({
               )}
             </div>
 
-            {/* Black, full-width register button (rendered only if allowed by story flag) */}
+            {/* MODIFIED: The button is now disabled based on the isLoading state,
+                and its text changes to give user feedback. */}
             {showSubmitButton && (
-              <button type="submit" className="btn btn-dark w-100">
-                Register
+              <button type="submit" className="btn btn-dark w-100" disabled={isLoading}>
+                {isLoading ? 'Registering...' : 'Register'}
               </button>
             )}
           </form>
