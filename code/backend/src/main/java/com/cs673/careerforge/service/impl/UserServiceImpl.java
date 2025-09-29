@@ -1,8 +1,8 @@
 package com.cs673.careerforge.service.impl;
 
 import com.cs673.careerforge.domain.User;
-import com.cs673.careerforge.common.UserType;
-import com.cs673.careerforge.repository.UserRepository;
+import com.cs673.careerforge.domain.common.UserType;
+import com.cs673.careerforge.data.UserRepository;
 import com.cs673.careerforge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

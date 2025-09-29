@@ -1,6 +1,6 @@
 package com.cs673.careerforge.domain;
 
-import com.cs673.careerforge.common.UserType;
+import com.cs673.careerforge.domain.common.UserType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import org.springframework.security.core.GrantedAuthority;

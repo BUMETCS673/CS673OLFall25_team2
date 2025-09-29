@@ -1,7 +1,7 @@
 package com.cs673.careerforge.service;
 
 import com.cs673.careerforge.domain.User;
-import com.cs673.careerforge.common.UserType;
+import com.cs673.careerforge.domain.common.UserType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

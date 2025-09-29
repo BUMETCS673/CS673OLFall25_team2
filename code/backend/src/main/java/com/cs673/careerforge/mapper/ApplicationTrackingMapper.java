@@ -1,10 +1,8 @@
 package com.cs673.careerforge.mapper;
 
 import com.cs673.careerforge.domain.ApplicationTracking;
-import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.utils.DateTimeConvertor;
-import com.cs673.careerforge.vo.ApplicationTrackingVO;
-import com.cs673.careerforge.vo.JobVO;
+import com.cs673.careerforge.web.vo.ApplicationTrackingVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

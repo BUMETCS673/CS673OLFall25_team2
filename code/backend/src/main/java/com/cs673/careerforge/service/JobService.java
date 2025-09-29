@@ -1,12 +1,11 @@
 package com.cs673.careerforge.service;
 
-import com.cs673.careerforge.common.EmploymentType;
+import com.cs673.careerforge.domain.common.EmploymentType;
 import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.domain.User;
-import com.cs673.careerforge.request.JobRequest;
-import com.cs673.careerforge.request.ListJobRequest;
-import com.cs673.careerforge.response.ListJobResponse;
-import com.cs673.careerforge.vo.JobVO;
+import com.cs673.careerforge.web.request.JobRequest;
+import com.cs673.careerforge.web.request.ListJobRequest;
+import com.cs673.careerforge.web.response.ListJobResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

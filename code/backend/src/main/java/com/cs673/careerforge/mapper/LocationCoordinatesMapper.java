@@ -1,10 +1,8 @@
 package com.cs673.careerforge.mapper;
 
 import com.cs673.careerforge.domain.LocationCoordinates;
-import com.cs673.careerforge.domain.User;
 import com.cs673.careerforge.utils.DateTimeConvertor;
-import com.cs673.careerforge.vo.LocationCoordinatesVO;
-import com.cs673.careerforge.vo.UserVO;
+import com.cs673.careerforge.web.vo.LocationCoordinatesVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

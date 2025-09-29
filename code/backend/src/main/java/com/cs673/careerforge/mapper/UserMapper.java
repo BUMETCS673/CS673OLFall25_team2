@@ -2,7 +2,7 @@ package com.cs673.careerforge.mapper;
 
 import com.cs673.careerforge.domain.User;
 import com.cs673.careerforge.utils.DateTimeConvertor;
-import com.cs673.careerforge.vo.UserVO;
+import com.cs673.careerforge.web.vo.UserVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

@@ -1,7 +1,7 @@
 package com.cs673.careerforge.domain;
 
-import com.cs673.careerforge.common.ApplicationStatus;
-import com.cs673.careerforge.common.UserType;
+import com.cs673.careerforge.domain.common.ApplicationStatus;
+import com.cs673.careerforge.domain.common.UserType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;

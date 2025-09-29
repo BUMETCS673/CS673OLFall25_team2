@@ -1,6 +1,6 @@
 package com.cs673.careerforge.service;
 
-import com.cs673.careerforge.common.ApplicationStatus;
+import com.cs673.careerforge.domain.common.ApplicationStatus;
 import com.cs673.careerforge.domain.ApplicationTracking;
 import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.domain.User;

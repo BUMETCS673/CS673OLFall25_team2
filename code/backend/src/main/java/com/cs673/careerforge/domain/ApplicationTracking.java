@@ -1,6 +1,6 @@
 package com.cs673.careerforge.domain;
 
-import com.cs673.careerforge.common.ApplicationStatus;
+import com.cs673.careerforge.domain.common.ApplicationStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 

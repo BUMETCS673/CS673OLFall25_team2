@@ -1,11 +1,11 @@
 package com.cs673.careerforge.service;
 
 import com.cs673.careerforge.domain.User;
-import com.cs673.careerforge.common.UserType;
+import com.cs673.careerforge.domain.common.UserType;
 import com.cs673.careerforge.domain.LocationCoordinates;
 import com.cs673.careerforge.domain.Benefits;
 import com.cs673.careerforge.domain.Values;
-import com.cs673.careerforge.repository.UserRepository;
+import com.cs673.careerforge.data.UserRepository;
 import com.cs673.careerforge.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

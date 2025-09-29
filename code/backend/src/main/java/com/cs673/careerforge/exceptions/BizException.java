@@ -1,6 +1,6 @@
 package com.cs673.careerforge.exceptions;
 
-import com.cs673.careerforge.common.ResultEnum;
+import com.cs673.careerforge.domain.common.ResultEnum;
 
 import java.io.Serializable;
 

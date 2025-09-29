@@ -1,10 +1,10 @@
 package com.cs673.careerforge.service.impl;
 
-import com.cs673.careerforge.common.ApplicationStatus;
+import com.cs673.careerforge.domain.common.ApplicationStatus;
 import com.cs673.careerforge.domain.ApplicationTracking;
 import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.domain.User;
-import com.cs673.careerforge.repository.ApplicationTrackingRepository;
+import com.cs673.careerforge.data.ApplicationTrackingRepository;
 import com.cs673.careerforge.service.ApplicationTrackingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
