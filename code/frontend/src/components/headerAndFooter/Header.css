@@ -6,7 +6,6 @@
  Framework-generated code: 0%
 */
 
-
 .header-container {
   width: 100%;
   box-sizing: border-box;
@@ -26,11 +25,11 @@
 }
 
 .logo-image {
-  height: 140px;
-  width: 160px;
+  height: 94px;
+  width: 154px;
 }
 
 .welcome-text {
   font-size: 1.1rem;
-  color: rgb(0, 0, 255);
+  color: rgb(145, 144, 144);
 }
