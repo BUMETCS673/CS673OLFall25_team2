@@ -65,6 +65,4 @@ public class JobVO {
     private String locationAddress;
 
     private LocationCoordinatesVO locationCoordinates;
-
-    private List<ApplicationTrackingVO> applications;
 }

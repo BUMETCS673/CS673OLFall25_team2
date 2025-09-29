@@ -1,15 +1,21 @@
 package com.cs673.careerforge.service.impl;
 
+import com.cs673.careerforge.common.ApplicationStatus;
 import com.cs673.careerforge.common.EmploymentType;
+import com.cs673.careerforge.common.ResultEnum;
+import com.cs673.careerforge.domain.ApplicationTracking;
 import com.cs673.careerforge.domain.Job;
+import com.cs673.careerforge.domain.SavedJob;
 import com.cs673.careerforge.domain.User;
+import com.cs673.careerforge.exceptions.InvalidParamException;
 import com.cs673.careerforge.mapper.JobMapper;
+import com.cs673.careerforge.repository.ApplicationTrackingRepository;
 import com.cs673.careerforge.repository.JobRepository;
-import com.cs673.careerforge.request.JobRequest;
+import com.cs673.careerforge.repository.SavedJobRepository;
+import com.cs673.careerforge.repository.UserRepository;
 import com.cs673.careerforge.request.ListJobRequest;
 import com.cs673.careerforge.response.ListJobResponse;
 import com.cs673.careerforge.service.JobService;
-import com.cs673.careerforge.vo.JobVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,15 +39,22 @@ public class JobServiceImpl implements JobService {
     @Autowired
     private JobRepository jobRepository;
 
-    @Override
-    public Job saveJob(long id, JobRequest request) {
-        // TODO: saveJob
-        return null;
-    }
+    @Autowired
+    private SavedJobRepository savedJobRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ApplicationTrackingRepository applicationTrackingRepository;
 
     @Override
     public boolean applyJob(long uid, long id) {
-        // TODO: applyJob
+        Job job = jobRepository.findById(id)
+                .orElseThrow(() -> new InvalidParamException(ResultEnum.BUSINESS_ERROR, "Job not found"));
+        User user = userRepository.findById(uid)
+                .orElseThrow(() -> new InvalidParamException(ResultEnum.BUSINESS_ERROR, "User not found"));
+        applicationTrackingRepository.save(new ApplicationTracking(user, job, ApplicationStatus.APPLIED));
         return true;
     }
 
@@ -60,11 +73,11 @@ public class JobServiceImpl implements JobService {
     @Override
     public Job updateJob(Job job) {
         if (job.getId() == null) {
-            throw new IllegalArgumentException("Job ID is required for update");
+            throw new InvalidParamException("Job ID is required for update");
         }
 
         Job existingJob = jobRepository.findById(job.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Job not found with ID: " + job.getId()));
+                .orElseThrow(() -> new InvalidParamException("Job not found with ID: " + job.getId()));
 
         // Update fields
         existingJob.setTitle(job.getTitle());
@@ -94,7 +107,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public boolean deleteJob(Long id) {
         if (!jobRepository.existsById(id)) {
-            throw new IllegalArgumentException("Job not found with ID: " + id);
+            throw new InvalidParamException("Job not found with ID: " + id);
         }
         jobRepository.deleteById(id);
         return true;
@@ -103,7 +116,7 @@ public class JobServiceImpl implements JobService {
     @Override
     public void deactivateJob(Long id) {
         Job job = jobRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Job not found with ID: " + id));
+                .orElseThrow(() -> new InvalidParamException("Job not found with ID: " + id));
         job.setIsActive(false);
         jobRepository.save(job);
     }
@@ -111,26 +124,26 @@ public class JobServiceImpl implements JobService {
     @Override
     public void activateJob(Long id) {
         Job job = jobRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Job not found with ID: " + id));
+                .orElseThrow(() -> new InvalidParamException("Job not found with ID: " + id));
         job.setIsActive(true);
         jobRepository.save(job);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ListJobResponse findAllJobs(ListJobRequest request) {
-        Page<Job> page = findAllJobs(PageRequest.of(request.getPage(), request.getSize()));
+    public ListJobResponse findAllSavedJobs(ListJobRequest request) {
+        Page<SavedJob> savedJobs = savedJobRepository.findByUser_IdOrderByCreatedAtDesc(request.getUid(), PageRequest.of(request.getPage(), request.getSize()));
         return ListJobResponse.builder()
-                .page(page.getTotalPages())
-                .size(page.getSize())
-                .total(page.getTotalElements())
-                .jobs(page.map(JobMapper.INSTANCE::toVO).toList())
+                .page(savedJobs.getTotalPages())
+                .size(savedJobs.getSize())
+                .total(savedJobs.getTotalElements())
+                .jobs(savedJobs.map(j -> JobMapper.INSTANCE.toVO(j.getJob())).toList())
                 .build();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Job> findAllJobs(Pageable pageable) {
+    public Page<Job> findAllSavedJobs(Pageable pageable) {
         return jobRepository.findAll(pageable);
     }
 
@@ -251,67 +264,67 @@ public class JobServiceImpl implements JobService {
     @Override
     public void validateJob(Job job) {
         if (job == null) {
-            throw new IllegalArgumentException("Job cannot be null");
+            throw new InvalidParamException("Job cannot be null");
         }
 
         if (job.getTitle() == null || job.getTitle().trim().isEmpty()) {
-            throw new IllegalArgumentException("Job title is required");
+            throw new InvalidParamException("Job title is required");
         }
 
         if (job.getDescription() == null || job.getDescription().trim().isEmpty()) {
-            throw new IllegalArgumentException("Job description is required");
+            throw new InvalidParamException("Job description is required");
         }
 
         if (job.getCompany() == null || job.getCompany().trim().isEmpty()) {
-            throw new IllegalArgumentException("Company name is required");
+            throw new InvalidParamException("Company name is required");
         }
 
         if (job.getLocation() == null || job.getLocation().trim().isEmpty()) {
-            throw new IllegalArgumentException("Job location is required");
+            throw new InvalidParamException("Job location is required");
         }
 
         if (job.getEmploymentType() == null) {
-            throw new IllegalArgumentException("Employment type is required");
+            throw new InvalidParamException("Employment type is required");
         }
 
         if (job.getPostedBy() == null) {
-            throw new IllegalArgumentException("Posted by user is required");
+            throw new InvalidParamException("Posted by user is required");
         }
 
         // Validate salary range
         if (job.getSalaryMin() != null && job.getSalaryMax() != null) {
             if (job.getSalaryMin().compareTo(job.getSalaryMax()) > 0) {
-                throw new IllegalArgumentException("Minimum salary cannot be greater than maximum salary");
+                throw new InvalidParamException("Minimum salary cannot be greater than maximum salary");
             }
         }
 
         // Validate salary values
         if (job.getSalaryMin() != null && job.getSalaryMin().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Minimum salary cannot be negative");
+            throw new InvalidParamException("Minimum salary cannot be negative");
         }
 
         if (job.getSalaryMax() != null && job.getSalaryMax().compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("Maximum salary cannot be negative");
+            throw new InvalidParamException("Maximum salary cannot be negative");
         }
 
         // Validate application deadline
         if (job.getApplicationDeadline() != null && job.getApplicationDeadline().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Application deadline must be in the future");
+            throw new InvalidParamException("Application deadline must be in the future");
         }
 
         // Validate description length
         if (job.getDescription().length() > 5000) {
-            throw new IllegalArgumentException("Job description cannot exceed 5000 characters");
+            throw new InvalidParamException("Job description cannot exceed 5000 characters");
         }
 
         // Validate requirements length
         if (job.getRequirements() != null && job.getRequirements().length() > 5000) {
-            throw new IllegalArgumentException("Requirements cannot exceed 5000 characters");
+            throw new InvalidParamException("Requirements cannot exceed 5000 characters");
         }
 
         // Validate benefits length
         if (job.getBenefits() != null && job.getBenefits().length() > 5000) {
-            throw new IllegalArgumentException("Benefits cannot exceed 5000 characters");
+            throw new InvalidParamException("Benefits cannot exceed 5000 characters");
         }
     }
 
