@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
    functions: Field (dropdown/popup, click-outside, portal/positioning),
    classes: none,
    AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
- Human code: 10% (functions: minor tweaks, comments, import moves; classes: none)
+ Human code (James Rose): 10% (functions: minor tweaks, comments, import moves; classes: none)
  Framework-generated code: 5% (tool: Vite/React)
 */
 const FIELDS = ['Engineering', 'Product', 'Design', 'Data', 'Operations'];

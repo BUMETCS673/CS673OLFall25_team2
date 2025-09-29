@@ -3,9 +3,14 @@ package com.cs673.careerforge.service;
 import com.cs673.careerforge.domain.common.EmploymentType;
 import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.domain.User;
+<<<<<<< HEAD
 import com.cs673.careerforge.web.request.JobRequest;
 import com.cs673.careerforge.web.request.ListJobRequest;
 import com.cs673.careerforge.web.response.ListJobResponse;
+=======
+import com.cs673.careerforge.request.ListJobRequest;
+import com.cs673.careerforge.response.ListJobResponse;
+>>>>>>> origin/dev
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,14 +24,6 @@ import java.util.Optional;
  */
 public interface JobService {
 
-    /**
-     * Create a new job posting.
-     *
-     * @param request the job to create
-     * @return the created job
-     * @throws IllegalArgumentException if validation fails
-     */
-    Job saveJob(long id, JobRequest request);
 
     /**
      * Create a new job posting.
@@ -88,11 +85,11 @@ public interface JobService {
     void activateJob(Long id);
 
     /**
-     * Find all jobs.
+     * Find all saved jobs.
      *
      * @return list of all jobs
      */
-    ListJobResponse findAllJobs(ListJobRequest request);
+    ListJobResponse findAllSavedJobs(ListJobRequest request);
 
     /**
      * Find all jobs with pagination.
@@ -100,7 +97,7 @@ public interface JobService {
      * @param pageable pagination information
      * @return page of jobs
      */
-    Page<Job> findAllJobs(Pageable pageable);
+    Page<Job> findAllSavedJobs(Pageable pageable);
 
     /**
      * Find active jobs.

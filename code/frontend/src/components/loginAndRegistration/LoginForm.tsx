@@ -8,7 +8,7 @@ import logo from '../../assets/logo.png'; // Import logo image
    - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
    - Modified and adapted by human
    - Functions/classes: LoginForm component structure, validation logic integration, JSX layout
- Human code: ~30% 
+ Human code (James Rose): ~30% 
    - Adjustments: added centering fixes, styled footer text, ensured responsive Bootstrap card
    - Functions/classes: final layout tweaks, style adjustments, props handling refinements
  Framework-generated code: 0%

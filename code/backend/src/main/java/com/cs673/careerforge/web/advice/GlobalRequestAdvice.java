@@ -1,5 +1,6 @@
 package com.cs673.careerforge.web.advice;
 
+import com.cs673.careerforge.common.auth.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest; // Spring Boot 3.x; for 2.x use javax.servlet.http.HttpServletRequest
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -17,10 +18,6 @@ import java.util.*;
 @Aspect
 @Component
 public class GlobalRequestAdvice {
-
-    private static final List<String> TARGET_FIELD_NAMES = Arrays.asList(
-            "clientIp", "userAgent", "requestId", "httpMethod", "requestUri", "headers"
-    );
 
     @Around("@within(org.springframework.web.bind.annotation.RestController)")
     public Object wrap(ProceedingJoinPoint pjp) throws Throwable {
@@ -76,6 +73,7 @@ public class GlobalRequestAdvice {
         String requestUri = request.getRequestURI();
 
         // Inject into @RequestBody object if fields/setters exist
+        setIfPresent(body, "uid", request.getAttribute("uid"));
         setIfPresent(body, "clientIp", clientIp);
         setIfPresent(body, "userAgent", userAgent);
         setIfPresent(body, "requestId", requestId);

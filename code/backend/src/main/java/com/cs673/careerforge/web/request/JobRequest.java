@@ -22,8 +22,6 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = false)
 public class JobRequest extends BaseRequest {
 
-    private Long id;
-
     private Long postedBy;
 
     private String title;

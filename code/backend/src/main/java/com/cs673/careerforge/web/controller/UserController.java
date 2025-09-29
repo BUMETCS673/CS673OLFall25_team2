@@ -5,12 +5,14 @@ package com.cs673.careerforge.web.controller;
  Framework-generated code: 0%
 */
 
+import com.cs673.careerforge.common.UserType;
 import com.cs673.careerforge.domain.User;
 import com.cs673.careerforge.exceptions.ConflictException;
 import com.cs673.careerforge.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,6 +59,7 @@ public class UserController {
         toCreate.setEmail(request.email());
         toCreate.setFirstName(request.firstName());
         toCreate.setLastName(request.lastName());
+        toCreate.setUserType(request.userType());
         toCreate.setPassword(request.password()); // assume service encodes
 
         User created = userService.createUser(toCreate);
@@ -88,6 +91,9 @@ public class UserController {
             @NotBlank(message = "firstName is required")
             @Size(max = 100, message = "firstName must be at most 100 characters")
             String firstName,
+
+            @NotNull(message = "userType is required")
+            UserType userType,
 
             @NotBlank(message = "lastName is required")
             @Size(max = 100, message = "lastName must be at most 100 characters")

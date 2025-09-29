@@ -1,6 +1,7 @@
 package com.cs673.careerforge.mapper;
 
 import com.cs673.careerforge.domain.Job;
+import com.cs673.careerforge.request.JobRequest;
 import com.cs673.careerforge.utils.DateTimeConvertor;
 import com.cs673.careerforge.web.vo.JobVO;
 import org.mapstruct.Mapper;
@@ -13,4 +14,5 @@ import org.mapstruct.factory.Mappers;
 public interface JobMapper {
     JobMapper INSTANCE = Mappers.getMapper(JobMapper.class);
     JobVO toVO(Job job);
+    Job toDO(JobRequest request);
 }

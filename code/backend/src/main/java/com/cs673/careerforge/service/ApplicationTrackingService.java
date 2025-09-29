@@ -4,6 +4,10 @@ import com.cs673.careerforge.domain.common.ApplicationStatus;
 import com.cs673.careerforge.domain.ApplicationTracking;
 import com.cs673.careerforge.domain.Job;
 import com.cs673.careerforge.domain.User;
+import com.cs673.careerforge.request.DeleteJobRequest;
+import com.cs673.careerforge.request.JobRequest;
+import com.cs673.careerforge.request.ListJobRequest;
+import com.cs673.careerforge.response.ListJobResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,7 +27,7 @@ public interface ApplicationTrackingService {
      * @return the created application
      * @throws IllegalArgumentException if validation fails or application already exists
      */
-    ApplicationTracking createApplication(ApplicationTracking application);
+    ApplicationTracking createApplication(JobRequest request);
     
     /**
      * Find application by ID.
@@ -49,6 +53,13 @@ public interface ApplicationTrackingService {
     ApplicationTracking updateApplication(ApplicationTracking application);
     
     /**
+     * Delete application by ID batch.
+     * @param request delete request
+     * @throws IllegalArgumentException if application not found
+     */
+    boolean deleteApplicationBatch(DeleteJobRequest request);
+
+    /**
      * Delete application by ID.
      * @param id the application ID
      * @throws IllegalArgumentException if application not found
@@ -64,11 +75,18 @@ public interface ApplicationTrackingService {
     
     /**
      * Find applications by applicant with pagination.
+     * @param request the pagination information
+     * @return page of applications by the applicant
+     */
+    ListJobResponse findApplicationsByApplicant(ListJobRequest request);
+
+    /**
+     * Find applications by applicant with pagination.
      * @param applicant the applicant user
      * @param pageable pagination information
      * @return page of applications by the applicant
      */
-    Page<ApplicationTracking> findApplicationsByApplicant(User applicant, Pageable pageable);
+    Page<ApplicationTracking> findByApplicantOrderByLastUpdatedtDesc(User applicant, Pageable pageable);
     
     /**
      * Find applications by job.
