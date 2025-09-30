@@ -12,11 +12,19 @@ import logo from '../../assets/logo.png';
 import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('jwt');
+      localStorage.removeItem('auth');
+      sessionStorage.clear();
+    } catch {}
+  };
+
   return (
     <header className="header-container">
       <div className="header-inner">
         <div className="logo-container">
-          <Link to="/login">
+          <Link to="/login" onClick={handleLogout}>
             <img src={logo} alt="CareerForge Logo" className="logo-image" />
           </Link>
         </div>

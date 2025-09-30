@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Link to navigate to Login page
+import { Link, useNavigate } from 'react-router-dom'; // Link to navigate to Login page
 import { isRequired, isEmail } from './validation'; // keep path simple (no .ts extension)
-import logo from '../../assets/logo.png'; // Import logo image
+import {
+  register as registerRequest,
+  type RegisterPayload,
+} from '../../api/auth/register';
 
 /*
  AI-generated code: ~65% 
@@ -15,7 +18,14 @@ import logo from '../../assets/logo.png'; // Import logo image
    - (React/Bootstrap boilerplate is used but not auto-generated)
 */
 
-type RegisterValues = { name: string; email: string; password: string };
+type RegisterValues = {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  userType: 'EMPLOYEE';
+};
 type Props = {
   onSubmit?: (values: RegisterValues) => void;
   showSubmitButton?: boolean;
@@ -27,48 +37,105 @@ const RegisterForm: React.FC<Props> = ({
   onSubmit,
   showSubmitButton = false,
 }) => {
+  const navigate = useNavigate();
   const [values, setValues] = useState<RegisterValues>({
-    name: '',
+    username: '',
     email: '',
     password: '',
+    firstName: '',
+    lastName: '',
+    userType: 'EMPLOYEE',
   });
 
   // Track touched fields for showing validation feedback
   const [touched, setTouched] = useState<Record<keyof RegisterValues, boolean>>(
     {
-      name: false,
+      username: false,
       email: false,
       password: false,
+      firstName: false,
+      lastName: false,
+      userType: false,
     }
   );
 
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
   // Validation: all fields required, email must match format
   const errors = {
-    name: !isRequired(values.name) ? 'Name is required' : '',
+    username: !isRequired(values.username) ? 'Username is required' : '',
     email: !isRequired(values.email)
       ? 'Email is required'
       : !isEmail(values.email)
       ? 'Enter a valid email'
       : '',
     password: !isRequired(values.password) ? 'Password is required' : '',
-  };
+    firstName: !isRequired(values.firstName) ? 'First name is required' : '',
+    lastName: !isRequired(values.lastName) ? 'Last name is required' : '',
+    userType: !isRequired(values.userType) ? 'User type is required' : '',
+  } as const;
 
   const hasError = (field: keyof RegisterValues) =>
     touched[field] && !!errors[field];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setTouched({ ...touched, [e.target.name]: true as any });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched({ name: true, email: true, password: true });
-    const valid = !errors.name && !errors.email && !errors.password;
-    if (valid && onSubmit) onSubmit(values);
+    setTouched({
+      username: true,
+      email: true,
+      password: true,
+      firstName: true,
+      lastName: true,
+      userType: true,
+    });
+    setServerError(null);
+    setSuccessMsg(null);
+
+    const valid =
+      !errors.username &&
+      !errors.email &&
+      !errors.password &&
+      !errors.firstName &&
+      !errors.lastName &&
+      !errors.userType;
+
+    if (!valid) return;
+
+    if (onSubmit) onSubmit(values);
+
+    try {
+      setLoading(true);
+      const payload: RegisterPayload = {
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        userType: 'EMPLOYEE',
+      };
+
+      await registerRequest(payload);
+      setSuccessMsg('Registration successful. Please log in.');
+      navigate('/login', { replace: true });
+    } catch (err: any) {
+      setServerError(err?.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,35 +148,40 @@ const RegisterForm: React.FC<Props> = ({
       <div className="card shadow-sm" style={{ width: 380, maxWidth: '100%' }}>
         <div className="card-body">
           {/* App/logo image at top (served from /public) */}
-          <img
-            src={logo}
-            alt="JobTracker"
-            className="img-fluid w-100 mb-3"
-            style={{ maxHeight: 100, objectFit: 'contain' }}
-          />
 
           <h2 className="h4 text-center mb-4">Register</h2>
 
+          {serverError && (
+            <div className="alert alert-danger py-2" role="alert">
+              {serverError}
+            </div>
+          )}
+          {successMsg && (
+            <div className="alert alert-success py-2" role="alert">
+              {successMsg}
+            </div>
+          )}
+
           <form className="w-100" noValidate onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="regName" className="form-label">
-                Name
+              <label htmlFor="regUsername" className="form-label">
+                Username
               </label>
               <input
-                id="regName"
-                name="name"
+                id="regUsername"
+                name="username"
                 type="text"
                 className={`form-control ${
-                  hasError('name') ? 'is-invalid' : ''
+                  hasError('username') ? 'is-invalid' : ''
                 }`}
-                value={values.name}
+                value={values.username}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Your full name"
+                placeholder="Choose a username"
                 required
               />
-              {hasError('name') && (
-                <div className="invalid-feedback">{errors.name}</div>
+              {hasError('username') && (
+                <div className="invalid-feedback">{errors.username}</div>
               )}
             </div>
 
@@ -157,18 +229,65 @@ const RegisterForm: React.FC<Props> = ({
               )}
             </div>
 
+            <div className="mb-3">
+              <label htmlFor="regFirstName" className="form-label">
+                First name
+              </label>
+              <input
+                id="regFirstName"
+                name="firstName"
+                type="text"
+                className={`form-control ${
+                  hasError('firstName') ? 'is-invalid' : ''
+                }`}
+                value={values.firstName}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="First name"
+                required
+              />
+              {hasError('firstName') && (
+                <div className="invalid-feedback">{errors.firstName}</div>
+              )}
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="regLastName" className="form-label">
+                Last name
+              </label>
+              <input
+                id="regLastName"
+                name="lastName"
+                type="text"
+                className={`form-control ${
+                  hasError('lastName') ? 'is-invalid' : ''
+                }`}
+                value={values.lastName}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder="Last name"
+                required
+              />
+              {hasError('lastName') && (
+                <div className="invalid-feedback">{errors.lastName}</div>
+              )}
+            </div>
+
             {/* Black, full-width register button (rendered only if allowed by story flag) */}
             {showSubmitButton && (
-              <button type="submit" className="btn btn-dark w-100">
-                Register
+              <button
+                type="submit"
+                className="btn btn-dark w-100"
+                disabled={loading}
+              >
+                {loading ? 'Registering…' : 'Register'}
               </button>
             )}
           </form>
 
           {/* Small footer text with link to Login page */}
           <p className="text-center mt-3 mb-0 small">
-            Already have an account? {/*modified the website from /login to /*/}
-            <Link to="/">Login</Link>
+            Already have an account? <Link to="/login">Login</Link>
           </p>
         </div>
       </div>

@@ -5,6 +5,15 @@
 
 import type { Job, DescriptionBreakdown } from '../../types/job';
 import defaultCompanyLogo from '../../assets/default-company-logo.jpg';
+import SaveJobButton from './SaveJobButton';
+import ApplyJobButton from './ApplyJobButton';
+
+// Import types for global functions
+declare global {
+  interface Window {
+    clearSavedAppliedJobs: () => string;
+  }
+}
 
 export default function JobCard({
   job,
@@ -233,17 +242,7 @@ export default function JobCard({
               </div>
             ) : null}
 
-            <div className="d-flex gap-2">
-              {job.url && (
-                <a
-                  href={job.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-primary"
-                >
-                  Apply Now
-                </a>
-              )}
+            <div className="d-flex gap-2 align-items-center flex-wrap">
               {mapHref && (
                 <a
                   href={mapHref}
@@ -264,6 +263,8 @@ export default function JobCard({
                   Company Page
                 </a>
               )}
+              <ApplyJobButton job={job} detailed={!!detailed} />
+              <SaveJobButton job={job} detailed={!!detailed} />
             </div>
           </div>
         )}
@@ -271,3 +272,5 @@ export default function JobCard({
     </div>
   );
 }
+
+// No button components needed here as they've been moved to separate files

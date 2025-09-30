@@ -1,6 +1,8 @@
 // src/api/auth/login.ts
 // Centralized login request helper
 
+import { postJson, stripEnvelope } from '../http';
+
 export type LoginResponseEnvelope = {
   success?: boolean;
   result?: { jwt?: string };
@@ -14,28 +16,18 @@ export async function login(
   username: string,
   password: string
 ): Promise<{ token: string; raw: LoginResponseEnvelope }> {
-  const API_BASE =
-    (import.meta as any)?.env?.VITE_API_BASE_URL || 'http://localhost:8080/api';
+  const { data } = await postJson<LoginResponseEnvelope>(
+    '/authenticate',
+    { username, password },
+    { noAuth: true }
+  );
 
-  const res = await fetch(`${API_BASE}/authenticate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  });
-
-  const data: LoginResponseEnvelope = await res
-    .json()
-    .catch(() => ({} as LoginResponseEnvelope));
-
-  if (!res.ok) {
-    const msg = data?.message || data?.error || `Login failed (${res.status})`;
-    throw new Error(msg);
-  }
-
-  const token = data?.result?.jwt || data?.jwt;
+  const unwrapped = stripEnvelope<LoginResponseEnvelope>(data);
+  const token = (unwrapped as any)?.result?.jwt || (unwrapped as any)?.jwt;
   if (!token) {
     throw new Error('JWT not found in response');
   }
 
-  return { token, raw: data };
+  console.log('Login response data:', data);
+  return { token, raw: unwrapped };
 }
