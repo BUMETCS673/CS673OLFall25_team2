@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: careerforge-app
     ports:
-      - '8080:8080'
+      - "8080:8080"
     environment:
       # --- DB ---
       SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/careerforge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
@@ -22,7 +22,7 @@ services:
 
       # --- Actuator (so you can curl without auth if you want) ---
       MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,info
-      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: 'true'
+      MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
 
     depends_on:
       db:
@@ -38,15 +38,25 @@ services:
       MYSQL_PASSWORD: secret
       MYSQL_ROOT_PASSWORD: rootpw
     ports:
-      - '3306:3306'
+      - "3306:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
-      test: ['CMD', 'mysqladmin', 'ping', '-h', '127.0.0.1', '-prootpw']
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-prootpw"]
       interval: 5s
       timeout: 5s
       retries: 20
     restart: unless-stopped
+
+  frontend-tests:
+    build:
+      context: ./code/frontend
+      dockerfile: Dockerfile.test
+    container_name: careerforge-frontend-tests
+    working_dir: /app
+    command: ["npm", "test", "--", "--ci"]
+    # No ports or volumes needed; image contains source + tests
+    # Run on-demand: `docker compose run --rm frontend-tests`
 
 volumes:
   mysql-data:
