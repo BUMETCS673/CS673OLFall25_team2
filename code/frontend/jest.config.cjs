@@ -13,11 +13,23 @@ module.exports = {
   setupFilesAfterEnv: ["<rootDir>/jest-setup.ts"], // your global setup
 
   transform: {
-    "^.+\\.tsx?$": ["ts-jest", { tsconfig: "tsconfig.json" }], // TypeScript
-    "^.+\\.(png|jpg|jpeg|gif|svg)$": "<rootDir>/fileTransformer.cjs" // image imports
+    '^.+\\.(t|j)sx?$': [
+      'ts-jest',
+      {
+        tsconfig: '<rootDir>/tsconfig.jest.json',
+        isolatedModules: false,
+        diagnostics: true,
+        useESM: false,
+      },
+    ],
   },
-
+// ... (previous config)
+  setupFilesAfterEnv: ['<rootDir>/src/tests/setupTests.ts'],
   moduleNameMapper: {
-    "\\.(css|less|scss|sass)$": "identity-obj-proxy" // CSS imports
-  }
+    // Mock static asset imports (images)
+    '\\.(jpg|jpeg|png|gif|webp|svg)$':
+      '<rootDir>/src/tests/__mocks__/fileMock.js',
+    // Mock CSS imports
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
 };

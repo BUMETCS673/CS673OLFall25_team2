@@ -1,8 +1,6 @@
 /*
- AI-generated code: 20% Formatting help with GPT
-
- Human code: 80% functions/classes: MyJobs component
-
+ AI-generated code: 0%
+ Human code: 100% functions/classes: MyJobs component
  Framework-generated code: 0%
 */
 
@@ -10,7 +8,7 @@
 import React from 'react';
 import './MyJobs.css';
 
-const MyJobs: React.FC = () => {
+const MyJobsButton: React.FC = () => {
   return (
     <button className="my-jobs-button">
       My Jobs
@@ -18,4 +16,4 @@ const MyJobs: React.FC = () => {
   );
 };
 
-export default MyJobs;
+export default MyJobsButton;

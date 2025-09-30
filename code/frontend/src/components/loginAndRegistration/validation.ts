@@ -2,7 +2,7 @@
  AI-generated code: ~50% 
    - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
    - Functions/classes: isRequired, isEmail utility functions suggested by AI
- Human code: ~50% 
+ Human code (James Rose): ~50% 
    - Adjustments: simplified regex validation, added doc comments, integration testing with forms
  Framework-generated code: 0%
    - (Plain TypeScript helpers, no framework generation)

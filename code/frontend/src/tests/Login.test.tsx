@@ -1,10 +1,7 @@
-/* src/tests/Login.test.tsx
-
- AI-generated code: 80% Tool: GPT
-
- Human code: 20% Logic
-
- Framework-generated code: 0%
+/*
+  AI-generated code: 80% Tool: GPT
+  Human code: 20% Logic (adapted to LoginForm.tsx by a human)
+  Framework-generated code: 0%
 */
 
 import React from 'react';
@@ -12,61 +9,58 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import LoginForm from '../components/loginAndRegistration/LoginForm';
 
-// Mock the global fetch function before each test
-global.fetch = jest.fn();
+// Mock the module containing the loginRequest function
+// This is more robust than mocking global 'fetch' as it directly targets the component's dependency.
+jest.mock('../api/auth/login', () => ({ // <-- CORRECTED PATH
+  login: jest.fn(),
+}));
+
+// Import the mock after defining it
+import { login as mockLoginRequest } from '../api/auth/login'; // <-- CORRECTED PATH
 
 // Mock react-router-dom's useNavigate hook
 const mockedNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'), // import and retain all actual functionalities
+  ...jest.requireActual('react-router-dom'), // Import and retain all actual functionalities
   useNavigate: () => mockedNavigate, // But hijack useNavigate
-  Link: (props: any) => <a {...props}>{props.children}</a>, // Simple mock for Link
+  Link: (props: any) => <a {...props}>{props.children}</a>, // Simple mock for Link component
 }));
 
 describe('LoginForm', () => {
   beforeEach(() => {
     // Clear all mocks before each test
-    (fetch as jest.Mock).mockClear();
+    (mockLoginRequest as jest.Mock).mockClear();
     mockedNavigate.mockClear();
+    jest.spyOn(Storage.prototype, 'setItem').mockClear();
+    jest.spyOn(Storage.prototype, 'getItem').mockClear();
   });
 
-  // Test case 1: Client-side validation
-  test('should show validation errors for invalid email and empty password and not submit', () => {
+  // Test 1: Client-side validation for empty fields
+  test('should show validation errors if username or password are empty', async () => {
     render(
       <BrowserRouter>
         <LoginForm showSubmitButton={true} />
       </BrowserRouter>
     );
 
-    const submitButton = screen.getByRole('button', { name: /login/i });
-
-    // Try to submit with invalid email
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'invalid-email' } });
+    const submitButton = screen.getByRole('button', { name: /Login/i });
     fireEvent.click(submitButton);
 
-    // Assert error message is shown and fetch was not called
-    expect(screen.getByText('Enter a valid email')).toBeInTheDocument();
-    expect(fetch).not.toHaveBeenCalled();
-
-    // Try to submit with empty password
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: '' } });
-    fireEvent.click(submitButton);
-
-    // Assert error message is shown and fetch was not called
+    // Assert error messages are shown and API was not called
+    expect(await screen.findByText('Username is required')).toBeInTheDocument();
     expect(screen.getByText('Password is required')).toBeInTheDocument();
-    expect(fetch).not.toHaveBeenCalled();
+    expect(mockLoginRequest).not.toHaveBeenCalled();
   });
 
-  // Test case 2: Successful login flow
+  // Test 2: Successful login flow
   test('should call login API, store token, and navigate on successful submission', async () => {
-    // Mock a successful fetch response
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({ token: 'fake-jwt-token' }),
+    // Mock a successful API response
+    (mockLoginRequest as jest.Mock).mockResolvedValue({
+      token: 'fake-jwt-token',
+      raw: { user: 'testuser' },
     });
 
-    // Mock localStorage
+    // Spy on localStorage
     const setItemSpy = jest.spyOn(Storage.prototype, 'setItem');
 
     render(
@@ -76,34 +70,31 @@ describe('LoginForm', () => {
     );
 
     // Fill out the form with valid credentials
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
-    fireEvent.click(screen.getByRole('button', { name: /login/i }));
+    fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'password123' } });
+    fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
     // Assert that the API was called correctly
     await waitFor(() => {
-      expect(fetch).toHaveBeenCalledWith('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: 'test@example.com', password: 'password123' }),
-      });
+      expect(mockLoginRequest).toHaveBeenCalledWith('testuser', 'password123');
     });
 
+    // Assert success message is displayed
+    expect(await screen.findByText('Logged in successfully. Token saved.')).toBeInTheDocument();
+
     // Assert that the token was stored and navigation occurred
-    expect(setItemSpy).toHaveBeenCalledWith('token', 'fake-jwt-token');
-    expect(mockedNavigate).toHaveBeenCalledWith('/dashboard'); // Or wherever it should go
+    expect(setItemSpy).toHaveBeenCalledWith('jwt', 'fake-jwt-token');
+    expect(setItemSpy).toHaveBeenCalledWith('auth', JSON.stringify({ user: 'testuser' }));
+    expect(mockedNavigate).toHaveBeenCalledWith('/content', { replace: true });
 
     setItemSpy.mockRestore(); // Clean up spy
   });
 
-  // Test case 3: 401/500 Error Handling
-  test('should show an alert on 401 or 500 error from the API', async () => {
-    // Mock a failed fetch response
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false,
-      status: 401,
-      json: async () => ({ message: 'Invalid credentials' }),
-    });
+  // Test 3: API error handling (e.g., invalid credentials)
+  test('should show an alert on API error', async () => {
+    // Mock a failed API response
+    const errorMessage = 'Invalid credentials';
+    (mockLoginRequest as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
     render(
       <BrowserRouter>
@@ -111,19 +102,21 @@ describe('LoginForm', () => {
       </BrowserRouter>
     );
 
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'wrong@example.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'wrongpassword' } });
-    fireEvent.click(screen.getByRole('button', { name: /login/i }));
+    fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'wronguser' } });
+    fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'wrongpassword' } });
+    fireEvent.click(screen.getByRole('button', { name: /Login/i }));
 
     // Wait for the error message to appear and assert it has role="alert"
     const alert = await screen.findByRole('alert');
-    expect(alert).toHaveTextContent('Invalid credentials');
+    expect(alert).toHaveTextContent(errorMessage);
   });
 
-  // Test case 4: Submit button disabled while in-flight
+  // Test 4: Submit button disabled while in-flight
   test('should disable the submit button while the form is submitting', async () => {
-    // Create a mock fetch that takes time to resolve
-    (fetch as jest.Mock).mockImplementationOnce(() => new Promise(resolve => setTimeout(() => resolve({ ok: true, json: async () => ({ token: 'token' }) }), 100)));
+    // Create a mock API call that takes time to resolve
+    (mockLoginRequest as jest.Mock).mockImplementation(
+      () => new Promise(resolve => setTimeout(() => resolve({ token: 'token', raw: {} }), 100))
+    );
 
     render(
       <BrowserRouter>
@@ -131,18 +124,20 @@ describe('LoginForm', () => {
       </BrowserRouter>
     );
 
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
+    fireEvent.change(screen.getByLabelText(/Username/i), { target: { value: 'testuser' } });
+    fireEvent.change(screen.getByLabelText(/Password/i), { target: { value: 'password123' } });
 
-    const submitButton = screen.getByRole('button', { name: /login/i });
+    const submitButton = screen.getByRole('button', { name: /Login/i });
     fireEvent.click(submitButton);
 
-    // Immediately after clicking, the button should be disabled
+    // Immediately after clicking, the button should be disabled and the text should change
     expect(submitButton).toBeDisabled();
+    expect(submitButton).toHaveTextContent('Logging in…');
 
     // Wait for the process to complete, and the button should be re-enabled
     await waitFor(() => {
       expect(submitButton).not.toBeDisabled();
+      expect(submitButton).toHaveTextContent('Login');
     });
   });
 });

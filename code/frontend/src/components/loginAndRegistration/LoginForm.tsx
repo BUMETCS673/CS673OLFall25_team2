@@ -1,28 +1,31 @@
 // ADDED: useNavigate to handle redirection after a successful login.
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Link to navigate to Register page
-import { isRequired, isEmail } from './validation'; // keep path simple (no .ts extension)
+import { isRequired } from './validation'; // keep path simple (no .ts extension)
 import logo from '../../assets/logo.png'; // Import logo image
+import { login as loginRequest } from '../../api/auth/login';
 
 /*
- AI-generated code: ~70% 
-   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
-   - Modified and adapted by human
-   - Functions/classes: LoginForm component structure, validation logic integration, JSX layout
- Human code: ~30% 
-   - Adjustments: added centering fixes, styled footer text, ensured responsive Bootstrap card
-   - Functions/classes: final layout tweaks, style adjustments, props handling refinements
- Framework-generated code: 0%
-   - (React/Bootstrap boilerplate is used but not auto-generated)
+ AI-generated code: ~70% 
+   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
+   - Modified and adapted by human
+   - Functions/classes: LoginForm component structure, validation logic integration, JSX layout
+ Human code (James Rose): ~30% 
+   - Adjustments: added centering fixes, styled footer text, ensured responsive Bootstrap card
+   - Functions/classes: final layout tweaks, style adjustments, props handling refinements
+ Framework-generated code: 0%
+   - (React/Bootstrap boilerplate is used but not auto-generated)
+
+   // Human (Pedro) refined the code 30%
 */
 
 /**
- * @typedef {Object} LoginValues
- * @property {string} email
- * @property {string} password
- */
+ * @typedef {Object} LoginValues
+ * @property {string} username
+ * @property {string} password
+ */
 type LoginValues = {
-  email: string;
+  username: string;
   password: string;
 };
 
@@ -33,36 +36,31 @@ type Props = {
   showSubmitButton?: boolean;
 };
 
-// Login form with email + password fields, Bootstrap styling, and basic validation
+// Login form with username + password fields, calls backend to get JWT and saves it
 const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
+  const navigate = useNavigate();
   // Controlled state for form fields
   const [values, setValues] = useState<LoginValues>({
-    email: '',
+    username: '',
     password: '',
   });
 
   // Track which fields the user has interacted with
   // Used to show errors only after user touches/leaves a field
   const [touched, setTouched] = useState<Record<keyof LoginValues, boolean>>({
-    email: false,
+    username: false,
     password: false,
   });
 
-  // ADDED: State to manage the API loading status (for disabling the button)
-  // and to store any errors returned from the API.
-  const [isLoading, setIsLoading] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
-  const navigate = useNavigate(); // ADDED: Hook for navigation
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   // Validation rules (errors show if not empty/invalid email)
   const errors = {
-    email: !isRequired(values.email)
-      ? 'Email is required'
-      : !isEmail(values.email)
-      ? 'Enter a valid email'
-      : '',
+    username: !isRequired(values.username) ? 'Username is required' : '',
     password: !isRequired(values.password) ? 'Password is required' : '',
-  };
+  } as const;
 
   const hasError = (field: keyof LoginValues) =>
     touched[field] && !!errors[field];
@@ -77,58 +75,38 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
     setTouched({ ...touched, [e.target.name]: true });
   };
 
-  /*
-  // DELETED: The original handleSubmit function was removed.
-  // It only handled client-side validation and called an external onSubmit prop.
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setTouched({ email: true, password: true });
-    const valid = !errors.email && !errors.password;
-    if (valid && onSubmit) onSubmit(values);
-  };
-  */
-
-  // ADDED: A new, asynchronous handleSubmit function to replace the old one.
-  // This function now handles the complete submission flow:
-  // 1. Sets a loading state to disable the UI.
-  // 2. Calls the fetch API to log the user in.
-  // 3. Handles success by storing the token and navigating.
-  // 4. Handles errors by displaying an alert.
-  // 5. Resets the loading state regardless of outcome.
+  // Prevent submission if validation fails
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched({ email: true, password: true });
-    setApiError(null);
+    setTouched({ username: true, password: true });
+    setServerError(null);
+    setSuccessMsg(null);
+    const valid = !errors.username && !errors.password;
+    if (!valid) return;
 
-    const valid = !errors.email && !errors.password;
-    if (!valid) {
-      return;
-    }
+    // Allow parent to intercept if provided
+    if (onSubmit) onSubmit(values);
 
-    setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
-      });
+      setLoading(true);
+      const { token, raw } = await loginRequest(
+        values.username,
+        values.password
+      );
 
-      const data = await response.json();
+      localStorage.setItem('jwt', token);
+      try {
+        localStorage.setItem('auth', JSON.stringify(raw));
+      } catch {}
 
-      if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong');
-      }
-
-      localStorage.setItem('token', data.token);
-      navigate('/dashboard');
-
-    } catch (error: any) {
-      setApiError(error.message);
+      setSuccessMsg('Logged in successfully. Token saved.');
+      navigate('/content', { replace: true });
+    } catch (err: any) {
+      setServerError(err?.message || 'Login failed');
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
-
 
   return (
     // Center the card regardless of parent layout; prevent squish
@@ -152,34 +130,37 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
 
           <h1 className="h4 text-center mb-4">Login</h1>
 
-          {/* ADDED: A conditional alert to display API errors.
-              This element has role="alert" which the test looks for. */}
-          {apiError && (
-            <div className="alert alert-danger" role="alert">
-              {apiError}
+          {serverError && (
+            <div className="alert alert-danger py-2" role="alert">
+              {serverError}
+            </div>
+          )}
+          {successMsg && (
+            <div className="alert alert-success py-2" role="alert">
+              {successMsg}
             </div>
           )}
 
           <form className="w-100" noValidate onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="loginEmail" className="form-label">
-                Email
+              <label htmlFor="loginUsername" className="form-label">
+                Username
               </label>
               <input
-                id="loginEmail"
-                name="email"
-                type="email"
+                id="loginUsername"
+                name="username"
+                type="text"
                 className={`form-control ${
-                  hasError('email') ? 'is-invalid' : ''
+                  hasError('username') ? 'is-invalid' : ''
                 }`}
-                value={values.email}
+                value={values.username}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="name@example.com"
+                placeholder="Your username"
                 required
               />
-              {hasError('email') && (
-                <div className="invalid-feedback">{errors.email}</div>
+              {hasError('username') && (
+                <div className="invalid-feedback">{errors.username}</div>
               )}
             </div>
 
@@ -208,8 +189,12 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
             {/* MODIFIED: The button is now disabled based on the isLoading state,
                 and its text changes to give user feedback. */}
             {showSubmitButton && (
-              <button type="submit" className="btn btn-dark w-100" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Login'}
+              <button
+                type="submit"
+                className="btn btn-dark w-100"
+                disabled={loading}
+              >
+                {loading ? 'Logging in…' : 'Login'}
               </button>
             )}
           </form>
