@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState, useCallback } from "react";
-import JobCard from "./JobCard";
-import type { Job } from "../../types/job";
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import JobCard from './JobCard';
+import type { Job } from '../../types/job';
 import {
   getMySaved,
   getMyApplied,
@@ -8,9 +8,9 @@ import {
   deleteAppliedJob,
   deleteAllSaved,
   deleteAllApplied,
-} from "../../api/endpoints/myJobs";
-import DeleteButton from "../buttons/Delete";
-import DeleteAll from "../buttons/DeleteAll";
+} from '../../api/pages/myJobs';
+import DeleteButton from '../buttons/Delete';
+import DeleteAll from '../buttons/DeleteAll';
 
 /*
  AI-generated code: ~50% (tool: ChatGPT, adapted; chat link: https://chatgpt.com/share/68d6d0b7-3ca8-8006-a7b7-223d71795542)
@@ -18,12 +18,12 @@ import DeleteAll from "../buttons/DeleteAll";
  Framework-generated code: ~5% (Vite + React scaffolding conventions)
 */
 
-const PANEL_MAX_HEIGHT = "100vh";
-const LG_QUERY = "(min-width: 992px)";
+const PANEL_MAX_HEIGHT = '100vh';
+const LG_QUERY = '(min-width: 992px)';
 
 interface MyJobsViewListProps {
-  view: "saved" | "applied";
-  onChangeView?: (v: "saved" | "applied") => void; // necessary prop
+  view: 'saved' | 'applied';
+  onChangeView?: (v: 'saved' | 'applied') => void; // necessary prop
 }
 
 /**
@@ -31,26 +31,27 @@ interface MyJobsViewListProps {
  * - Left: list of jobs with delete support
  * - Right: job details (desktop) or modal overlay (mobile)
  */
-const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) => {
+const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
+  view,
+  onChangeView,
+}) => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isLgUp, setIsLgUp] = useState<boolean>(
-    () =>
-      typeof window !== "undefined"
-        ? window.matchMedia(LG_QUERY).matches
-        : true
+  const [isLgUp, setIsLgUp] = useState<boolean>(() =>
+    typeof window !== 'undefined' ? window.matchMedia(LG_QUERY).matches : true
   );
 
   // Watch for screen size changes (desktop vs mobile)
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
     const mql = window.matchMedia(LG_QUERY);
     const handler = (e: MediaQueryListEvent) => setIsLgUp(e.matches);
-    mql.addEventListener?.("change", handler) ?? mql.addListener(handler);
+    mql.addEventListener?.('change', handler) ?? mql.addListener(handler);
     return () =>
-      mql.removeEventListener?.("change", handler) ?? mql.removeListener(handler);
+      mql.removeEventListener?.('change', handler) ??
+      mql.removeListener(handler);
   }, []);
 
   // Fetch jobs whenever view changes
@@ -60,11 +61,12 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
       try {
         setLoading(true);
         setError(null);
-        const data = view === "saved" ? await getMySaved() : await getMyApplied();
+        const data =
+          view === 'saved' ? await getMySaved() : await getMyApplied();
         setJobs(data as Job[]);
       } catch (e: any) {
-        if (e.name !== "AbortError")
-          setError(e?.message || "Failed to fetch jobs");
+        if (e.name !== 'AbortError')
+          setError(e?.message || 'Failed to fetch jobs');
       } finally {
         setLoading(false);
       }
@@ -90,7 +92,7 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
   // Delete one job (optimistic UI with rollback on error)
   const handleDelete = useCallback(
     async (id: string) => {
-      const label = view === "saved" ? "saved" : "applied";
+      const label = view === 'saved' ? 'saved' : 'applied';
       if (!window.confirm(`Delete this ${label} job?`)) return;
 
       const prev = jobs;
@@ -98,7 +100,7 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
       if (selectedJobId === id) setSelectedJobId(null);
 
       try {
-        if (view === "saved") await deleteSavedJob(id);
+        if (view === 'saved') await deleteSavedJob(id);
         else await deleteAppliedJob(id);
       } catch (e: any) {
         setJobs(prev); // rollback
@@ -115,7 +117,7 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
       setJobs([]);
       setSelectedJobId(null);
     } catch (e: any) {
-      setError(e?.message || "Failed to delete all saved jobs");
+      setError(e?.message || 'Failed to delete all saved jobs');
     }
   }, []);
 
@@ -126,7 +128,7 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
       setJobs([]);
       setSelectedJobId(null);
     } catch (e: any) {
-      setError(e?.message || "Failed to delete all applied jobs");
+      setError(e?.message || 'Failed to delete all applied jobs');
     }
   }, []);
 
@@ -137,28 +139,28 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
         <div
           className="jobs-list flex-shrink-0 overflow-auto p-0"
           style={{
-            flexBasis: "100%",
-            flex: "0 0 30%",
+            flexBasis: '100%',
+            flex: '0 0 30%',
             maxHeight: PANEL_MAX_HEIGHT,
             minHeight: 0,
-            background: "var(--surface-bg)",
-            borderRight: "1px solid var(--surface-border-color)",
+            background: 'var(--surface-bg)',
+            borderRight: '1px solid var(--surface-border-color)',
           }}
         >
           <div
             className="position-sticky top-0 p-3 border-bottom"
             style={{
-              background: "var(--surface-bg)",
-              borderBottom: "1px solid var(--surface-border-color)",
+              background: 'var(--surface-bg)',
+              borderBottom: '1px solid var(--surface-border-color)',
             }}
           >
             {/* Header w/ Delete All for Saved & Applied */}
             <div className="d-flex justify-content-between align-items-center">
               <h2 className="m-0">
-                {view === "saved" ? "Saved Jobs" : "Applied Jobs"}
+                {view === 'saved' ? 'Saved Jobs' : 'Applied Jobs'}
               </h2>
 
-              {view === "saved" ? (
+              {view === 'saved' ? (
                 <DeleteAll
                   label="Delete All"
                   disabled={loading || jobs.length === 0}
@@ -175,18 +177,26 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
 
             {/* Small toggle buttons under the title, above the list */}
             <div className="mt-2">
-              <div className="btn-group btn-group-sm" role="group" aria-label="Choose jobs view">
+              <div
+                className="btn-group btn-group-sm"
+                role="group"
+                aria-label="Choose jobs view"
+              >
                 <button
                   type="button"
-                  className={`btn ${view === "saved" ? "btn-danger" : "btn-outline-danger"}`}
-                  onClick={() => onChangeView?.("saved")}
+                  className={`btn ${
+                    view === 'saved' ? 'btn-danger' : 'btn-outline-danger'
+                  }`}
+                  onClick={() => onChangeView?.('saved')}
                 >
                   Saved Jobs
                 </button>
                 <button
                   type="button"
-                  className={`btn ${view === "applied" ? "btn-danger" : "btn-outline-danger"}`}
-                  onClick={() => onChangeView?.("applied")}
+                  className={`btn ${
+                    view === 'applied' ? 'btn-danger' : 'btn-outline-danger'
+                  }`}
+                  onClick={() => onChangeView?.('applied')}
                 >
                   Applied Jobs
                 </button>
@@ -221,12 +231,12 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
                   <div
                     key={id}
                     className={`list-group-item w-100 text-start ${
-                      isActive ? "active" : ""
+                      isActive ? 'active' : ''
                     }`}
                     aria-selected={isActive}
                     style={{
-                      background: "var(--surface-bg)",
-                      borderBottom: "1px solid var(--surface-border-color)",
+                      background: 'var(--surface-bg)',
+                      borderBottom: '1px solid var(--surface-border-color)',
                     }}
                   >
                     <div className="d-flex align-items-start">
@@ -235,7 +245,7 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
                         type="button"
                         onClick={() => handleSelect(id)}
                         onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ")
+                          if (e.key === 'Enter' || e.key === ' ')
                             handleSelect(id);
                         }}
                         className="btn btn-link text-start p-0 flex-grow-1 text-decoration-none"
@@ -268,12 +278,12 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
         <div
           className="job-details d-none d-lg-block flex-grow-1 overflow-auto p-3"
           style={{
-            flexBasis: "100%",
-            flex: "1 1 70%",
+            flexBasis: '100%',
+            flex: '1 1 70%',
             maxHeight: PANEL_MAX_HEIGHT,
             minHeight: 0,
-            background: "var(--surface-bg)",
-            borderLeft: "1px solid var(--surface-border-color)",
+            background: 'var(--surface-bg)',
+            borderLeft: '1px solid var(--surface-border-color)',
           }}
         >
           {selectedJob ? (
@@ -283,7 +293,9 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
           ) : loading ? (
             <p className="text-muted">Loading details…</p>
           ) : (
-            <p className="text-muted">Select a job from the list to view details.</p>
+            <p className="text-muted">
+              Select a job from the list to view details.
+            </p>
           )}
         </div>
       </div>
@@ -297,7 +309,7 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
           aria-modal="true"
           aria-label="Job details"
           onKeyDown={(e) => {
-            if (e.key === "Escape") handleCloseMobile();
+            if (e.key === 'Escape') handleCloseMobile();
           }}
         >
           <div className="d-flex align-items-center justify-content-center h-100 p-3">
@@ -305,17 +317,17 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({ view, onChangeView }) =
               className="shadow rounded w-100"
               style={{
                 maxWidth: 640,
-                maxHeight: "90vh",
-                overflow: "auto",
-                background: "var(--surface-bg)",
-                border: "1px solid var(--surface-border-color)",
+                maxHeight: '90vh',
+                overflow: 'auto',
+                background: 'var(--surface-bg)',
+                border: '1px solid var(--surface-border-color)',
               }}
             >
               <div
                 className="d-flex align-items-center justify-content-between p-2 border-bottom sticky-top"
                 style={{
-                  background: "var(--surface-bg)",
-                  borderBottom: "1px solid var(--surface-border-color)",
+                  background: 'var(--surface-bg)',
+                  borderBottom: '1px solid var(--surface-border-color)',
                 }}
               >
                 <strong>Job Details</strong>

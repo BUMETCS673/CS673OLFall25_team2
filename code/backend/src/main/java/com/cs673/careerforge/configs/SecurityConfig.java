@@ -30,6 +30,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import com.cs673.careerforge.security.JwtAuthenticationEntryPoint;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -40,7 +45,8 @@ public class SecurityConfig {
                                            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
         //csrf.disable -> typical for stateless APIs
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 // allow H2 console to render in a frame
                 .headers(h -> h.frameOptions(f -> f.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
@@ -68,6 +74,22 @@ public class SecurityConfig {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                // Allow Vite dev server origin; add more origins as needed
+                configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Origin", "Accept"));
+                configuration.setExposedHeaders(List.of("Location"));
+                configuration.setAllowCredentials(true);
+                configuration.setMaxAge(3600L);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
