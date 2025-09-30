@@ -56,7 +56,6 @@ class UserTest {
     @DisplayName("Should create user with valid data")
     void shouldCreateUserWithValidData() {
         assertNotNull(user);
-        assertEquals("testuser", user.getUsername());
         assertEquals("test@example.com", user.getEmail());
         assertEquals("John", user.getFirstName());
         assertEquals("Doe", user.getLastName());
@@ -138,7 +137,6 @@ class UserTest {
         assertTrue(user.isEnabled());
 
         assertEquals("password123", user.getPassword());
-        assertEquals("testuser", user.getUsername());
         assertEquals(1, user.getAuthorities().size());
         assertTrue(user.getAuthorities().iterator().next().getAuthority().contains("EMPLOYEE"));
     }

@@ -5,27 +5,24 @@ package com.cs673.careerforge.security;
  Human code: 10%
 */
 
-import io.jsonwebtoken.io.Encoders;
-import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.SignatureAlgorithm;
-import javax.crypto.SecretKey;
-
+import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.io.Encoders;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.core.env.Environment;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 @TestConfiguration
 public class TestJwtConfig {
 
-    @Bean
-    @Primary
-    public JwtUtil jwtUtil(Environment env) {
-        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        String base64Key = Encoders.BASE64.encode(key.getEncoded());
+    @DynamicPropertySource
+    static void jwtProperties(DynamicPropertyRegistry registry) {
+        // Generate a proper Base64-encoded HS256 key
+        String base64Key = Encoders.BASE64.encode(
+                Keys.secretKeyFor(SignatureAlgorithm.HS256).getEncoded()
+        );
 
-        long expiration = 3600000L; // 1 hour (or read from test properties if you prefer)
-
-        return new JwtUtil(expiration, env, base64Key);
+        registry.add("app.jwt.secret", () -> base64Key);
+        registry.add("app.jwt.expiration", () -> 3600000L); // 1 hour
     }
 }

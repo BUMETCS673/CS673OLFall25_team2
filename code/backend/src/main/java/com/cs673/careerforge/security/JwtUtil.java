@@ -79,7 +79,12 @@ If missing → generate a key, append/persist it into application-dev.properties
 
         // 2. Check application.properties (injected via @Value)
         if (base64Secret != null && !base64Secret.isBlank()) {
-            return base64Secret;
+            try {
+                Decoders.BASE64.decode(base64Secret); // validate
+                return base64Secret;
+            } catch (Exception e) {
+                throw new IllegalStateException("Invalid Base64 secret configured", e);
+            }
         }
 
         // 3. Decide based on profile

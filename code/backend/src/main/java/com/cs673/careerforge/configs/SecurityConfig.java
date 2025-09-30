@@ -38,6 +38,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtRequestFilter jwtRequestFilter,
                                            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
+
+        System.out.println(">>> Using custom SecurityConfig filterChain <<<");
         //csrf.disable -> typical for stateless APIs
         return http
                 .csrf(csrf -> csrf.disable())
@@ -50,18 +52,14 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/h2-console/**",
                                 "/public/**",
-                                "/authenticate", // change for login endpoint
-                                "/register"        // change for signup endpoint
+                                "/auth/login",
+                                "/auth/register"
                         ).permitAll()
-                        .requestMatchers("/secure").authenticated() // secure endpoint requires JWT
-                     //   .requestMatchers("/secure").hasRole("USER") // secure endpoint requires JWT, both USER and ADMIN get in
-                        .requestMatchers("/admin/**").hasRole("ADMIN") //only ADMIN. Not implemented yet. Just being used for tests
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // no HTTP sessions
                 )
-                // plug in the custom entrypoint
                 .exceptionHandling(ex ->
                         ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
@@ -73,28 +71,6 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
         return cfg.getAuthenticationManager();
     }
-
-    // @Bean
-    // public UserDetailsService users(
-    //         @Value("${app.security.user.name}") String userName,
-    //         @Value("${app.security.user.password}") String userPass,
-    //         @Value("${app.security.admin.name}") String adminName,
-    //         @Value("${app.security.admin.password}") String adminPass) {
-    //
-    //     PasswordEncoder encoder = passwordEncoder();
-    //
-    //     UserDetails user = User.withUsername(userName)
-    //             .password(encoder.encode(userPass))
-    //             .roles("USER")
-    //             .build();
-    //
-    //     UserDetails admin = User.withUsername(adminName)
-    //             .password(encoder.encode(adminPass))
-    //             .roles("ADMIN")
-    //             .build();
-    //
-    //     return new InMemoryUserDetailsManager(user, admin);
-    // }
 
     @Bean
     public PasswordEncoder passwordEncoder() {

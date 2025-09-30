@@ -26,12 +26,6 @@ public class GlobalExceptionAdvice {
         return BaseResult.fail(e.getResultEnum().code(), e.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
-    public BaseResult<Void> handleOther(Exception e) {
-        markException();
-        return BaseResult.fail(ResultEnum.INTERNAL_ERROR.code(), ResultEnum.INTERNAL_ERROR.msg());
-    }
-
     private void markException() {
         ServletRequestAttributes attrs =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

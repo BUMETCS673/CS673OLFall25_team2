@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.cs673.careerforge.exceptions.InvalidParamException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -87,7 +88,6 @@ class UserServiceTest {
     @DisplayName("Should create user successfully")
     void shouldCreateUserSuccessfully() {
         // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
@@ -97,37 +97,19 @@ class UserServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("testuser", result.getUsername());
         assertEquals("test@example.com", result.getEmail());
         verify(userRepository).save(testUser);
-    }
-
-    @Test
-    @DisplayName("Should throw exception when username already exists")
-    void shouldThrowExceptionWhenUsernameAlreadyExists() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(true);
-
-        // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> userService.createUser(testUser)
-        );
-
-        assertEquals("Username already exists: testuser", exception.getMessage());
-        verify(userRepository, never()).save(any(User.class));
     }
 
     @Test
     @DisplayName("Should throw exception when email already exists")
     void shouldThrowExceptionWhenEmailAlreadyExists() {
         // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
             () -> userService.createUser(testUser)
         );
 
@@ -143,20 +125,6 @@ class UserServiceTest {
 
         // When
         Optional<User> result = userService.findById(1L);
-
-        // Then
-        assertTrue(result.isPresent());
-        assertEquals(testUser, result.get());
-    }
-
-    @Test
-    @DisplayName("Should find user by username")
-    void shouldFindUserByUsername() {
-        // Given
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-
-        // When
-        Optional<User> result = userService.findByUsername("testuser");
 
         // Then
         assertTrue(result.isPresent());
@@ -183,7 +151,6 @@ class UserServiceTest {
         // Given
         User updatedUser = new User();
         updatedUser.setId(1L);
-        updatedUser.setUsername("updateduser");
         updatedUser.setEmail("updated@example.com");
         updatedUser.setFirstName("Jane");
         updatedUser.setLastName("Smith");
@@ -214,7 +181,6 @@ class UserServiceTest {
         updatedUser.setBadges("[\"Innovative\", \"Fast Growing\"]");
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(userRepository.existsByUsername("updateduser")).thenReturn(false);
         when(userRepository.existsByEmail("updated@example.com")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
 
@@ -223,7 +189,6 @@ class UserServiceTest {
 
         // Then
         assertNotNull(result);
-        assertEquals("updateduser", result.getUsername());
         assertEquals("updated@example.com", result.getEmail());
         verify(userRepository).save(any(User.class));
     }
@@ -238,8 +203,8 @@ class UserServiceTest {
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidParamException exception = assertThrows(
+            InvalidParamException.class,
             () -> userService.updateUser(updatedUser)
         );
 
@@ -266,8 +231,8 @@ class UserServiceTest {
         when(userRepository.existsById(999L)).thenReturn(false);
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
             () -> userService.deleteUser(999L)
         );
 
@@ -369,19 +334,6 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Should check if username exists")
-    void shouldCheckIfUsernameExists() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(true);
-
-        // When
-        boolean exists = userService.existsByUsername("testuser");
-
-        // Then
-        assertTrue(exists);
-    }
-
-    @Test
     @DisplayName("Should check if email exists")
     void shouldCheckIfEmailExists() {
         // Given
@@ -444,12 +396,12 @@ class UserServiceTest {
         invalidUser.setUsername(""); // Invalid: empty username
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> userService.validateUser(invalidUser)
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
+                () -> userService.validateUser(invalidUser)
         );
 
-        assertEquals("Username is required", exception.getMessage());
+        assertEquals("Email is required", exception.getMessage());
     }
 
     @Test
@@ -476,9 +428,9 @@ class UserServiceTest {
         when(passwordEncoder.matches("wrongPassword", "password123")).thenReturn(false);
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> userService.changePassword(1L, "wrongPassword", "newPassword")
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
+                () -> userService.changePassword(1L, "wrongPassword", "newPassword1") // make sure new password has a digit
         );
 
         assertEquals("Old password is incorrect", exception.getMessage());
@@ -509,14 +461,15 @@ class UserServiceTest {
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
 
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> userService.resetPassword("nonexistent@example.com")
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
+                () -> userService.resetPassword("nonexistent@example.com")
         );
 
         assertEquals("User not found with email: nonexistent@example.com", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
     }
+
 
     @Test
     @DisplayName("Should update company owner fields successfully")
