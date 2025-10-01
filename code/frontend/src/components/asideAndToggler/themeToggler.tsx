@@ -2,10 +2,16 @@ import { useTheme } from '../../theme/ThemeContext';
 import sunImage from '../../assets/sun.png';
 import moonImage from '../../assets/moon.jpg';
 
-/**
- * Theme toggle button for switching between light and dark mode.
- * Updates global font/background colors and persists preference.
- */
+/*
+ AI-generated code: 80% (tool: ChatGPT, modified and adapted,
+   functions: ThemeToggler,
+   classes: none,
+   AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
+ Human code (James Rose): 15% (functions: casing/paths, comments; classes: none)
+ Framework-generated code: 5% (tool: Vite/React)
+*/
+
+// Theme toggle button component
 export default function ThemeToggler() {
   const { theme, toggle } = useTheme();
 

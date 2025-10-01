@@ -1,6 +1,18 @@
+/*
+ AI-generated code:  20% Formatting help with GPT
+
+ Human code: 80% classes: footer container
+
+ Framework-generated code: 0%
+  
+*/
+
+
 .footer-container {
   text-align: center;
   padding: 1rem;
   color: #6c757d;
   margin-top: 0;
+  /* Use the correct variable for the header/footer background */
+  background-color: var(--header-footer-bg);
 }

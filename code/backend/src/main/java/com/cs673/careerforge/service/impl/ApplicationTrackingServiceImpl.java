@@ -1,13 +1,23 @@
 package com.cs673.careerforge.service.impl;
 
-import com.cs673.careerforge.entity.ApplicationStatus;
-import com.cs673.careerforge.entity.ApplicationTracking;
-import com.cs673.careerforge.entity.Job;
-import com.cs673.careerforge.entity.User;
+import com.cs673.careerforge.common.ApplicationStatus;
+import com.cs673.careerforge.common.ResultEnum;
+import com.cs673.careerforge.domain.ApplicationTracking;
+import com.cs673.careerforge.domain.Job;
+import com.cs673.careerforge.domain.User;
+import com.cs673.careerforge.exceptions.InvalidParamException;
+import com.cs673.careerforge.mapper.JobMapper;
 import com.cs673.careerforge.repository.ApplicationTrackingRepository;
+import com.cs673.careerforge.repository.JobRepository;
+import com.cs673.careerforge.repository.UserRepository;
+import com.cs673.careerforge.request.DeleteJobRequest;
+import com.cs673.careerforge.request.JobRequest;
+import com.cs673.careerforge.request.ListJobRequest;
+import com.cs673.careerforge.response.ListJobResponse;
 import com.cs673.careerforge.service.ApplicationTrackingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +28,7 @@ import java.util.Optional;
 
 /**
  * Service implementation for ApplicationTracking com.cs673.careerforge.entity operations.
+ * Written by human.
  */
 @Service
 @Transactional
@@ -25,17 +36,30 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
     
     @Autowired
     private ApplicationTrackingRepository applicationTrackingRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private JobRepository jobRepository;
     
     @Override
-    public ApplicationTracking createApplication(ApplicationTracking application) {
-        validateApplication(application);
-        
-        // Check if application already exists
-        if (existsByApplicantAndJob(application.getApplicant(), application.getJob())) {
-            throw new IllegalArgumentException("Application already exists for this user and job");
+    public ApplicationTracking createApplication(JobRequest request) {
+        if (request.getUid() == null) {
+            throw new InvalidParamException("User Login required");
         }
-        
-        return applicationTrackingRepository.save(application);
+
+        // ensure user exists & active
+        User user = userRepository.findById(request.getUid())
+                .orElseThrow(() -> new InvalidParamException("User not found: " + request.getUid()));
+        if (Boolean.FALSE.equals(user.getIsActive())) {
+            throw new InvalidParamException("User is inactive");
+        }
+
+        // ensure job exists & active
+        Job job = jobRepository.save(JobMapper.INSTANCE.toDO(request));
+
+        return applicationTrackingRepository.save(new ApplicationTracking(user, job));
     }
     
     @Override
@@ -53,11 +77,11 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
     @Override
     public ApplicationTracking updateApplication(ApplicationTracking application) {
         if (application.getId() == null) {
-            throw new IllegalArgumentException("Application ID is required for update");
+            throw new InvalidParamException("Application ID is required for update");
         }
         
         ApplicationTracking existingApplication = applicationTrackingRepository.findById(application.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Application not found with ID: " + application.getId()));
+                .orElseThrow(() -> new InvalidParamException("Application not found with ID: " + application.getId()));
         
         // Update fields
         existingApplication.setApplicationStatus(application.getApplicationStatus());
@@ -70,11 +94,21 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
         validateApplication(existingApplication);
         return applicationTrackingRepository.save(existingApplication);
     }
-    
+
+    @Override
+    @Transactional
+    public boolean deleteApplicationBatch(DeleteJobRequest request) {
+        if (request.getUid() == null || request.getJobIds() == null) {
+            throw new InvalidParamException("UserId and JobId(s) are required");
+        }
+        // idempotent delete
+        return applicationTrackingRepository.deleteByApplicant_IdAndJob_IdIn(request.getUid(), request.getJobIds()) > 0;
+    }
+
     @Override
     public void deleteApplication(Long id) {
         if (!applicationTrackingRepository.existsById(id)) {
-            throw new IllegalArgumentException("Application not found with ID: " + id);
+            throw new InvalidParamException("Application not found with ID: " + id);
         }
         applicationTrackingRepository.deleteById(id);
     }
@@ -84,11 +118,27 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
     public List<ApplicationTracking> findApplicationsByApplicant(User applicant) {
         return applicationTrackingRepository.findByApplicant(applicant);
     }
-    
+
+    @Override
+    public ListJobResponse findApplicationsByApplicant(ListJobRequest request) {
+        if (request.getUid() == null) {
+            throw new InvalidParamException("Uid is required for findApplicationsByApplicant");
+        }
+        User user = userRepository.findById(request.getUid())
+                .orElseThrow(() -> new InvalidParamException(ResultEnum.BUSINESS_ERROR, "User not found"));
+        Page<ApplicationTracking> page = findByApplicantOrderByLastUpdatedtDesc(user, PageRequest.of(request.getPage(), request.getSize()));
+        return ListJobResponse.builder()
+                .page(page.getTotalPages())
+                .size(page.getSize())
+                .total(page.getTotalElements())
+                .jobs(page.map(j -> JobMapper.INSTANCE.toVO(j.getJob())).toList())
+                .build();
+    }
+
     @Override
     @Transactional(readOnly = true)
-    public Page<ApplicationTracking> findApplicationsByApplicant(User applicant, Pageable pageable) {
-        return applicationTrackingRepository.findByApplicant(applicant, pageable);
+    public Page<ApplicationTracking> findByApplicantOrderByLastUpdatedtDesc(User applicant, Pageable pageable) {
+        return applicationTrackingRepository.findByApplicantOrderByLastUpdatedDesc(applicant, pageable);
     }
     
     @Override
@@ -234,7 +284,7 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
     @Override
     public ApplicationTracking updateApplicationStatus(Long applicationId, ApplicationStatus newStatus) {
         ApplicationTracking application = applicationTrackingRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Application not found with ID: " + applicationId));
+                .orElseThrow(() -> new InvalidParamException("Application not found with ID: " + applicationId));
         
         application.setApplicationStatus(newStatus);
         return applicationTrackingRepository.save(application);
@@ -243,10 +293,10 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
     @Override
     public ApplicationTracking addNotes(Long applicationId, String notes) {
         ApplicationTracking application = applicationTrackingRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Application not found with ID: " + applicationId));
+                .orElseThrow(() -> new InvalidParamException("Application not found with ID: " + applicationId));
         
         if (notes != null && notes.length() > 2000) {
-            throw new IllegalArgumentException("Notes cannot exceed 2000 characters");
+            throw new InvalidParamException("Notes cannot exceed 2000 characters");
         }
         
         application.setNotes(notes);
@@ -256,10 +306,10 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
     @Override
     public ApplicationTracking scheduleInterview(Long applicationId, LocalDateTime interviewDate) {
         ApplicationTracking application = applicationTrackingRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Application not found with ID: " + applicationId));
+                .orElseThrow(() -> new InvalidParamException("Application not found with ID: " + applicationId));
         
         if (interviewDate != null && interviewDate.isBefore(application.getAppliedDate())) {
-            throw new IllegalArgumentException("Interview date cannot be before application date");
+            throw new InvalidParamException("Interview date cannot be before application date");
         }
         
         application.setInterviewDate(interviewDate);
@@ -273,10 +323,10 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
     @Override
     public ApplicationTracking scheduleFollowUp(Long applicationId, LocalDateTime followUpDate) {
         ApplicationTracking application = applicationTrackingRepository.findById(applicationId)
-                .orElseThrow(() -> new IllegalArgumentException("Application not found with ID: " + applicationId));
+                .orElseThrow(() -> new InvalidParamException("Application not found with ID: " + applicationId));
         
         if (followUpDate != null && followUpDate.isBefore(application.getAppliedDate())) {
-            throw new IllegalArgumentException("Follow-up date cannot be before application date");
+            throw new InvalidParamException("Follow-up date cannot be before application date");
         }
         
         application.setFollowUpDate(followUpDate);
@@ -286,44 +336,44 @@ public class ApplicationTrackingServiceImpl implements ApplicationTrackingServic
     @Override
     public void validateApplication(ApplicationTracking application) {
         if (application == null) {
-            throw new IllegalArgumentException("Application cannot be null");
+            throw new InvalidParamException("Application cannot be null");
         }
         
         if (application.getApplicant() == null) {
-            throw new IllegalArgumentException("Applicant is required");
+            throw new InvalidParamException("Applicant is required");
         }
         
         if (application.getJob() == null) {
-            throw new IllegalArgumentException("Job is required");
+            throw new InvalidParamException("Job is required");
         }
         
         if (application.getApplicationStatus() == null) {
-            throw new IllegalArgumentException("Application status is required");
+            throw new InvalidParamException("Application status is required");
         }
         
         // Validate notes length
         if (application.getNotes() != null && application.getNotes().length() > 2000) {
-            throw new IllegalArgumentException("Notes cannot exceed 2000 characters");
+            throw new InvalidParamException("Notes cannot exceed 2000 characters");
         }
         
         // Validate cover letter length
         if (application.getCoverLetter() != null && application.getCoverLetter().length() > 5000) {
-            throw new IllegalArgumentException("Cover letter cannot exceed 5000 characters");
+            throw new InvalidParamException("Cover letter cannot exceed 5000 characters");
         }
         
         // Validate resume path length
 //        if (application.getResumePath() != null && application.getResumePath().length() > 255) {
-//            throw new IllegalArgumentException("Resume path cannot exceed 255 characters");
+//            throw new InvalidParamException("Resume path cannot exceed 255 characters");
 //        }
         
         // Validate interview date
         if (application.getInterviewDate() != null && application.getInterviewDate().isBefore(application.getAppliedDate())) {
-            throw new IllegalArgumentException("Interview date cannot be before application date");
+            throw new InvalidParamException("Interview date cannot be before application date");
         }
         
         // Validate follow-up date
         if (application.getFollowUpDate() != null && application.getFollowUpDate().isBefore(application.getAppliedDate())) {
-            throw new IllegalArgumentException("Follow-up date cannot be before application date");
+            throw new InvalidParamException("Follow-up date cannot be before application date");
         }
     }
     

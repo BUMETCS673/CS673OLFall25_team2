@@ -1,7 +1,7 @@
 package com.cs673.careerforge.service;
 
-import com.cs673.careerforge.entity.User;
-import com.cs673.careerforge.entity.UserType;
+import com.cs673.careerforge.domain.User;
+import com.cs673.careerforge.common.UserType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,6 +10,7 @@ import java.util.Optional;
 
 /**
  * Service interface for User com.cs673.careerforge.entity operations.
+ * Written by human.
  */
 public interface UserService {
     

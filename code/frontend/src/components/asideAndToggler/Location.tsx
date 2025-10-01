@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-/**
- * Location filter component used in the Aside panel.
- * Clicking the button opens an inline input prompt.
- */
+/*
+ AI-generated code: 85% (tool: ChatGPT, modified and adapted,
+   functions: Location (inline panel, later portal version, centering, close button, keyboard handling),
+   classes: none,
+   AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
+ Human code (James Rose): 10% (functions: copy/fit tweaks, comments; classes: none)
+ Framework-generated code: 5% (tool: Vite/React)
+*/
+
 interface LocationProps {
   onChange?: (value: string | null) => void;
 }
@@ -19,11 +24,7 @@ export default function Location({ onChange }: LocationProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
   // Track computed position for the floating panel
-  const [coords, setCoords] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  }>({
+  const [coords, setCoords] = useState({
     top: 0,
     left: 0,
     width: 0,
@@ -106,7 +107,7 @@ export default function Location({ onChange }: LocationProps) {
       <div className="position-relative" ref={containerRef}>
         <button
           type="button"
-          className="btn btn-outline-secondary w-100 text-truncate"
+          className="btn btn-outline-secondary w-100 text-truncate filter-button"
           onClick={toggleOpen}
           aria-expanded={open}
           aria-haspopup="dialog"
@@ -120,20 +121,18 @@ export default function Location({ onChange }: LocationProps) {
         createPortal(
           <div
             ref={overlayRef}
-            role="dialog"
-            aria-label="Location input"
-            // Render outside the Aside so it can extend left; fixed so it anchors to viewport coords
-            className="shadow rounded border bg-body p-3"
+            className="shadow rounded border dropdown-panel p-3"
             style={{
               position: 'fixed',
-              zIndex: 1060, // above dropdowns/headers
+              zIndex: 1060,
               top: coords.top,
               left: coords.left,
               width: coords.width,
               maxWidth: '100vw',
             }}
+            role="dialog"
+            aria-label="Location input"
           >
-            {/* Faded "X" close control in the corner */}
             <button
               type="button"
               className="btn-close position-absolute top-0 end-0 m-2"

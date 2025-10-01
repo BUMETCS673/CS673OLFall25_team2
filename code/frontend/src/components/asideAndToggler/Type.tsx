@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-/**
- * Type filter component used in the Aside panel.
- * Provides a dropdown for selecting job types (e.g., full-time, part-time).
- */
+/*
+ AI-generated code: 80% (tool: ChatGPT, modified and adapted,
+   functions: Type (dropdown/popup variants, shorter fitted panel),
+   classes: none,
+   AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
+ Human code (James Rose): 15% (functions: constraints, removing search, comments; classes: none)
+ Framework-generated code: 5% (tool: Vite/React)
+*/
 
 const TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship'];
 
@@ -36,11 +40,7 @@ export default function Type({ onChange }: TypeProps) {
   }, []);
 
   // Track computed position for the floating panel (align right edge to button; extend left)
-  const [coords, setCoords] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  }>({
+  const [coords, setCoords] = useState({
     top: 0,
     left: 0,
     width: 0,
@@ -84,10 +84,10 @@ export default function Type({ onChange }: TypeProps) {
     <>
       <div className="position-relative" ref={ref}>
         {/* Note: using button+dropdown here instead of <select>
-            so styling is consistent with Field/Location */}
+              so styling is consistent with Field/Location */}
         <button
           type="button"
-          className="btn btn-outline-secondary w-100 text-truncate"
+          className="btn btn-outline-secondary w-100 text-truncate filter-button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-haspopup="listbox"
@@ -102,7 +102,7 @@ export default function Type({ onChange }: TypeProps) {
         createPortal(
           <div
             ref={overlayRef}
-            className="shadow rounded border bg-body p-3"
+            className="shadow rounded border dropdown-panel p-3"
             style={{
               position: 'fixed',
               zIndex: 1060,

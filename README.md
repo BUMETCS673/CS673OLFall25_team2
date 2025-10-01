@@ -65,6 +65,32 @@ npm run dev
 
 > Backend and database setup instructions will be added when the Java service and schema are initialized. An `.env.example` will be included for DB credentials and any API keys.
 
+### Running Frontend Tests (Jest + RTL)
+
+The frontend test suite lives under `code/frontend/src/tests`. We use Jest with `ts-jest` and React Testing Library.
+
+Run locally:
+
+```bash
+cd code/frontend
+npm install
+npm run test
+```
+
+Run in Docker (for screenshots or CI):
+
+```bash
+# from repository root
+docker compose build frontend-tests
+docker compose run --rm frontend-tests
+```
+
+Notes:
+
+- Tests run in a jsdom environment with a dedicated `tsconfig.jest.json`.
+- `src/tests/setupTests.ts` sets up jest-dom and polyfills TextEncoder/Decoder used by react-router.
+- The Docker image for tests is defined by `code/frontend/Dockerfile.test` and invoked via the `frontend-tests` service in `docker-compose.yml`.
+
 ## Database connection Setup
 
 ### Connecting remote database
@@ -93,6 +119,19 @@ server/               # Java backend (to be added)
 
 This project uses job data via the **Rise Jobs API**: [https://pitchwall.co/product/rise-jobs-api](https://pitchwall.co/product/rise-jobs-api).
 Please review and respect the provider’s terms of service and attribution guidelines.
+
+## Security
+
+### JWT Secret Setup
+
+- **Development:** No setup required!  
+  The app auto-generates a secure secret on first run and saves it to `~/.jwt-secret`.
+
+- **Production:** You must provide a real secret via
+  - Environment variable: `APP_JWT_SECRET`, or
+  - Spring property: `app.jwt.secret`
+
+If no secret is provided in production, the app will fail to start.
 
 ## License
 
