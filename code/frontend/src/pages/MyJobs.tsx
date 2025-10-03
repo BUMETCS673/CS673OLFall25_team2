@@ -18,19 +18,7 @@ export default function MyJobs() {
   return (
     <Layout
       header={<Header />}
-      mainContent={
-        <div className="container py-4">
-          <h2
-            className="mb-3"
-            style={{ fontWeight: 700, textAlign: 'left', marginLeft: '1rem' }}
-          >
-            My Jobs
-          </h2>
-          <div className="mt-3">
-            <MyJobsViewList view={view} onChangeView={setView} />
-          </div>
-        </div>
-      }
+      mainContent={<MyJobsViewList view={view} onChangeView={setView} />}
       aside={<Aside />}
       footer={<Footer />}
     />

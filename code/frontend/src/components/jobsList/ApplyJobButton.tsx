@@ -16,6 +16,22 @@ export default function ApplyJobButton({ job, detailed }: ApplyJobButtonProps) {
     'idle' | 'applying' | 'applied' | 'error' | 'unapplying'
   >('idle');
   const [errMsg, setErrMsg] = React.useState<string | null>(null);
+  const [showSuccessAlert, setShowSuccessAlert] = React.useState(false);
+
+  // Add CSS for fadeIn animation
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px) translateX(-50%); }
+        to { opacity: 1; transform: translateY(0) translateX(-50%); }
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   // Check localStorage on component mount
   React.useEffect(() => {
@@ -70,6 +86,14 @@ export default function ApplyJobButton({ job, detailed }: ApplyJobButtonProps) {
         if (job._id) {
           toggleAppliedJobId(job._id); // This will add it since we're in the apply flow
         }
+
+        // Open the job URL in a new tab if it exists
+        if (job.url) {
+          window.open(job.url, '_blank', 'noopener,noreferrer');
+        }
+
+        // Show success alert
+        setShowSuccessAlert(true);
       } else {
         throw new Error('Apply did not succeed');
       }
@@ -81,6 +105,44 @@ export default function ApplyJobButton({ job, detailed }: ApplyJobButtonProps) {
 
   return (
     <>
+      {/* Success alert notification */}
+      {showSuccessAlert && (
+        <div
+          className="alert alert-success alert-dismissible fade show mb-3 shadow-sm border-start border-success border-4"
+          role="alert"
+          style={{
+            animation: 'fadeIn 0.5s ease-out',
+            position: 'fixed',
+            top: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            minWidth: '300px',
+            maxWidth: '500px',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+          }}
+        >
+          <div className="d-flex align-items-center">
+            <i className="bi bi-check-circle-fill me-2 fs-4"></i>
+            <div>
+              <strong>Job Successfully Applied!</strong>
+              <div>"{job.title}" has been added to your Applied Jobs list.</div>
+              {job.url && (
+                <div className="mt-1">
+                  Application page has been opened in a new tab.
+                </div>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="btn-close"
+            aria-label="Close"
+            onClick={() => setShowSuccessAlert(false)}
+          ></button>
+        </div>
+      )}
+
       <button
         type="button"
         className={`btn btn-${

@@ -253,16 +253,6 @@ export default function JobCard({
                   View on Map
                 </a>
               )}
-              {job.owner?.slug && (
-                <a
-                  href={`https://joinrise.co/${job.owner.slug}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-outline-secondary"
-                >
-                  Company Page
-                </a>
-              )}
               <ApplyJobButton job={job} detailed={!!detailed} />
               <SaveJobButton job={job} detailed={!!detailed} />
             </div>

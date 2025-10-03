@@ -59,6 +59,7 @@ const JobsViewList = () => {
           throw new Error(`Error fetching jobs: ${response.statusText}`);
         const data: JobsApiEnvelope = await response.json();
         const list: Job[] = data?.result?.jobs || [];
+
         setJobs(list);
         setError(null);
       } catch (e: any) {

@@ -128,8 +128,7 @@ export async function saveJob(
   token?: string
 ): Promise<SaveJobResponse> {
   const payload = buildSavedJobPayload(job);
-  console.log('token in saveJob function:', token);
-  console.log('Payload to be sent:', payload);
+
   const { data } = await postJson<SaveJobResponse>(
     '/jobs/saved/save',
     payload,
@@ -138,6 +137,7 @@ export async function saveJob(
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     }
   );
+
   console.log('Save job response data:', data);
   return data;
 }
@@ -147,8 +147,6 @@ export async function applyJob(
   token?: string
 ): Promise<SaveJobResponse> {
   const payload = buildSavedJobPayload(job);
-  console.log('token in applyJob function:', token);
-  console.log('Payload to be sent (apply):', payload);
   const { data } = await postJson<SaveJobResponse>(
     '/jobs/applied/apply',
     payload,
@@ -157,6 +155,7 @@ export async function applyJob(
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     }
   );
+
   console.log('Apply job response data:', data);
   return data;
 }
