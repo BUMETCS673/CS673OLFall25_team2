@@ -1,33 +1,18 @@
-// src/tests/setupTests.ts
+// src/setupTests.ts
+// 100% Copilot generated setup for testing environment
 
 import '@testing-library/jest-dom';
-import { TextEncoder, TextDecoder } from 'util';
 
-// Polyfill TextEncoder/TextDecoder
+// Polyfill TextEncoder/TextDecoder for libraries that expect them in the test env
+// Node 18+ provides these in 'util', but jsdom environment may not attach to global
+import { TextEncoder, TextDecoder } from 'util';
+// @ts-ignore - augment global for test environment
 if (typeof (global as any).TextEncoder === 'undefined') {
+  // @ts-ignore
   (global as any).TextEncoder = TextEncoder;
 }
+// @ts-ignore - augment global for test environment
 if (typeof (global as any).TextDecoder === 'undefined') {
+  // @ts-ignore
   (global as any).TextDecoder = TextDecoder as unknown as new () => TextDecoder;
 }
-
-// Mock for ThemeProvider
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: jest.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
-});
-
-global.fetch = jest.fn(() =>
-  Promise.resolve({
-    json: () => Promise.resolve({}),
-  })
-) as jest.Mock;

@@ -204,15 +204,8 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
             </div>
           </div>
 
-          {/* ======================= THE ONLY CHANGE IS HERE ======================= */}
           {error && (
-            <div
-              className="alert alert-danger d-flex justify-content-between align-items-center m-3"
-              // [+] ADDED: role="alert" attribute
-              // This is the single line I have added to your code.
-              // It makes this error message findable by the test and improves accessibility.
-              role="alert"
-            >
+            <div className="alert alert-danger d-flex justify-content-between align-items-center m-3">
               <span>{error}</span>
               <button
                 className="btn btn-sm btn-light"
@@ -222,7 +215,6 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
               </button>
             </div>
           )}
-          {/* ======================= END OF CHANGE ======================= */}
 
           {loading ? (
             <p className="text-muted p-3">Loading jobs...</p>
