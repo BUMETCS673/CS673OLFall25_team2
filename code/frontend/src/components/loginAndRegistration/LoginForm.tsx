@@ -1,3 +1,4 @@
+// ADDED: useNavigate to handle redirection after a successful login.
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Link to navigate to Register page
 import { isRequired } from './validation'; // keep path simple (no .ts extension)
@@ -185,7 +186,8 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
               )}
             </div>
 
-            {/* Black, full-width login button (rendered only if allowed by story flag) */}
+            {/* MODIFIED: The button is now disabled based on the isLoading state,
+                and its text changes to give user feedback. */}
             {showSubmitButton && (
               <button
                 type="submit"
