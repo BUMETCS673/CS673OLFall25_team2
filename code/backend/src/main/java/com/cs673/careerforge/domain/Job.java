@@ -27,6 +27,8 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
+
 
 /**
  * Job com.cs673.careerforge.entity representing job postings created by employers.
@@ -125,7 +127,7 @@ public class Job {
 
     // JPA Relationships
     @OneToMany(mappedBy = "job", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ApplicationTracking> applications;
+    private List<ApplicationTracking> applications = new ArrayList<>();
 
     // Constructors
     public Job() {
@@ -220,6 +222,6 @@ public class Job {
 
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return id != null ? id.hashCode() : 0;
     }
 }

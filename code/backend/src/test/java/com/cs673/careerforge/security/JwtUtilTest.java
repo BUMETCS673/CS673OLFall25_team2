@@ -98,4 +98,51 @@ class JwtUtilTest {
 
         assertFalse(jwtUtil.validateToken(expiredToken, testUser));
     }
+
+    @Test
+    void validateToken_tamperedTokenShouldFail(){
+        UserDetails testUser = User.withUsername("testUser")
+                .password("password")
+                .roles("USER")
+                .build();
+
+        //generate a valid token
+        String token = jwtUtil.generateToken(testUser);
+
+        //tamper with the token
+        String tamperedToken = token + "111";
+
+        //assert that the validation will fail
+        assertFalse(jwtUtil.validateToken(tamperedToken, testUser),
+            "The token has been tampered with! FAIL");
+        }
+
+    @Test
+    void validateToken_wrongSignature() {
+        UserDetails testUser = User.withUsername("testuser")
+                .password("password")
+                .roles("USER")
+                .build();
+
+        Key otherKey = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        String token = Jwts.builder()
+                .setSubject(testUser.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 60000))
+                .signWith(otherKey, SignatureAlgorithm.HS256)
+                .compact();
+
+        assertFalse(jwtUtil.validateToken(token, testUser));
+    }
+
+    @Test
+    void validateToken_nullOrEmpty() {
+        UserDetails testUser = User.withUsername("testuser")
+                .password("password")
+                .roles("USER")
+                .build();
+
+        assertFalse(jwtUtil.validateToken(null, testUser));
+        assertFalse(jwtUtil.validateToken("", testUser));
+    }
 }

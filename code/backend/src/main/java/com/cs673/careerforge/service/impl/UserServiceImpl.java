@@ -204,46 +204,44 @@ public class UserServiceImpl implements UserService {
             throw new InvalidParamException("User cannot be null");
         }
 
-        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
-            throw new InvalidParamException("Username is required");
-        }
-
+        // Email
         if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
             throw new InvalidParamException("Email is required");
         }
-
-        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
-            throw new InvalidParamException("Password is required");
-        }
-
-        if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
-            throw new InvalidParamException("First name is required");
-        }
-
-        if (user.getLastName() == null || user.getLastName().trim().isEmpty()) {
-            throw new InvalidParamException("Last name is required");
-        }
-
-        if (user.getUserType() == null) {
-            throw new InvalidParamException("User type is required");
-        }
-
-        // Validate email format
         if (!user.getEmail().matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             throw new InvalidParamException("Invalid email format");
         }
 
-        // Validate password strength
+        // Password
+        if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+            throw new InvalidParamException("Password is required");
+        }
         if (user.getPassword().length() < 8) {
             throw new InvalidParamException("Password must be at least 8 characters long");
         }
-
         if (!user.getPassword().matches(".*[A-Za-z].*")) {
             throw new InvalidParamException("Password must contain at least one letter");
         }
-
         if (!user.getPassword().matches(".*\\d.*")) {
             throw new InvalidParamException("Password must contain at least one number");
+        }
+
+        // Username → fallback to email if missing
+        if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+            user.setUsername(user.getEmail());
+        }
+
+        // First/last name → defaults to avoid null constraint errors
+        if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
+            user.setFirstName("N/A");
+        }
+        if (user.getLastName() == null || user.getLastName().trim().isEmpty()) {
+            user.setLastName("N/A");
+        }
+
+        // UserType → default to EMPLOYEE
+        if (user.getUserType() == null) {
+            user.setUserType(UserType.EMPLOYEE);
         }
     }
 

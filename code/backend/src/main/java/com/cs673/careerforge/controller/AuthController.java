@@ -4,45 +4,79 @@ package com.cs673.careerforge.model;
  AI-generated code: 90% (tool: ChatGPT, modified and adapted)
  Human code: 10%
 */
-
 import com.cs673.careerforge.model.AuthRequest;
-import com.cs673.careerforge.model.AuthResponse;
 import com.cs673.careerforge.security.JwtUtil;
+import com.cs673.careerforge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
+import com.cs673.careerforge.domain.User;
+
+
+import java.util.Map;
 
 @RestController
+@RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
+    private final UserService userService;
 
     @Autowired
-    private JwtUtil jwtUtil;
+    public AuthController(AuthenticationManager authenticationManager,
+                          JwtUtil jwtUtil,
+                          UserDetailsService userDetailsService,
+                          UserService userService) {
+        this.authenticationManager = authenticationManager;
+        this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
+        this.userService = userService;
+    }
 
-    @Autowired
-    private UserDetailsService userDetailsService;
-
-    @PostMapping("/authenticate")
-    public AuthResponse createAuthToken(@RequestBody AuthRequest authRequest) throws Exception {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-            );
-            //For debugging below
-            //System.out.println(">>> /authenticate called with: " + authRequest.getUsername());
-        } catch (BadCredentialsException e) {
-            throw new Exception("Incorrect username or password", e);
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
+        if (authRequest.getEmail() == null || authRequest.getPassword() == null) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "status", 400,
+                    "error", "Bad Request",
+                    "message", "Email and password are required"
+            ));
         }
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(userDetails);
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authRequest.getEmail(), authRequest.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException ex) {
+            return ResponseEntity.status(401).body(Map.of(
+                    "status", 401,
+                    "error", "Unauthorized",
+                    "message", "Invalid email or password"
+            ));
+        }
 
-        return new AuthResponse(jwt);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
+        String token = jwtUtil.generateToken(userDetails);
+
+        User userEntity = userService.findByEmail(authRequest.getEmail())
+                .orElseThrow(() -> new IllegalStateException("User not found after authentication"));
+
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "user", Map.of(
+                        "id", "USER_" + userEntity.getId(),
+                        "name", userEntity.getFirstName() + " " + userEntity.getLastName(),
+                        "email", userEntity.getEmail()
+                )
+        ));
     }
 }
