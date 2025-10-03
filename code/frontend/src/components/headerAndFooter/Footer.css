@@ -7,12 +7,9 @@
   
 */
 
-
 .footer-container {
+  font-size: 0.85rem;
   text-align: center;
   padding: 1rem;
-  color: #6c757d;
-  margin-top: 0;
-  /* Use the correct variable for the header/footer background */
-  background-color: var(--header-footer-bg);
+  color: #717273;
 }

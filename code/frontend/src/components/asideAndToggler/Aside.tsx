@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import Field from './Field';
-import Location from './Location';
 import Type from './Type';
 import ThemeToggler from './themeToggler';
 // import MyJobsDropdown from './MyJobsDropdown'; // (kept available if you still use it elsewhere)
@@ -26,9 +25,9 @@ export default function Aside({ myJobsView, onMyJobsViewChange }: AsideProps) {
   const navigate = useNavigate();
 
   const isMyJobs = pathname.startsWith('/myJobs');
-  const buttonLabel = isMyJobs ? 'Home' : 'My Jobs';
+  const buttonLabel = isMyJobs ? 'Jobs List' : 'My Jobs';
   // CHANGED: always use solid red button on both pages
-  const buttonClass = 'btn btn-danger w-100 text-truncate';
+  const buttonClass = 'btn btn-info w-100 text-truncate';
 
   const onButtonClick = () => {
     if (isMyJobs) navigate('/content');
@@ -37,13 +36,17 @@ export default function Aside({ myJobsView, onMyJobsViewChange }: AsideProps) {
 
   // Only show dropdown if props are provided (not on MyJobs page per your request)
   const showMyJobsControls =
-    typeof myJobsView !== 'undefined' && typeof onMyJobsViewChange === 'function';
+    typeof myJobsView !== 'undefined' &&
+    typeof onMyJobsViewChange === 'function';
 
   return (
     <div className="d-flex flex-column gap-3" aria-label="Filters and theme">
-      <div className="d-flex flex-column gap-2" role="group" aria-label="Filters">
+      <div
+        className="d-flex flex-column gap-2"
+        role="group"
+        aria-label="Filters"
+      >
         <Field onChange={(v) => console.log('field:', v)} />
-        <Location onChange={(v) => console.log('location:', v)} />
         <Type onChange={(v) => console.log('type:', v)} />
 
         <button

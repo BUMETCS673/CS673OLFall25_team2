@@ -110,7 +110,7 @@ const JobsViewList = () => {
               borderBottom: '1px solid var(--surface-border-color)',
             }}
           >
-            <h2 className="m-0">Job Listings</h2>
+            <h4 className="m-0">Job Listings</h4>
           </div>
 
           {error && (

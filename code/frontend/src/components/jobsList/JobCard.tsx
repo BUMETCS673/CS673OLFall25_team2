@@ -78,9 +78,7 @@ export default function JobCard({
             />
           )}
           <div className="flex-grow-1">
-            <h5 className="card-title mb-1 fw-light text-primary">
-              {job.title}
-            </h5>
+            <h5 className="card-title mb-1 fw-light fw-700">{job.title}</h5>
             <div className="text-muted">
               {job.owner?.companyName ?? 'Unknown Company'}
             </div>
@@ -117,6 +115,7 @@ export default function JobCard({
         {detailed && (
           <div className="mt-3">
             {summary && <p className="fst-italic">{summary}</p>}
+            <ApplyJobButton job={job} detailed={!!detailed} />
 
             <div className="row row-cols-1 row-cols-md-2 g-2 small mb-3">
               {job.locationAddress && (
@@ -127,7 +126,7 @@ export default function JobCard({
                       href={mapHref}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-primary"
+                      className="text-info"
                       title="Open in Google Maps"
                     >
                       {job.locationAddress}
@@ -253,7 +252,7 @@ export default function JobCard({
                   View on Map
                 </a>
               )}
-              <ApplyJobButton job={job} detailed={!!detailed} />
+
               <SaveJobButton job={job} detailed={!!detailed} />
             </div>
           </div>

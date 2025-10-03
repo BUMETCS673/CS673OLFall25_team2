@@ -49,9 +49,7 @@ export default function SavedAppliedJobCard({
       <div className="card-body">
         <div className="d-flex align-items-start gap-3">
           <div className="flex-grow-1">
-            <h5 className="card-title mb-1 fw-light text-primary">
-              {job.title}
-            </h5>
+            <h5 className="card-title mb-1 fw-light text-info">{job.title}</h5>
             <div className="text-muted">{job.company}</div>
           </div>
         </div>
@@ -90,7 +88,7 @@ export default function SavedAppliedJobCard({
                       href={mapHref}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-primary"
+                      className="text-info"
                       title="Open in Google Maps"
                     >
                       {job.locationAddress}

@@ -150,8 +150,8 @@ export default function ApplyJobButton({ job, detailed }: ApplyJobButtonProps) {
             ? 'success'
             : state === 'error'
             ? 'danger'
-            : 'primary'
-        } px-5`}
+            : 'info'
+        } px-5 mb-3 w-100`}
         disabled={state === 'applying' || state === 'unapplying' || !detailed}
         onClick={onClick}
         title={

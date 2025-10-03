@@ -226,7 +226,7 @@ export default function SavedJobApplyButton({
               ? 'btn-success'
               : state === 'error'
               ? 'btn-outline-danger'
-              : 'btn-primary'
+              : 'btn-info'
           } px-4`}
           disabled={state === 'applying' || state === 'applied' || !detailed}
           onClick={onClick}

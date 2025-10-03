@@ -52,11 +52,11 @@ body {
   --bs-body-color: var(--fg);
   --bs-border-color: var(--border);
   --bs-link-color: #0000ff;
-  --bs-link-hover-color: #0066ff;
+  --bs-link-hover-color: #bbd5fc;
 
   /* Selected Card */
-  --selected-border: rgba(0, 0, 255);
-  --selected-bg: rgb(0, 0, 255);
+  --selected-border: rgb(98, 216, 255);
+  --selected-bg: rgb(98, 216, 255);
   --selected-color: #000000;
 }
 
@@ -288,7 +288,7 @@ footer.bg-body {
 }
 
 .filter-button:hover {
-  background-color: rgba(0, 0, 255) !important;
+  background-color: rgb(141, 248, 246) !important;
   color: rgb(255, 255, 255);
   transition: all 0.2s ease;
 }
