@@ -9,6 +9,19 @@ import './JobsViewList.css';
 
 const LG_QUERY = '(min-width: 992px)';
 
+// Helper function to transform job types according to business rules
+const transformJobType = (type: string | undefined): string => {
+  if (!type) return 'Unknown';
+
+  const normalizedType = type.trim();
+
+  if (normalizedType === 'Regular Full-Time') return 'Office';
+  if (normalizedType === 'Full-Time') return 'Home';
+  if (normalizedType === 'Hybrid') return 'Hybrid';
+
+  return 'Unknown';
+};
+
 const JobsViewList = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
@@ -41,6 +54,7 @@ const JobsViewList = () => {
     const set = new Map<string, string>();
     for (const j of jobs) {
       if (j.type) {
+        // Use the already transformed type values
         const norm = j.type.trim();
         if (norm && !set.has(norm.toLowerCase()))
           set.set(norm.toLowerCase(), norm);
@@ -85,7 +99,6 @@ const JobsViewList = () => {
     [filteredJobs, selectedJobId]
   );
 
-  // Pedro's written code
   useEffect(() => {
     const controller = new AbortController();
     (async () => {
@@ -100,7 +113,13 @@ const JobsViewList = () => {
         const data: JobsApiEnvelope = await response.json();
         const list: Job[] = data?.result?.jobs || [];
 
-        setJobs(list);
+        // Transform job types according to business rules
+        const transformedList = list.map((job) => ({
+          ...job,
+          type: transformJobType(job.type),
+        }));
+
+        setJobs(transformedList);
         setError(null);
       } catch (e: any) {
         if (e.name !== 'AbortError')
@@ -112,7 +131,6 @@ const JobsViewList = () => {
     return () => controller.abort();
   }, []);
 
-  // Pedro's written code
   useEffect(() => {
     if (isLgUp && !selectedJobId && filteredJobs.length > 0)
       setSelectedJobId(filteredJobs[0]._id);
@@ -151,9 +169,10 @@ const JobsViewList = () => {
     };
   }, []);
 
-  // Pedro's written code
   const handleSelect = useCallback((id: string) => setSelectedJobId(id), []);
   const handleCloseMobile = useCallback(() => setSelectedJobId(null), []);
+
+  console.log(jobs);
 
   return (
     <div className="container-fluid w-100 d-flex flex-column flex-grow-1 min-h-0 pb-5">

@@ -4,12 +4,9 @@
 import { postJson, stripEnvelope } from '../http';
 
 export type RegisterPayload = {
-  username: string;
+  name: string;
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
-  userType: 'EMPLOYEE';
 };
 
 export type RegisteredUser = {
@@ -25,19 +22,34 @@ export type RegisteredUser = {
 export async function register(
   payload: RegisterPayload
 ): Promise<{ user: RegisteredUser; location?: string; raw?: any }> {
-  const { data, response } = await postJson<any>(
-    '/public/users/register',
-    payload,
-    { noAuth: true }
-  );
+  const { data, response } = await postJson<any>('/auth/register', payload, {
+    noAuth: true,
+  });
 
   const location = response.headers.get('Location') || undefined;
   console.log('Register response data:', data);
 
+  console.log('Register response data:', data);
+
+  // Backend returns { token: string, user: RegisteredUser }
   const unwrapped = stripEnvelope<any>(data);
-  const user: RegisteredUser = unwrapped?.user || unwrapped;
-  if (!user || !user.username) {
-    throw new Error('Unexpected register response shape');
+  const user = unwrapped?.user || {};
+
+  if (!user) {
+    throw new Error('User data not found in response');
   }
-  return { user, location, raw: data };
+
+  return {
+    user: {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      userType: user.userType,
+      isActive: user.isActive,
+    },
+    location,
+    raw: data,
+  };
 }

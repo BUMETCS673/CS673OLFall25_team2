@@ -11,12 +11,9 @@ import {
 } from '../../api/auth/register';
 
 type RegisterValues = {
-  username: string;
+  name: string;
   email: string;
   password: string;
-  firstName: string;
-  lastName: string;
-  userType: 'EMPLOYEE';
 };
 type Props = {
   onSubmit?: (values: RegisterValues) => void;
@@ -31,23 +28,17 @@ const RegisterForm: React.FC<Props> = ({
 }) => {
   const navigate = useNavigate();
   const [values, setValues] = useState<RegisterValues>({
-    username: '',
+    name: '',
     email: '',
     password: '',
-    firstName: '',
-    lastName: '',
-    userType: 'EMPLOYEE',
   });
 
   // Track touched fields for showing validation feedback
   const [touched, setTouched] = useState<Record<keyof RegisterValues, boolean>>(
     {
-      username: false,
+      name: false,
       email: false,
       password: false,
-      firstName: false,
-      lastName: false,
-      userType: false,
     }
   );
 
@@ -57,16 +48,13 @@ const RegisterForm: React.FC<Props> = ({
 
   // Validation: all fields required, email must match format
   const errors = {
-    username: !isRequired(values.username) ? 'Username is required' : '',
+    name: !isRequired(values.name) ? 'Full name is required' : '',
     email: !isRequired(values.email)
       ? 'Email is required'
       : !isEmail(values.email)
       ? 'Enter a valid email'
       : '',
     password: !isRequired(values.password) ? 'Password is required' : '',
-    firstName: !isRequired(values.firstName) ? 'First name is required' : '',
-    lastName: !isRequired(values.lastName) ? 'Last name is required' : '',
-    userType: !isRequired(values.userType) ? 'User type is required' : '',
   } as const;
 
   const hasError = (field: keyof RegisterValues) =>
@@ -87,23 +75,14 @@ const RegisterForm: React.FC<Props> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTouched({
-      username: true,
+      name: true,
       email: true,
       password: true,
-      firstName: true,
-      lastName: true,
-      userType: true,
     });
     setServerError(null);
     setSuccessMsg(null);
 
-    const valid =
-      !errors.username &&
-      !errors.email &&
-      !errors.password &&
-      !errors.firstName &&
-      !errors.lastName &&
-      !errors.userType;
+    const valid = !errors.name && !errors.email && !errors.password;
 
     if (!valid) return;
 
@@ -111,19 +90,37 @@ const RegisterForm: React.FC<Props> = ({
 
     try {
       setLoading(true);
+      console.log('Submitting registration with:', values);
+
       const payload: RegisterPayload = {
-        username: values.username,
+        name: values.name,
         email: values.email,
         password: values.password,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        userType: 'EMPLOYEE',
       };
 
-      await registerRequest(payload);
-      setSuccessMsg('Registration successful. Please log in.');
-      navigate('/login', { replace: true });
+      try {
+        console.log('Sending registration request with payload:', payload);
+        const result = await registerRequest(payload);
+        console.log('Registration successful:', result);
+
+        setSuccessMsg('Registration successful. Please log in.');
+
+        // Navigate after a slight delay to allow the user to see the success message
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 1500);
+      } catch (error: any) {
+        console.error('Registration error:', error);
+        if (error.status === 409) {
+          setServerError('This email is already registered');
+        } else {
+          setServerError(
+            error?.message || 'Registration failed. Please try again.'
+          );
+        }
+      }
     } catch (err: any) {
+      console.error('Registration form error:', err);
       setServerError(err?.message || 'Registration failed');
     } finally {
       setLoading(false);
@@ -156,24 +153,24 @@ const RegisterForm: React.FC<Props> = ({
 
           <form className="w-100" noValidate onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label htmlFor="regUsername" className="form-label">
-                Username
+              <label htmlFor="regName" className="form-label">
+                Full Name
               </label>
               <input
-                id="regUsername"
-                name="username"
+                id="regName"
+                name="name"
                 type="text"
                 className={`form-control ${
-                  hasError('username') ? 'is-invalid' : ''
+                  hasError('name') ? 'is-invalid' : ''
                 }`}
-                value={values.username}
+                value={values.name}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Choose a username"
+                placeholder="Your full name"
                 required
               />
-              {hasError('username') && (
-                <div className="invalid-feedback">{errors.username}</div>
+              {hasError('name') && (
+                <div className="invalid-feedback">{errors.name}</div>
               )}
             </div>
 
@@ -221,50 +218,6 @@ const RegisterForm: React.FC<Props> = ({
               )}
             </div>
 
-            <div className="mb-3">
-              <label htmlFor="regFirstName" className="form-label">
-                First Name
-              </label>
-              <input
-                id="regFirstName"
-                name="firstName"
-                type="text"
-                className={`form-control ${
-                  hasError('firstName') ? 'is-invalid' : ''
-                }`}
-                value={values.firstName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="First name"
-                required
-              />
-              {hasError('firstName') && (
-                <div className="invalid-feedback">{errors.firstName}</div>
-              )}
-            </div>
-
-            <div className="mb-3">
-              <label htmlFor="regLastName" className="form-label">
-                Last Name
-              </label>
-              <input
-                id="regLastName"
-                name="lastName"
-                type="text"
-                className={`form-control ${
-                  hasError('lastName') ? 'is-invalid' : ''
-                }`}
-                value={values.lastName}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Last name"
-                required
-              />
-              {hasError('lastName') && (
-                <div className="invalid-feedback">{errors.lastName}</div>
-              )}
-            </div>
-
             {/* Black, full-width register button (rendered only if allowed by story flag) */}
             {showSubmitButton && (
               <button
@@ -279,7 +232,10 @@ const RegisterForm: React.FC<Props> = ({
 
           {/* Small footer text with link to Login page */}
           <p className="text-center mt-3 mb-0 small">
-            Already have an account? <Link to="/login">Login</Link>
+            Already have an account?{' '}
+            <Link to="/login">
+              <span className="text-info">Login</span>
+            </Link>
           </p>
         </div>
       </div>

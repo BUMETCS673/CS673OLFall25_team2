@@ -18,6 +18,19 @@ import DeleteAll from '../buttons/DeleteAll';
 
 const LG_QUERY = '(min-width: 992px)';
 
+// Helper function to transform job types according to business rules
+const transformJobType = (type: string | undefined): string => {
+  if (!type) return 'Unknown';
+
+  const normalizedType = type.trim();
+
+  if (normalizedType === 'Regular Full-Time') return 'Office';
+  if (normalizedType === 'Full-Time') return 'Home';
+  if (normalizedType === 'Hybrid') return 'Hybrid';
+
+  return 'Unknown';
+};
+
 interface MyJobsViewListProps {
   view: 'saved' | 'applied';
   onChangeView?: (v: 'saved' | 'applied') => void;
@@ -72,7 +85,14 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
         setError(null);
         const data =
           view === 'saved' ? await getMySaved() : await getMyApplied();
-        setJobs(data);
+
+        // Transform job types according to business rules
+        const transformedData = data.map((job) => ({
+          ...job,
+          type: transformJobType(job.type),
+        }));
+
+        setJobs(transformedData);
       } catch (e: any) {
         console.error(`Error fetching ${view} jobs:`, e);
         if (e.name !== 'AbortError')
