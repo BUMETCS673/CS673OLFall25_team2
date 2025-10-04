@@ -1,17 +1,18 @@
-import React, { useState, useRef, useEffect } from "react";
+// MyJobsDropdown.tsx
+// Copilot and ChatGPT assisted with this component
+// 70% AI-generated, 30% human refined
 
-/*
- AI-generated code: ~40% (tool: ChatGPT, adapted; chat link: https://chatgpt.com/share/68d6d0b7-3ca8-8006-a7b7-223d71795542)
- Human code: ~55% (dropdown state handling, click-outside detection, parent onChange integration)
- Framework-generated code: ~5% (Vite + React scaffolding conventions)
-*/
+import { useState, useRef, useEffect } from 'react';
 
 interface MyJobsDropdownProps {
-  currentView: "saved" | "applied";
-  onChange: (view: "saved" | "applied") => void;
+  currentView: 'saved' | 'applied';
+  onChange: (view: 'saved' | 'applied') => void;
 }
 
-const MyJobsDropdown: React.FC<MyJobsDropdownProps> = ({ currentView, onChange }) => {
+const MyJobsDropdown: React.FC<MyJobsDropdownProps> = ({
+  currentView,
+  onChange,
+}) => {
   const [open, setOpen] = useState(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -25,13 +26,13 @@ const MyJobsDropdown: React.FC<MyJobsDropdownProps> = ({ currentView, onChange }
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSelect = (view: "saved" | "applied") => {
-    onChange(view);   // tell parent
-    setOpen(false);   // close dropdown
+  const handleSelect = (view: 'saved' | 'applied') => {
+    onChange(view); // tell parent
+    setOpen(false); // close dropdown
   };
 
   return (
@@ -44,7 +45,7 @@ const MyJobsDropdown: React.FC<MyJobsDropdownProps> = ({ currentView, onChange }
         aria-expanded={open}
         onClick={() => setOpen(!open)}
       >
-        {currentView === "saved" ? "Saved Jobs" : "Applied Jobs"}
+        {currentView === 'saved' ? 'Saved Jobs' : 'Applied Jobs'}
       </button>
 
       {/* Dropdown menu */}
@@ -58,8 +59,8 @@ const MyJobsDropdown: React.FC<MyJobsDropdownProps> = ({ currentView, onChange }
             <button
               className="dropdown-item"
               role="option"
-              aria-selected={currentView === "saved"}
-              onClick={() => handleSelect("saved")}
+              aria-selected={currentView === 'saved'}
+              onClick={() => handleSelect('saved')}
             >
               Saved
             </button>
@@ -68,8 +69,8 @@ const MyJobsDropdown: React.FC<MyJobsDropdownProps> = ({ currentView, onChange }
             <button
               className="dropdown-item"
               role="option"
-              aria-selected={currentView === "applied"}
-              onClick={() => handleSelect("applied")}
+              aria-selected={currentView === 'applied'}
+              onClick={() => handleSelect('applied')}
             >
               Applied
             </button>

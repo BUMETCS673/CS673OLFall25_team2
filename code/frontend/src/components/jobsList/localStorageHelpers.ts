@@ -1,5 +1,5 @@
 // localStorageHelpers.ts
-// Helper functions for job state persistence in localStorage
+// 100% Copilot generated helpers for managing saved and applied jobs in localStorage
 
 // Keys used for localStorage
 export const SAVED_JOBS_KEY = 'savedJobs';

@@ -1,14 +1,12 @@
 // JobCard.tsx
-// Authors: Pedro Ramirez and Copilot
-// Pedro wrote the entire component and logic
-// Copilot assisted with formatting, some JSX structure, and utility functions
+// Copilot and ChatGPT assisted with this component
+// 70% human written, 20% Copilot, 10% ChatGPT
 
 import type { Job, DescriptionBreakdown } from '../../types/job';
 import defaultCompanyLogo from '../../assets/default-company-logo.jpg';
 import SaveJobButton from './SaveJobButton';
 import ApplyJobButton from './ApplyJobButton';
 
-// Import types for global functions
 declare global {
   interface Window {
     clearSavedAppliedJobs: () => string;
@@ -22,15 +20,12 @@ export default function JobCard({
   job: Job;
   detailed?: boolean;
 }) {
-  // Pedro's written code with some ChatGPT formatting help
   const db: DescriptionBreakdown =
     job.descriptionBreakdown ?? ({} as DescriptionBreakdown);
 
-  // Pedro's written code with some ChatGPT formatting help
   const fmtMoney = (n?: number) =>
     typeof n === 'number' ? `$${n.toLocaleString()}` : undefined;
 
-  // Pedro's written code with some ChatGPT formatting help
   const postedDate = job.createdAt
     ? new Date(job.createdAt).toLocaleDateString()
     : undefined;
@@ -38,7 +33,6 @@ export default function JobCard({
     ? new Date(job.updatedAt).toLocaleDateString()
     : undefined;
 
-  // Pedro's written code with some ChatGPT formatting help
   const mapHref = job.locationCoordinates
     ? `https://www.google.com/maps/search/?api=1&query=${job.locationCoordinates.lat},${job.locationCoordinates.lon}`
     : undefined;
@@ -51,8 +45,6 @@ export default function JobCard({
     new Set([...(db.keywords ?? []), ...(job.skills_suggest ?? [])])
   );
 
-  // Pedro wrote most of this JSX structure with some Copilot formatting help
-  // logic and utility functions are Pedro's
   return (
     <div
       className="card job-card shadow-sm"
@@ -261,5 +253,3 @@ export default function JobCard({
     </div>
   );
 }
-
-// No button components needed here as they've been moved to separate files

@@ -1,17 +1,10 @@
-/*
- AI-generated code: 20% Formatting help with GPT
-
- Human code: 80% functions/classes: Login component
-
- Framework-generated code: 0%
-*/
-
+// Login.tsx
+// 100% human written
 
 import Header from '../components/headerAndFooter/Header';
 import Footer from '../components/headerAndFooter/Footer';
 import Layout from '../components/wrapper/Layout';
 import LoginForm from '../components/loginAndRegistration/LoginForm';
-
 
 export default function Login() {
   return (

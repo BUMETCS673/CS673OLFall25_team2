@@ -1,6 +1,6 @@
 // TDD test for LoginForm component
 // Copilot generated initial test structure and logic
-// Human (Pedro) refined the test, added mocks, and ensured it covers login flow
+// Human refined the test, added mocks, and ensured it covers login flow
 // 60% AI-generated, 40% human refined
 
 import { render, screen, waitFor } from '@testing-library/react';

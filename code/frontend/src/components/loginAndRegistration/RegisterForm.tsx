@@ -1,22 +1,14 @@
+// RegisterForm.tsx
+// Copilot assisted with this component
+// 70% AI-generated, 30% human refined
+
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Link to navigate to Login page
-import { isRequired, isEmail } from './validation'; // keep path simple (no .ts extension)
+import { Link, useNavigate } from 'react-router-dom';
+import { isRequired, isEmail } from './validation';
 import {
   register as registerRequest,
   type RegisterPayload,
 } from '../../api/auth/register';
-
-/*
- AI-generated code: ~65% 
-   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
-   - Modified and adapted by human
-   - Functions/classes: RegisterForm component structure, validation integration, JSX layout
- Human code (James Rose): ~35% 
-   - Adjustments: footer text "Already have an account?", fixed link targets, applied centering card layout
-   - Functions/classes: human refinements for props, consistent styling with LoginForm
- Framework-generated code: 0%
-   - (React/Bootstrap boilerplate is used but not auto-generated)
-*/
 
 type RegisterValues = {
   username: string;
@@ -221,7 +213,7 @@ const RegisterForm: React.FC<Props> = ({
                 value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Create a password"
+                placeholder="*****************"
                 required
               />
               {hasError('password') && (
@@ -231,7 +223,7 @@ const RegisterForm: React.FC<Props> = ({
 
             <div className="mb-3">
               <label htmlFor="regFirstName" className="form-label">
-                First name
+                First Name
               </label>
               <input
                 id="regFirstName"
@@ -253,7 +245,7 @@ const RegisterForm: React.FC<Props> = ({
 
             <div className="mb-3">
               <label htmlFor="regLastName" className="form-label">
-                Last name
+                Last Name
               </label>
               <input
                 id="regLastName"

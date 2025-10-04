@@ -1,5 +1,6 @@
 // SavedAppliedJobCard.tsx
-// Renders jobs returned from /jobs/saved/list and /jobs/applied/list
+// Copilot and ChatGPT assisted with this component
+// 50% AI-generated, 50% human refined
 
 import type { SavedAppliedJob } from '../../api/pages/myJobs';
 import SavedJobApplyButton from './SavedJobApplyButton';

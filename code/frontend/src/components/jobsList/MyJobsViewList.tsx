@@ -1,3 +1,7 @@
+// MyJobsViewList.tsx
+// ChatGPT assisted with this component
+// 40% human written, 60% Copilot generated
+
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import SavedAppliedJobCard from './SavedAppliedJobCard';
 import type { SavedAppliedJob } from '../../api/pages/myJobs';
@@ -12,24 +16,13 @@ import {
 import DeleteButton from '../buttons/Delete';
 import DeleteAll from '../buttons/DeleteAll';
 
-/*
- AI-generated code: ~50% (tool: ChatGPT, adapted; chat link: https://chatgpt.com/share/68d6d0b7-3ca8-8006-a7b7-223d71795542)
- Human code: ~45% (bulk delete logic, error handling, data fetch integration)
- Framework-generated code: ~5% (Vite + React scaffolding conventions)
-*/
-
 const LG_QUERY = '(min-width: 992px)';
 
 interface MyJobsViewListProps {
   view: 'saved' | 'applied';
-  onChangeView?: (v: 'saved' | 'applied') => void; // necessary prop
+  onChangeView?: (v: 'saved' | 'applied') => void;
 }
 
-/**
- * Displays the Saved or Applied jobs list with two panels:
- * - Left: list of jobs with delete support
- * - Right: job details (desktop) or modal overlay (mobile)
- */
 const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
   view,
   onChangeView,

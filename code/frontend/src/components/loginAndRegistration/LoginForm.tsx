@@ -1,22 +1,12 @@
+// LoginForm.tsx
+// Copilot assisted with this component
+// 70% AI-generated, 30% human refined
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Link to navigate to Register page
 import { isRequired } from './validation'; // keep path simple (no .ts extension)
 import logo from '../../assets/logo.png'; // Import logo image
 import { login as loginRequest } from '../../api/auth/login';
-
-/*
- AI-generated code: ~70% 
-   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
-   - Modified and adapted by human
-   - Functions/classes: LoginForm component structure, validation logic integration, JSX layout
- Human code (James Rose): ~30% 
-   - Adjustments: added centering fixes, styled footer text, ensured responsive Bootstrap card
-   - Functions/classes: final layout tweaks, style adjustments, props handling refinements
- Framework-generated code: 0%
-   - (React/Bootstrap boilerplate is used but not auto-generated)
-
-   // Human (Pedro) refined the code 30%
-*/
 
 /**
  * @typedef {Object} LoginValues
@@ -113,9 +103,9 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
       className="d-flex flex-column align-items-center justify-content-center mt-4"
       style={{ width: '100vw', padding: '1rem' }}
     >
-      <h6 className="text-muted fw-bold text-capitalize mb-3">
+      <h5 className="text-muted fw-bold text-capitalize mb-3">
         Your job hunt, organized.
-      </h6>
+      </h5>
       {/* Subtle card container around the form */}
       <div className="card shadow-sm" style={{ width: 380, maxWidth: '100%' }}>
         <div className="card-body">
@@ -124,7 +114,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
             src={logo}
             alt="JobTracker"
             className="img-fluid w-100 mb-3"
-            style={{ maxHeight: 100, objectFit: 'contain' }}
+            style={{ maxHeight: 77, objectFit: 'contain' }}
           />
 
           <h1 className="h4 text-center mb-4">Login</h1>

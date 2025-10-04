@@ -1,9 +1,5 @@
-/*
- AI-generated code: 20% Formatting help with GPT
-    - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
- Human code: 80% functions/classes: MyJobs component
- Framework-generated code: 0%
-*/
+// MyJobs.tsx
+// 100% human written
 
 import { useState } from 'react';
 import Header from '../components/headerAndFooter/Header';

@@ -1,5 +1,6 @@
 // SaveJobButton.tsx
-// Component for saving jobs with localStorage persistence
+// Copilot and ChatGPT assisted with this component
+// 60% AI-generated, 40% human refined
 
 import React from 'react';
 import { saveJob } from '../../api/savedAndApplied/savedAndApplied';
@@ -88,7 +89,7 @@ export default function SaveJobButton({ job, detailed }: SaveJobButtonProps) {
             ? 'btn-success'
             : state === 'error'
             ? 'btn-danger'
-            : 'btn-secondary'
+            : 'btn-warning'
         }`}
         disabled={state === 'saving' || state === 'unsaving' || !detailed}
         onClick={onClick}

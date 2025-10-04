@@ -1,16 +1,9 @@
+// Type.tsx
+// Copilot and ChatGPT assisted with this component
+// 60% AI-generated, 40% human refined
+
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-
-/*
- AI-generated code: 80% (tool: ChatGPT, modified and adapted,
-   functions: Type (dropdown/popup variants, shorter fitted panel),
-   classes: none,
-   AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
- Human code (James Rose): 15% (functions: constraints, removing search, comments; classes: none)
- Framework-generated code: 5% (tool: Vite/React)
-*/
-
-const TYPES = ['Full-time', 'Part-time', 'Contract', 'Internship'];
 
 interface TypeProps {
   onChange?: (value: string | null) => void;
@@ -19,6 +12,7 @@ interface TypeProps {
 export default function Type({ onChange }: TypeProps) {
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState<string | null>(null);
+  const [dynamicTypes, setDynamicTypes] = useState<string[]>([]);
   const ref = useRef<HTMLDivElement>(null);
   const anchorRef = useRef<HTMLButtonElement>(null); // anchor for positioning
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -54,7 +48,6 @@ export default function Type({ onChange }: TypeProps) {
       if (!el) return;
       const rect = el.getBoundingClientRect();
 
-      // ~half the previous length (was 520px). Use 260px max, keep 16px gutters.
       const maxWidth = Math.min(260, window.innerWidth - 32);
       const left = Math.min(
         Math.max(rect.right - maxWidth, 16),
@@ -77,14 +70,29 @@ export default function Type({ onChange }: TypeProps) {
   const choose = (v: string | null) => {
     setValue(v);
     onChange?.(v);
+    const evt = new CustomEvent('jobs:typeSelect', { detail: { value: v } });
+    window.dispatchEvent(evt);
     setOpen(false);
   };
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<{
+        types: string[];
+        selectedType: string | null;
+      }>;
+      setDynamicTypes(ce.detail.types);
+      if (ce.detail.selectedType !== value) {
+        if (!open) setValue(ce.detail.selectedType);
+      }
+    };
+    window.addEventListener('jobs:types', handler);
+    return () => window.removeEventListener('jobs:types', handler);
+  }, [open, value]);
 
   return (
     <>
       <div className="position-relative" ref={ref}>
-        {/* Note: using button+dropdown here instead of <select>
-              so styling is consistent with Field/Location */}
         <button
           type="button"
           className="btn btn-outline-secondary w-100 text-truncate filter-button"
@@ -138,7 +146,7 @@ export default function Type({ onChange }: TypeProps) {
                 Any type
               </button>
 
-              {TYPES.map((t) => (
+              {dynamicTypes.map((t) => (
                 <button
                   key={t}
                   className="list-group-item list-group-item-action"
@@ -148,6 +156,11 @@ export default function Type({ onChange }: TypeProps) {
                   {t}
                 </button>
               ))}
+              {!dynamicTypes.length && (
+                <div className="text-muted small p-2">
+                  No types detected yet…
+                </div>
+              )}
             </div>
           </div>,
           document.body

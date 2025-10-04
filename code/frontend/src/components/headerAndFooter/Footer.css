@@ -13,3 +13,8 @@
   padding: 1rem;
   color: #717273;
 }
+
+/* Dark theme override */
+html[data-theme='dark'] .footer-container {
+  color: #ffffff;
+}

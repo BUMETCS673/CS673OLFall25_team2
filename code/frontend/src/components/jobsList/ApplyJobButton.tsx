@@ -1,5 +1,6 @@
 // ApplyJobButton.tsx
-// Component for applying to jobs with localStorage persistence
+// Copilot and ChatGPT assisted with this component
+// 60% AI-generated, 40% human refined
 
 import React from 'react';
 import { applyJob } from '../../api/savedAndApplied/savedAndApplied';
