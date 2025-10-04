@@ -1,22 +1,14 @@
+// LoginForm.tsx
+// Copilot assisted with this component
+// 70% AI-generated, 30% human refined
+
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; // Link to navigate to Register page
 import { isRequired } from './validation'; // keep path simple (no .ts extension)
 import logo from '../../assets/logo.png'; // Import logo image
+import blackLogo from '../../assets/blackLogo.png'; // Import dark theme logo
 import { login as loginRequest } from '../../api/auth/login';
-
-/*
- AI-generated code: ~70% 
-   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
-   - Modified and adapted by human
-   - Functions/classes: LoginForm component structure, validation logic integration, JSX layout
- Human code (James Rose): ~30% 
-   - Adjustments: added centering fixes, styled footer text, ensured responsive Bootstrap card
-   - Functions/classes: final layout tweaks, style adjustments, props handling refinements
- Framework-generated code: 0%
-   - (React/Bootstrap boilerplate is used but not auto-generated)
-
-   // Human (Pedro) refined the code 30%
-*/
+import { useTheme } from '../../theme/ThemeContext'; // Import theme context
 
 /**
  * @typedef {Object} LoginValues
@@ -38,6 +30,7 @@ type Props = {
 // Login form with username + password fields, calls backend to get JWT and saves it
 const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
   const navigate = useNavigate();
+  const { theme } = useTheme(); // Get current theme
   // Controlled state for form fields
   const [values, setValues] = useState<LoginValues>({
     username: '',
@@ -88,15 +81,19 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
 
     try {
       setLoading(true);
+      console.log('Login attempt with:', { email: values.username });
       const { token, raw } = await loginRequest(
-        values.username,
+        values.username.trim(),
         values.password
       );
 
       localStorage.setItem('jwt', token);
       try {
         localStorage.setItem('auth', JSON.stringify(raw));
-      } catch {}
+        console.log('Auth data saved to localStorage');
+      } catch (e) {
+        console.error('Failed to save auth data to localStorage:', e);
+      }
 
       setSuccessMsg('Logged in successfully. Token saved.');
       navigate('/content', { replace: true });
@@ -113,18 +110,18 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
       className="d-flex flex-column align-items-center justify-content-center mt-4"
       style={{ width: '100vw', padding: '1rem' }}
     >
-      <h6 className="text-muted fw-bold text-capitalize mb-3">
+      <h5 className="text-muted fw-bold text-capitalize mb-3">
         Your job hunt, organized.
-      </h6>
+      </h5>
       {/* Subtle card container around the form */}
       <div className="card shadow-sm" style={{ width: 380, maxWidth: '100%' }}>
         <div className="card-body">
-          {/* App/logo image at top (served from /public) */}
+          {/* App/logo image at top - theme aware */}
           <img
-            src={logo}
+            src={theme === 'dark' ? blackLogo : logo}
             alt="JobTracker"
             className="img-fluid w-100 mb-3"
-            style={{ maxHeight: 100, objectFit: 'contain' }}
+            style={{ maxHeight: 77, objectFit: 'contain' }}
           />
 
           <h1 className="h4 text-center mb-4">Login</h1>
@@ -143,7 +140,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
           <form className="w-100" noValidate onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="loginUsername" className="form-label">
-                Username
+                Email Address
               </label>
               <input
                 id="loginUsername"
@@ -155,7 +152,7 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
                 value={values.username}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Your username"
+                placeholder="Your email address"
                 required
               />
               {hasError('username') && (
@@ -199,7 +196,10 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
 
           {/* Small footer text with link to Register page */}
           <div className="text-center mt-3 mb-0 small">
-            Don’t have an account? <Link to="/register">Register</Link>
+            Don’t have an account?{' '}
+            <Link to="/register">
+              <span className="text-info">Register</span>
+            </Link>
           </div>
         </div>
       </div>
