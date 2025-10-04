@@ -172,8 +172,6 @@ const JobsViewList = () => {
   const handleSelect = useCallback((id: string) => setSelectedJobId(id), []);
   const handleCloseMobile = useCallback(() => setSelectedJobId(null), []);
 
-  console.log(jobs);
-
   return (
     <div className="container-fluid w-100 d-flex flex-column flex-grow-1 min-h-0 pb-5">
       <div className="d-flex w-100 flex-column flex-lg-row flex-grow-1 min-h-0">
