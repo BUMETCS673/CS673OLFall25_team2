@@ -2,7 +2,7 @@ name: deploy-ec2
 
 on:
   push:
-    branches: [ "dev" , "main"]
+    branches: [ "dev" , "main", "updateDeployYML"]
 
 permissions:
   id-token: write
@@ -30,7 +30,7 @@ jobs:
 
       - name: Unit tests
         working-directory: code/backend
-        run: mvn -B -ntp test
+        run: mvn -B -ntp package
 
       - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
