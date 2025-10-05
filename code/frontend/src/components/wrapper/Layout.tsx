@@ -1,11 +1,9 @@
-// Layout.tsx
-// Author: ChatGPT and Pedro Ramirez
-// ChatGPT generated the initial layout structure and logic
-// Pedro refined the layout, added responsiveness, and ensured accessibility
+//Layout.tsx
+// Copilot assisted with this component
+// 60% AI-generated, 40% human refined
 
 import type { ReactNode } from 'react';
 
-// Pedro's written code
 type LayoutProps = {
   header?: ReactNode;
   aside?: ReactNode;
@@ -23,8 +21,6 @@ export default function Layout({
 }: LayoutProps) {
   const main = mainContent ?? children;
 
-  // initial structure and logic by ChatGPT
-  // Pedro refined the layout, added responsiveness (Boostrap classes), and ensured accessibility
   return (
     <div className="d-flex flex-column vh-100">
       <header className="w-100 mb-0 bg-body">{header}</header>

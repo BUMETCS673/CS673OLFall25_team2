@@ -6,7 +6,6 @@
  Framework-generated code: 0%
 */
 
-
 import React from 'react';
 import './Delete.css';
 

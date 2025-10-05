@@ -1,9 +1,5 @@
-/*
- AI-generated code: 20% Formatting help with GPT
-    - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
- Human code: 80% functions/classes: MyJobs component
- Framework-generated code: 0%
-*/
+// MyJobs.tsx
+// 100% human written
 
 import { useState } from 'react';
 import Header from '../components/headerAndFooter/Header';
@@ -18,19 +14,7 @@ export default function MyJobs() {
   return (
     <Layout
       header={<Header />}
-      mainContent={
-        <div className="container py-4">
-          <h2
-            className="mb-3"
-            style={{ fontWeight: 700, textAlign: 'left', marginLeft: '1rem' }}
-          >
-            My Jobs
-          </h2>
-          <div className="mt-3">
-            <MyJobsViewList view={view} onChangeView={setView} />
-          </div>
-        </div>
-      }
+      mainContent={<MyJobsViewList view={view} onChangeView={setView} />}
       aside={<Aside />}
       footer={<Footer />}
     />

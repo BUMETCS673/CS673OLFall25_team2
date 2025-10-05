@@ -52,11 +52,11 @@ body {
   --bs-body-color: var(--fg);
   --bs-border-color: var(--border);
   --bs-link-color: #0000ff;
-  --bs-link-hover-color: #0066ff;
+  --bs-link-hover-color: #bbd5fc;
 
   /* Selected Card */
-  --selected-border: rgba(0, 0, 255);
-  --selected-bg: rgb(0, 0, 255);
+  --selected-border: rgb(98, 216, 255);
+  --selected-bg: rgb(98, 216, 255);
   --selected-color: #000000;
 }
 
@@ -68,7 +68,7 @@ body {
   --border: #565869; /* Border color (slightly darker than surface) */
 
   /* Header and Footer dark mode background */
-  --header-footer-bg: #141414;
+  --header-footer-bg: #1a1a1a;
 
   /* Bootstrap adaptation */
   --bs-body-bg: var(--bg);
@@ -282,13 +282,13 @@ footer.bg-body {
 }
 
 .btn-outline-secondary.filter-button:hover {
-  background-color: rgba(0, 0, 255) !important;
+  background-color: rgb(0, 229, 255) !important;
   color: #fff;
   transition: all 0.2s ease;
 }
 
 .filter-button:hover {
-  background-color: rgba(0, 0, 255) !important;
+  background-color: rgb(0, 229, 255) !important;
   color: rgb(255, 255, 255);
   transition: all 0.2s ease;
 }

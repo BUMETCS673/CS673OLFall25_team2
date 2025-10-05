@@ -1,7 +1,8 @@
-/* JobsViewList.css */
-/* Styling for the jobs view list component */
+/* 
+JobsViewList.css 
+100% human written
+*/
 
-/* Ensure panels don't exceed viewport height */
 .jobs-list,
 .job-details {
   max-height: calc(100vh - 180px);

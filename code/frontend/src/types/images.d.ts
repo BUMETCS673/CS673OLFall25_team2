@@ -1,5 +1,6 @@
-// Module declarations for importing image assets in TypeScript/TSX files.
-// Without these, TypeScript may report errors like "Cannot find module '*.png'".
+// images.d.ts
+// TypeScript declaration file for image imports
+// 100% human written
 
 declare module '*.avif' {
   const src: string;

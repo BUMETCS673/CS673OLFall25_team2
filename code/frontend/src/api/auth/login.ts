@@ -1,12 +1,18 @@
 // src/api/auth/login.ts
 // Centralized login request helper
 
+import { postJson, stripEnvelope } from '../http';
+
 export type LoginResponseEnvelope = {
-  success?: boolean;
-  result?: { jwt?: string };
-  jwt?: string;
+  token?: string;
+  user?: {
+    id?: string;
+    name?: string;
+    email?: string;
+  };
   message?: string;
   error?: string;
+  status?: number;
   [k: string]: any;
 };
 
@@ -14,28 +20,36 @@ export async function login(
   username: string,
   password: string
 ): Promise<{ token: string; raw: LoginResponseEnvelope }> {
-  const API_BASE =
-    (import.meta as any)?.env?.VITE_API_BASE_URL || 'http://localhost:8080/api';
+  // Trim the email to remove any whitespace
+  const trimmedEmail = username.trim();
+  console.log('Attempting login with:', { email: trimmedEmail });
 
-  const res = await fetch(`${API_BASE}/authenticate`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ username, password }),
-  });
+  try {
+    const { data } = await postJson<LoginResponseEnvelope>(
+      '/auth/login',
+      { email: trimmedEmail, password },
+      {
+        noAuth: true,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
 
-  const data: LoginResponseEnvelope = await res
-    .json()
-    .catch(() => ({} as LoginResponseEnvelope));
+    const unwrapped = stripEnvelope<LoginResponseEnvelope>(data);
+    const token = (unwrapped as any)?.token;
+    if (!token) {
+      throw new Error('JWT not found in response');
+    }
 
-  if (!res.ok) {
-    const msg = data?.message || data?.error || `Login failed (${res.status})`;
-    throw new Error(msg);
+    console.log('Login response data:', data);
+    return { token, raw: unwrapped };
+  } catch (error: any) {
+    console.error('Login error:', error);
+    if (error.status === 401) {
+      throw new Error('Invalid email or password');
+    } else if (error.status === 403) {
+      throw new Error('Account is not active');
+    } else {
+      throw error;
+    }
   }
-
-  const token = data?.result?.jwt || data?.jwt;
-  if (!token) {
-    throw new Error('JWT not found in response');
-  }
-
-  return { token, raw: data };
 }

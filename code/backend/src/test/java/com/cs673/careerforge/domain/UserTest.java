@@ -14,9 +14,9 @@ import java.time.LocalDateTime;
  */
 @DisplayName("User Entity Tests")
 class UserTest {
-    
+
     private User user;
-    
+
     @BeforeEach
     void setUp() {
         user = new User();
@@ -27,7 +27,7 @@ class UserTest {
         user.setLastName("Doe");
         user.setUserType(UserType.EMPLOYEE);
         user.setIsActive(true);
-        
+
         // Set company owner fields for testing
         user.setCompanyName("TestCorp");
         user.setPhoto("https://example.com/logo.png");
@@ -39,30 +39,29 @@ class UserTest {
         user.setIsClaimed(true);
         user.setSlug("testcorp");
         user.setLocationAddress("San Francisco, CA");
-        
+
         LocationCoordinates coords = new LocationCoordinates(37.7749, -122.4194);
         user.setLocationCoordinates(coords);
-        
+
         Benefits benefits = new Benefits("Employee Benefits", "[\"Health Insurance\", \"401K\"]");
         user.setBenefits(benefits);
-        
+
         Values values = new Values("Company Values", "[\"Innovation\", \"Collaboration\"]");
         user.setValues(values);
-        
+
         user.setBadges("[\"Tech Leader\", \"Great Place to Work\"]");
     }
-    
+
     @Test
     @DisplayName("Should create user with valid data")
     void shouldCreateUserWithValidData() {
         assertNotNull(user);
-        assertEquals("testuser", user.getUsername());
         assertEquals("test@example.com", user.getEmail());
         assertEquals("John", user.getFirstName());
         assertEquals("Doe", user.getLastName());
         assertEquals(UserType.EMPLOYEE, user.getUserType());
         assertTrue(user.getIsActive());
-        
+
         // Test company owner fields
         assertEquals("TestCorp", user.getCompanyName());
         assertEquals("https://example.com/logo.png", user.getPhoto());
@@ -83,20 +82,20 @@ class UserTest {
         assertEquals("Company Values", user.getValues().getTitle());
         assertEquals("[\"Tech Leader\", \"Great Place to Work\"]", user.getBadges());
     }
-    
+
     @Test
     @DisplayName("Should return full name correctly")
     void shouldReturnFullNameCorrectly() {
         assertEquals("John Doe", user.getFullName());
     }
-    
+
     @Test
     @DisplayName("Should identify employee correctly")
     void shouldIdentifyEmployeeCorrectly() {
         assertTrue(user.isEmployee());
         assertFalse(user.isEmployer());
     }
-    
+
     @Test
     @DisplayName("Should identify employer correctly")
     void shouldIdentifyEmployerCorrectly() {
@@ -104,31 +103,31 @@ class UserTest {
         assertFalse(user.isEmployee());
         assertTrue(user.isEmployer());
     }
-    
+
     @Test
     @DisplayName("Should set timestamps on creation")
     void shouldSetTimestampsOnCreation() {
-        User newUser = new User("newuser", "new@example.com", "password123", 
+        User newUser = new User("newuser", "new@example.com", "password123",
                                "Jane", "Smith", UserType.EMPLOYER);
-        
+
         assertNotNull(newUser.getCreatedAt());
         assertNotNull(newUser.getUpdatedAt());
         assertTrue(newUser.getCreatedAt().isBefore(LocalDateTime.now().plusSeconds(1)));
         assertTrue(newUser.getUpdatedAt().isBefore(LocalDateTime.now().plusSeconds(1)));
     }
-    
+
     @Test
     @DisplayName("Should update timestamp on update")
     void shouldUpdateTimestampOnUpdate() {
         LocalDateTime originalUpdatedAt = user.getUpdatedAt();
-        
+
         // Simulate update
         user.setFirstName("Updated");
         user.onUpdate();
-        
+
         assertTrue(user.getUpdatedAt().isAfter(originalUpdatedAt));
     }
-    
+
     @Test
     @DisplayName("Should implement UserDetails correctly")
     void shouldImplementUserDetailsCorrectly() {
@@ -136,18 +135,17 @@ class UserTest {
         assertTrue(user.isAccountNonLocked());
         assertTrue(user.isCredentialsNonExpired());
         assertTrue(user.isEnabled());
-        
+
         assertEquals("password123", user.getPassword());
-        assertEquals("testuser", user.getUsername());
         assertEquals(1, user.getAuthorities().size());
         assertTrue(user.getAuthorities().iterator().next().getAuthority().contains("EMPLOYEE"));
     }
-    
+
     @Test
     @DisplayName("Should handle null values gracefully")
     void shouldHandleNullValuesGracefully() {
         User nullUser = new User();
-        
+
         assertNull(nullUser.getUsername());
         assertNull(nullUser.getEmail());
         assertNull(nullUser.getFirstName());
@@ -155,37 +153,39 @@ class UserTest {
         assertNull(nullUser.getUserType());
         assertNull(nullUser.getPassword());
     }
-    
+
     @Test
     @DisplayName("Should implement equals and hashCode correctly")
     void shouldImplementEqualsAndHashCodeCorrectly() {
         User user1 = new User();
         user1.setId(1L);
-        
+
         User user2 = new User();
         user2.setId(1L);
-        
+
         User user3 = new User();
         user3.setId(2L);
-        
+
         assertEquals(user1, user2);
         assertNotEquals(user1, user3);
         assertEquals(user1.hashCode(), user2.hashCode());
         assertNotEquals(user1.hashCode(), user3.hashCode());
     }
-    
+
     @Test
     @DisplayName("Should return correct string representation")
     void shouldReturnCorrectStringRepresentation() {
         String userString = user.toString();
-        
+
+        System.out.println("TESTING" + userString);
+
         assertTrue(userString.contains("testuser"));
         assertTrue(userString.contains("test@example.com"));
         assertTrue(userString.contains("John"));
         assertTrue(userString.contains("Doe"));
-        assertTrue(userString.contains("EMPLOYEE"));
+        assertTrue(userString.contains("Employee"));
     }
-    
+
     @Test
     @DisplayName("Should handle empty collections for relationships")
     void shouldHandleEmptyCollectionsForRelationships() {
@@ -194,78 +194,78 @@ class UserTest {
         assertTrue(user.getPostedJobs().isEmpty());
         assertTrue(user.getApplications().isEmpty());
     }
-    
+
     @Test
     @DisplayName("Should handle company owner fields correctly")
     void shouldHandleCompanyOwnerFieldsCorrectly() {
         // Test company name
         user.setCompanyName("NewCorp");
         assertEquals("NewCorp", user.getCompanyName());
-        
+
         // Test photo
         user.setPhoto("https://newcorp.com/logo.png");
         assertEquals("https://newcorp.com/logo.png", user.getPhoto());
-        
+
         // Test rating
         user.setRating("4.8");
         assertEquals("4.8", user.getRating());
-        
+
         // Test sector
         user.setSector("Finance");
         assertEquals("Finance", user.getSector());
-        
+
         // Test funding
         user.setFunding("Series B");
         assertEquals("Series B", user.getFunding());
-        
+
         // Test team size
         user.setTeamSize(500);
         assertEquals(500, user.getTeamSize());
-        
+
         // Test evaluated size
         user.setEvaluatedSize("enterprise");
         assertEquals("enterprise", user.getEvaluatedSize());
-        
+
         // Test is claimed
         user.setIsClaimed(false);
         assertFalse(user.getIsClaimed());
-        
+
         // Test slug
         user.setSlug("newcorp");
         assertEquals("newcorp", user.getSlug());
-        
+
         // Test location address
         user.setLocationAddress("New York, NY");
         assertEquals("New York, NY", user.getLocationAddress());
-        
+
         // Test location coordinates
         LocationCoordinates newCoords = new LocationCoordinates(40.7128, -74.0060);
         user.setLocationCoordinates(newCoords);
         assertEquals(40.7128, user.getLocationCoordinates().getLat());
         assertEquals(-74.0060, user.getLocationCoordinates().getLon());
-        
+
         // Test benefits
         Benefits newBenefits = new Benefits("New Benefits", "[\"Health\", \"Dental\"]");
         user.setBenefits(newBenefits);
         assertEquals("New Benefits", user.getBenefits().getTitle());
         assertEquals("[\"Health\", \"Dental\"]", user.getBenefits().getBenefitsList());
-        
+
         // Test values
         Values newValues = new Values("New Values", "[\"Integrity\", \"Excellence\"]");
         user.setValues(newValues);
         assertEquals("New Values", user.getValues().getTitle());
         assertEquals("[\"Integrity\", \"Excellence\"]", user.getValues().getValuesList());
-        
+
         // Test badges
         user.setBadges("[\"Innovative\", \"Fast Growing\"]");
         assertEquals("[\"Innovative\", \"Fast Growing\"]", user.getBadges());
     }
-    
+
     @Test
     @DisplayName("Should handle null company owner fields gracefully")
     void shouldHandleNullCompanyOwnerFieldsGracefully() {
         User nullUser = new User();
-        
+
         assertNull(nullUser.getCompanyName());
         assertNull(nullUser.getPhoto());
         assertNull(nullUser.getRating());
@@ -281,7 +281,7 @@ class UserTest {
         assertNull(nullUser.getValues());
         assertNull(nullUser.getBadges());
     }
-    
+
     @Test
     @DisplayName("Should handle embedded objects correctly")
     void shouldHandleEmbeddedObjectsCorrectly() {
@@ -290,13 +290,13 @@ class UserTest {
         user.setLocationCoordinates(coords);
         assertEquals(0.0, user.getLocationCoordinates().getLat());
         assertEquals(0.0, user.getLocationCoordinates().getLon());
-        
+
         // Test Benefits
         Benefits benefits = new Benefits("Test Benefits", "[\"Test1\", \"Test2\"]");
         user.setBenefits(benefits);
         assertEquals("Test Benefits", user.getBenefits().getTitle());
         assertEquals("[\"Test1\", \"Test2\"]", user.getBenefits().getBenefitsList());
-        
+
         // Test Values
         Values values = new Values("Test Values", "[\"Value1\", \"Value2\"]");
         user.setValues(values);

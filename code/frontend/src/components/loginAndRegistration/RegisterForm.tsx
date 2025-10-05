@@ -1,21 +1,20 @@
+// RegisterForm.tsx
+// Copilot assisted with this component
+// 70% AI-generated, 30% human refined
+
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Link to navigate to Login page
-import { isRequired, isEmail } from './validation'; // keep path simple (no .ts extension)
-import logo from '../../assets/logo.png'; // Import logo image
+import { Link, useNavigate } from 'react-router-dom';
+import { isRequired, isEmail } from './validation';
+import {
+  register as registerRequest,
+  type RegisterPayload,
+} from '../../api/auth/register';
 
-/*
- AI-generated code: ~65% 
-   - Tool: ChatGPT (link: https://chatgpt.com/share/68d43c9d-4d60-8006-a1a7-14ae49475a5a)
-   - Modified and adapted by human
-   - Functions/classes: RegisterForm component structure, validation integration, JSX layout
- Human code (James Rose): ~35% 
-   - Adjustments: footer text "Already have an account?", fixed link targets, applied centering card layout
-   - Functions/classes: human refinements for props, consistent styling with LoginForm
- Framework-generated code: 0%
-   - (React/Bootstrap boilerplate is used but not auto-generated)
-*/
-
-type RegisterValues = { name: string; email: string; password: string };
+type RegisterValues = {
+  name: string;
+  email: string;
+  password: string;
+};
 type Props = {
   onSubmit?: (values: RegisterValues) => void;
   showSubmitButton?: boolean;
@@ -27,6 +26,7 @@ const RegisterForm: React.FC<Props> = ({
   onSubmit,
   showSubmitButton = false,
 }) => {
+  const navigate = useNavigate();
   const [values, setValues] = useState<RegisterValues>({
     name: '',
     email: '',
@@ -42,33 +42,89 @@ const RegisterForm: React.FC<Props> = ({
     }
   );
 
+  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
   // Validation: all fields required, email must match format
   const errors = {
-    name: !isRequired(values.name) ? 'Name is required' : '',
+    name: !isRequired(values.name) ? 'Full name is required' : '',
     email: !isRequired(values.email)
       ? 'Email is required'
       : !isEmail(values.email)
       ? 'Enter a valid email'
       : '',
     password: !isRequired(values.password) ? 'Password is required' : '',
-  };
+  } as const;
 
   const hasError = (field: keyof RegisterValues) =>
     touched[field] && !!errors[field];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     setTouched({ ...touched, [e.target.name]: true as any });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setTouched({ name: true, email: true, password: true });
+    setTouched({
+      name: true,
+      email: true,
+      password: true,
+    });
+    setServerError(null);
+    setSuccessMsg(null);
+
     const valid = !errors.name && !errors.email && !errors.password;
-    if (valid && onSubmit) onSubmit(values);
+
+    if (!valid) return;
+
+    if (onSubmit) onSubmit(values);
+
+    try {
+      setLoading(true);
+      console.log('Submitting registration with:', values);
+
+      const payload: RegisterPayload = {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      };
+
+      try {
+        console.log('Sending registration request with payload:', payload);
+        const result = await registerRequest(payload);
+        console.log('Registration successful:', result);
+
+        setSuccessMsg('Registration successful. Please log in.');
+
+        // Navigate after a slight delay to allow the user to see the success message
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 1500);
+      } catch (error: any) {
+        console.error('Registration error:', error);
+        if (error.status === 409) {
+          setServerError('This email is already registered');
+        } else {
+          setServerError(
+            error?.message || 'Registration failed. Please try again.'
+          );
+        }
+      }
+    } catch (err: any) {
+      console.error('Registration form error:', err);
+      setServerError(err?.message || 'Registration failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -81,19 +137,24 @@ const RegisterForm: React.FC<Props> = ({
       <div className="card shadow-sm" style={{ width: 380, maxWidth: '100%' }}>
         <div className="card-body">
           {/* App/logo image at top (served from /public) */}
-          <img
-            src={logo}
-            alt="JobTracker"
-            className="img-fluid w-100 mb-3"
-            style={{ maxHeight: 100, objectFit: 'contain' }}
-          />
 
           <h2 className="h4 text-center mb-4">Register</h2>
+
+          {serverError && (
+            <div className="alert alert-danger py-2" role="alert">
+              {serverError}
+            </div>
+          )}
+          {successMsg && (
+            <div className="alert alert-success py-2" role="alert">
+              {successMsg}
+            </div>
+          )}
 
           <form className="w-100" noValidate onSubmit={handleSubmit}>
             <div className="mb-3">
               <label htmlFor="regName" className="form-label">
-                Name
+                Full Name
               </label>
               <input
                 id="regName"
@@ -149,7 +210,7 @@ const RegisterForm: React.FC<Props> = ({
                 value={values.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                placeholder="Create a password"
+                placeholder="*****************"
                 required
               />
               {hasError('password') && (
@@ -159,16 +220,22 @@ const RegisterForm: React.FC<Props> = ({
 
             {/* Black, full-width register button (rendered only if allowed by story flag) */}
             {showSubmitButton && (
-              <button type="submit" className="btn btn-dark w-100">
-                Register
+              <button
+                type="submit"
+                className="btn btn-dark w-100"
+                disabled={loading}
+              >
+                {loading ? 'Registering…' : 'Register'}
               </button>
             )}
           </form>
 
           {/* Small footer text with link to Login page */}
           <p className="text-center mt-3 mb-0 small">
-            Already have an account? {/*modified the website from /login to /*/}
-            <Link to="/">Login</Link>
+            Already have an account?{' '}
+            <Link to="/login">
+              <span className="text-info">Login</span>
+            </Link>
           </p>
         </div>
       </div>
