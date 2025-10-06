@@ -81,31 +81,11 @@ jobs:
             SERVICE="${SERVICE_NAME}"
             PORT="${APP_PORT}"
             
-            # Install jq if missing
-            if ! command -v jq >/dev/null 2>&1; then
-            sudo apt-get update -y && sudo apt-get install -y jq
-            fi
-
             # Write env file
             sudo mkdir -p /etc
-                    
-            echo "[INFO] Fetching DB secret from Secrets Manager..."
-            DB_SECRET=$(aws secretsmanager get-secret-value --secret-id careerforge-db-secret --query SecretString --output text)
-                    
-            JDBC_URL=$(echo $DB_SECRET | jq -r '.jdbcUrl')
-            DB_USER=$(echo $DB_SECRET | jq -r '.username')
-            DB_PASS=$(echo $DB_SECRET | jq -r '.password')
-                    
-            echo "[INFO] JDBC_URL=$JDBC_URL"
-            echo "[INFO] DB_USER=$DB_USER"
-            echo "[INFO] DB_PASS=********"   # don’t print the actual password
-                    
             sudo tee /etc/careerforge.env > /dev/null <<EOF
             APP_JWT_SECRET=${{ secrets.APP_JWT_SECRET }}
             SPRING_PROFILES_ACTIVE=prod
-            JDBC_URL=$JDBC_URL
-            DB_USER=$DB_USER
-            DB_PASS=$DB_PASS
             EOF
 
             # Install Docker if absent
