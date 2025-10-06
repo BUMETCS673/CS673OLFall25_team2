@@ -11,7 +11,7 @@ permissions:
 env:
   AWS_REGION: ${{ vars.AWS_REGION || 'us-east-1' }}
   ECR_REPOSITORY: ${{ vars.ECR_REPOSITORY || 'careerforge' }}
-  EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
+  EC2_PUBLIC_IP: ${{ vars.EC2_PUBLIC_IP }}
   APP_PORT: "8080"
   SERVICE_NAME: "careerforge"
 
@@ -28,6 +28,7 @@ jobs:
           java-version: '17'
           cache: maven
 
+      # Fail fast on tests
       - name: Unit tests
         working-directory: code/backend
         run: mvn -B -ntp test
@@ -40,7 +41,6 @@ jobs:
 
       - name: Ensure ECR repo exists
         run: |
-          set -e
           aws ecr describe-repositories --repository-names "${ECR_REPOSITORY}" >/dev/null 2>&1 || \
           aws ecr create-repository --repository-name "${ECR_REPOSITORY}"
 
@@ -50,8 +50,7 @@ jobs:
 
       - name: Compute image tag
         id: vars
-        run: |
-          echo "image=${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
+        run: echo "image=${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}:${{ github.sha }}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -69,7 +68,7 @@ jobs:
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
-          host: ${{ vars.EC2_PUBLIC_IP }}
+          host: ${{ env.EC2_PUBLIC_IP }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
@@ -77,20 +76,19 @@ jobs:
           envs: AWS_REGION,APP_PORT,SERVICE_NAME
           script: |
             set -eu
-
             REGION="${AWS_REGION}"
             IMAGE="${{ steps.vars.outputs.image }}"
             SERVICE="${SERVICE_NAME}"
             PORT="${APP_PORT}"
 
-            # --- Ensure Docker (Ubuntu 24.04-safe: remove conflicts, use Docker repo .asc key) ---
+            # Install Docker if absent
             if ! command -v docker >/dev/null 2>&1; then
               if command -v apt-get >/dev/null 2>&1; then
                 sudo apt-get update -y
                 for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do
                   sudo apt-get remove -y "$pkg" || true
                 done
-                sudo apt-get install -y ca-certificates curl unzip
+                sudo apt-get install -y ca-certificates curl
                 sudo install -m 0755 -d /etc/apt/keyrings
                 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo tee /etc/apt/keyrings/docker.asc >/dev/null
                 sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -98,36 +96,34 @@ jobs:
                 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $VERSION_CODENAME stable" | sudo tee /etc/apt/sources.list.d/docker.list >/dev/null
                 sudo apt-get update -y
                 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-              elif command -v dnf >/dev/null 2>&1; then
-                sudo dnf -y update || true
-                sudo dnf -y install docker curl unzip || sudo yum -y install docker curl unzip
               elif command -v yum >/dev/null 2>&1; then
-                sudo yum -y update || true
-                sudo yum -y install docker curl unzip
+                sudo yum -y install docker curl || true
+              elif command -v dnf >/dev/null 2>&1; then
+                sudo dnf -y install docker curl || true
               else
                 echo "no supported package manager found"; exit 1
               fi
             fi
-
             sudo systemctl enable --now docker || true
 
-            # --- ECR login (non-TTY per AWS docs) ---
+            # ECR login
             ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
             REGISTRY="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
             aws ecr get-login-password --region "$REGION" | sudo docker login --username AWS --password-stdin "$REGISTRY"
 
-            # --- Pull & run: host 80 -> container ${PORT} ---
+            # Deploy
             sudo docker rm -f "$SERVICE" || true
             sudo docker pull "$IMAGE"
-            sudo docker run -d --restart unless-stopped --env-file /etc/careerforge.env --name "$SERVICE" -p 80:"$PORT" "$IMAGE" 
+            sudo docker run -d --restart unless-stopped \
+              --env-file /etc/careerforge.env \
+              --name "$SERVICE" -p 80:"$PORT" "$IMAGE"
 
-            # --- Health check w/ retries ---
+            # Health check
             for i in $(seq 1 10); do
               code=$(curl -sS -o /dev/null -w '%{http_code}' http://localhost/hello || true)
               [ "$code" = "200" ] && { echo "Health: OK (200)"; break; }
-              echo "Health: not ready (code=${code:-none}), retrying..."
+              echo "Health: not ready (code=${code:-none}); retry..."
               sleep 3
             done
 
-            # Evidence
             sudo docker ps --format 'table {{.Names}}\t{{.Image}}\t{{.Ports}}'
