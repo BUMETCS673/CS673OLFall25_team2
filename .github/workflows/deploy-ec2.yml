@@ -86,9 +86,6 @@ jobs:
             sudo tee /etc/careerforge.env > /dev/null <<EOF
             APP_JWT_SECRET=${{ secrets.APP_JWT_SECRET }}
             SPRING_PROFILES_ACTIVE=prod
-            SPRING_DATASOURCE_URL=jdbc:mysql://careerforge-db:3306/careerforge?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-            SPRING_DATASOURCE_USERNAME=cf_user
-            SPRING_DATASOURCE_PASSWORD=secret
             EOF
 
             # Install Docker if absent
