@@ -80,6 +80,13 @@ jobs:
             IMAGE="${{ steps.vars.outputs.image }}"
             SERVICE="${SERVICE_NAME}"
             PORT="${APP_PORT}"
+            
+            # Write env file
+            sudo mkdir -p /etc
+            sudo tee /etc/careerforge.env > /dev/null <<EOF
+            APP_JWT_SECRET=${{ secrets.APP_JWT_SECRET }}
+            SPRING_PROFILES_ACTIVE=prod
+            EOF
 
             # Install Docker if absent
             if ! command -v docker >/dev/null 2>&1; then
