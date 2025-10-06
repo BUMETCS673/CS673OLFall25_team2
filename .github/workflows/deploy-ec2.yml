@@ -86,6 +86,11 @@ jobs:
             sudo tee /etc/careerforge.env > /dev/null <<EOF
             APP_JWT_SECRET=${{ secrets.APP_JWT_SECRET }}
             SPRING_PROFILES_ACTIVE=prod
+            
+            # --- Database ---
+            JDBC_URL=${{ secrets.JDBC_URL }}
+            SPRING_DATASOURCE_USERNAME=${{ secrets.RDS_USERNAME }}
+            SPRING_DATASOURCE_PASSWORD=${{ secrets.RDS_PASSWORD }}
             EOF
 
             # Install Docker if absent
