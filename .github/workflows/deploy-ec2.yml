@@ -72,7 +72,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
-          script_stop: true
           envs: AWS_REGION,APP_PORT,SERVICE_NAME
           script: |
             set -eu
@@ -87,7 +86,7 @@ jobs:
             sudo tee /etc/careerforge.env > /dev/null <<EOF
             APP_JWT_SECRET=${{ secrets.APP_JWT_SECRET }}
             SPRING_PROFILES_ACTIVE=prod
-            JDBC_URL=$JDBC_URL${{ secrets.JDBC_URL }}
+            JDBC_URL=${{ secrets.JDBC_URL }}
             EOF
 
             # Install Docker if absent
