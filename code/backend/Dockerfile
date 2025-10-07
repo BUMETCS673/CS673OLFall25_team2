@@ -2,31 +2,29 @@
 
 # ---- Build stage ----
 FROM maven:3.9.9-eclipse-temurin-21 AS build
-WORKDIR /app
+WORKDIR /src
 
-# Copy only the pom first to maximize dependency caching
+# Prime dependency cache
 COPY pom.xml .
-# Cache the local Maven repo across builds
-RUN --mount=type=cache,target=/root/.m2 mvn -q -B -DskipTests dependency:go-offline
+RUN --mount=type=cache,target=/root/.m2 mvn -q -B -ntp dependency:go-offline
 
-# Now copy sources and build
+# Build with tests
 COPY src ./src
-# Skip compiling and running tests (fixes build errors from broken test sources)
-RUN --mount=type=cache,target=/root/.m2 mvn -q -B -Dmaven.test.skip=true package
+RUN --mount=type=cache,target=/root/.m2 mvn -q -B -ntp package \
+ && JAR="$(ls target/*.jar | grep -v 'original' | head -n1)" \
+ && cp "$JAR" target/app.jar
 
 # ---- Runtime image ----
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-# Copy the fat jar produced by Spring Boot
-# (Your jar currently builds as CareerForge-0.0.1-SNAPSHOT.jar; wildcard keeps it robust)
-COPY --from=build /app/target/*.jar /app/app.jar
+COPY --from=build /src/target/app.jar /app/app.jar
 
-# Expose Spring Boot's port (application.properties has server.port=8080)
 EXPOSE 8080
+ENV SPRING_PROFILES_ACTIVE=docker
 
-# Drop privileges
-RUN useradd -ms /bin/bash spring && chown -R spring:spring /app
+# Run as non-root
+RUN useradd -r -s /usr/sbin/nologin spring && chown -R spring:spring /app
 USER spring
 
-ENTRYPOINT ["java","-XX:MaxRAMPercentage=75","-jar","/app/app.jar"]
+ENTRYPOINT ["java","-jar","/app/app.jar"]

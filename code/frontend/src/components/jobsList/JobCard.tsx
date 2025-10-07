@@ -1,10 +1,17 @@
 // JobCard.tsx
-// Authors: Pedro Ramirez and Copilot
-// Pedro wrote the entire component and logic
-// Copilot assisted with formatting, some JSX structure, and utility functions
+// Copilot and ChatGPT assisted with this component
+// 70% human written, 20% Copilot, 10% ChatGPT
 
 import type { Job, DescriptionBreakdown } from '../../types/job';
 import defaultCompanyLogo from '../../assets/default-company-logo.jpg';
+import SaveJobButton from './SaveJobButton';
+import ApplyJobButton from './ApplyJobButton';
+
+declare global {
+  interface Window {
+    clearSavedAppliedJobs: () => string;
+  }
+}
 
 export default function JobCard({
   job,
@@ -13,15 +20,12 @@ export default function JobCard({
   job: Job;
   detailed?: boolean;
 }) {
-  // Pedro's written code with some ChatGPT formatting help
   const db: DescriptionBreakdown =
     job.descriptionBreakdown ?? ({} as DescriptionBreakdown);
 
-  // Pedro's written code with some ChatGPT formatting help
   const fmtMoney = (n?: number) =>
     typeof n === 'number' ? `$${n.toLocaleString()}` : undefined;
 
-  // Pedro's written code with some ChatGPT formatting help
   const postedDate = job.createdAt
     ? new Date(job.createdAt).toLocaleDateString()
     : undefined;
@@ -29,7 +33,6 @@ export default function JobCard({
     ? new Date(job.updatedAt).toLocaleDateString()
     : undefined;
 
-  // Pedro's written code with some ChatGPT formatting help
   const mapHref = job.locationCoordinates
     ? `https://www.google.com/maps/search/?api=1&query=${job.locationCoordinates.lat},${job.locationCoordinates.lon}`
     : undefined;
@@ -42,8 +45,6 @@ export default function JobCard({
     new Set([...(db.keywords ?? []), ...(job.skills_suggest ?? [])])
   );
 
-  // Pedro wrote most of this JSX structure with some Copilot formatting help
-  // logic and utility functions are Pedro's
   return (
     <div
       className="card job-card shadow-sm"
@@ -69,9 +70,7 @@ export default function JobCard({
             />
           )}
           <div className="flex-grow-1">
-            <h5 className="card-title mb-1 font-weight-bold text-primary">
-              {job.title}
-            </h5>
+            <h5 className="card-title mb-1 fw-light fw-700">{job.title}</h5>
             <div className="text-muted">
               {job.owner?.companyName ?? 'Unknown Company'}
             </div>
@@ -108,6 +107,7 @@ export default function JobCard({
         {detailed && (
           <div className="mt-3">
             {summary && <p className="fst-italic">{summary}</p>}
+            <ApplyJobButton job={job} detailed={!!detailed} />
 
             <div className="row row-cols-1 row-cols-md-2 g-2 small mb-3">
               {job.locationAddress && (
@@ -118,7 +118,7 @@ export default function JobCard({
                       href={mapHref}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-primary"
+                      className="text-info"
                       title="Open in Google Maps"
                     >
                       {job.locationAddress}
@@ -233,17 +233,7 @@ export default function JobCard({
               </div>
             ) : null}
 
-            <div className="d-flex gap-2">
-              {job.url && (
-                <a
-                  href={job.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-primary"
-                >
-                  Apply Now
-                </a>
-              )}
+            <div className="d-flex gap-2 align-items-center flex-wrap">
               {mapHref && (
                 <a
                   href={mapHref}
@@ -254,16 +244,8 @@ export default function JobCard({
                   View on Map
                 </a>
               )}
-              {job.owner?.slug && (
-                <a
-                  href={`https://joinrise.co/${job.owner.slug}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="btn btn-outline-secondary"
-                >
-                  Company Page
-                </a>
-              )}
+
+              <SaveJobButton job={job} detailed={!!detailed} />
             </div>
           </div>
         )}

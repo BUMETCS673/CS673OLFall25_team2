@@ -5,29 +5,39 @@ package com.cs673.careerforge.web;
  Framework-generated code: 0%
 */
 
+import com.cs673.careerforge.common.UserType;
 import com.cs673.careerforge.domain.User;
 import com.cs673.careerforge.exceptions.ConflictException;
 import com.cs673.careerforge.service.UserService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import com.cs673.careerforge.security.JwtUtil;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("/public/users")
+@RequestMapping("/auth")
 public class UserController {
 
     private final UserService userService;
+    private final UserDetailsService userDetailsService;
+    private final JwtUtil jwtUtil;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService,
+                          UserDetailsService userDetailsService,
+                          JwtUtil jwtUtil) {
         this.userService = userService;
+        this.userDetailsService = userDetailsService;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
@@ -38,28 +48,48 @@ public class UserController {
      *  - 400 Bad Request with structured field errors (handled by RestExceptionHandler)
      */
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
         // Uniqueness guard for 409
-        List<String> conflicts = new ArrayList<>();
-        if (userService.existsByUsername(request.username())) {
-            conflicts.add("username");
-        }
         if (userService.existsByEmail(request.email())) {
-            conflicts.add("email");
-        }
-        if (!conflicts.isEmpty()) {
-            throw new ConflictException("Unique constraint violation", conflicts);
+            throw new ConflictException("Email already exists: " + request.email(), List.of("email"));
         }
 
-        // Map DTO -> Entity (only fields the client is allowed to set)
+        // --- Handle name ---
+        String[] parts = request.name().trim().split(" ", 2);
+
+        String firstName = parts.length > 0
+                ? parts[0].replaceAll("[^a-zA-Z\\s]", "")
+                : "Unknown";
+        if (firstName.isBlank()) firstName = "Unknown";
+
+        String lastName = parts.length > 1
+                ? parts[1].replaceAll("[^a-zA-Z\\s]", "")
+                : "Unknown";
+        if (lastName.isBlank()) lastName = "Unknown";
+
+        // --- Auto-generate username ---
+        // use prefix of email, sanitize to letters/numbers/underscores
+        String username = request.email().split("@")[0]
+                .replaceAll("[^a-zA-Z0-9_]", "_");
+
+        if (username.isBlank()) {
+            username = "user_" + System.currentTimeMillis(); // fallback
+        }
+
+        // --- Map DTO -> Entity ---
         User toCreate = new User();
-        toCreate.setUsername(request.username());
+        toCreate.setUsername(username);
         toCreate.setEmail(request.email());
-        toCreate.setFirstName(request.firstName());
-        toCreate.setLastName(request.lastName());
-        toCreate.setPassword(request.password()); // assume service encodes
+        toCreate.setFirstName(firstName);
+        toCreate.setLastName(lastName);
+        toCreate.setUserType(UserType.EMPLOYEE); // default role
+        toCreate.setPassword(request.password()); // encoded in service
 
         User created = userService.createUser(toCreate);
+
+        // --- Build JWT ---
+        var userDetails = userDetailsService.loadUserByUsername(created.getEmail());
+        String jwt = jwtUtil.generateToken(userDetails);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequestUri()
@@ -67,15 +97,20 @@ public class UserController {
                 .buildAndExpand(created.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).body(UserResponse.from(created));
+        UserResponse userResponse = UserResponse.from(created);
+        RegisterResponse response = new RegisterResponse(jwt, userResponse);
+
+        return ResponseEntity.created(location).body(response);
     }
 
     // ---------- DTOs ----------
 
+
     public record RegisterRequest(
-            @NotBlank(message = "username is required")
-            @Size(min = 3, max = 50, message = "username must be between 3 and 50 characters")
-            String username,
+
+            @NotBlank(message = "name is required")
+            @Size(min = 3, max = 100, message = "name must be between 3 and 100 characters")
+            String name,
 
             @NotBlank(message = "email is required")
             @Email(message = "email must be a valid email address")
@@ -83,16 +118,10 @@ public class UserController {
 
             @NotBlank(message = "password is required")
             @Size(min = 8, max = 100, message = "password must be between 8 and 100 characters")
-            String password,
-
-            @NotBlank(message = "firstName is required")
-            @Size(max = 100, message = "firstName must be at most 100 characters")
-            String firstName,
-
-            @NotBlank(message = "lastName is required")
-            @Size(max = 100, message = "lastName must be at most 100 characters")
-            String lastName
+            String password
     ) {}
+
+    public record RegisterResponse(String token, UserResponse user) {}
 
     public static class UserResponse {
         private Long id;
@@ -123,4 +152,5 @@ public class UserController {
         public String getUserType() { return userType; }
         public Boolean getIsActive() { return isActive; }
     }
+
 }

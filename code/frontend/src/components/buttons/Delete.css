@@ -7,28 +7,25 @@
   
 */
 
-
 .delete-button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 26px;
+  height: 26px;
   line-height: 1;
-  font-size: 1.5rem;
-  font-weight: normal;
+  font-size: 1.7rem;
+  font-weight: 700;
   cursor: pointer;
-  
+  padding: 0;
   background-color: white;
   color: #ff4136;
-  border: 2px solid #ff4136;
-  border-radius: 8px;
-
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  border: none;
+  font-family: fantasy;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .delete-button:hover {
-  background-color: #ffeded;
-  color: #e02f23;
-  border-color: #e02f23;
+  color: #000000;
 }

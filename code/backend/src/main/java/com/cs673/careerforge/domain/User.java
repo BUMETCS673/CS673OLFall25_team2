@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * User com.cs673.careerforge.entity representing both employees and employers in the job tracking system.
@@ -101,7 +102,7 @@ public class User implements UserDetails {
     private String evaluatedSize;
     
     @Column(name = "is_claimed")
-    private Boolean isClaimed = false;
+    private Boolean isClaimed;
     
     @Size(max = 100, message = "Slug must not exceed 100 characters")
     @Column(name = "slug", length = 100)
@@ -134,6 +135,8 @@ public class User implements UserDetails {
     public User() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        this.postedJobs = new ArrayList<>();
+        this.applications = new ArrayList<>();
     }
     
     public User(String username, String email, String password, String firstName, 
@@ -172,7 +175,7 @@ public class User implements UserDetails {
     
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
     
     @Override
@@ -430,9 +433,10 @@ public class User implements UserDetails {
         User user = (User) o;
         return id != null && id.equals(user.id);
     }
-    
+
     @Override
     public int hashCode() {
-        return getClass().hashCode();
+        return java.util.Objects.hash(id);
     }
+
 }

@@ -1,33 +1,33 @@
+// themeToggler.tsx
+// Copilot and ChatGPT assisted with this component
+// 60% AI-generated, 40% human refined
+
 import { useTheme } from '../../theme/ThemeContext';
 import sunImage from '../../assets/sun.png';
-import moonImage from '../../assets/moon.jpg';
+import moonImage from '../../assets/moon.png';
 
-/*
- AI-generated code: 80% (tool: ChatGPT, modified and adapted,
-   functions: ThemeToggler,
-   classes: none,
-   AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
- Human code: 15% (functions: casing/paths, comments; classes: none)
- Framework-generated code: 5% (tool: Vite/React)
-*/
-
-// Theme toggle button component
 export default function ThemeToggler() {
   const { theme, toggle } = useTheme();
 
   return (
-    <div className="w-100" onClick={toggle} aria-label="Toggle color theme">
+    <div
+      className="w-100 d-flex justify-content-end"
+      onClick={toggle}
+      aria-label="Toggle color theme"
+    >
       {theme === 'light' ? (
         <img
           src={moonImage}
           alt="Switch to dark mode"
-          style={{ width: '40px', height: '40px' }}
+          style={{ width: '47px', height: '47px' }}
+          className="user-select-none me-3"
         />
       ) : (
         <img
           src={sunImage}
           alt="Switch to light mode"
-          style={{ width: '40px', height: '40px' }}
+          style={{ width: '47px', height: '47px' }}
+          className="user-select-none me-3"
         />
       )}
     </div>

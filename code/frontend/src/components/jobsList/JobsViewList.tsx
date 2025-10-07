@@ -1,29 +1,40 @@
 // JobsViewList.tsx
-// Authors: OpenAI's ChatGPT and Pedro Ramirez
-// ChatGPT generated the JSX structure and basic logic
-// useState, useEffect, useMemo, useCallback
-// fetch jobs from API, display list and details
-// responsive design with media query were Pedro's idea and implementation
-// along with some refactoring in the JSX structure
+// Copilot and ChatGPT assisted with this component
+// 70% human written, 20% Copilot, 10% ChatGPT
 
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import JobCard from './JobCard';
 import type { Job, JobsApiEnvelope } from '../../types/job';
+import './JobsViewList.css';
 
-const PANEL_MAX_HEIGHT = '100vh';
 const LG_QUERY = '(min-width: 992px)';
 
+// Helper function to transform job types according to business rules
+const transformJobType = (type: string | undefined): string => {
+  if (!type) return 'Unknown';
+
+  const normalizedType = type.trim();
+
+  if (normalizedType === 'Regular Full-Time') return 'Office';
+  if (normalizedType === 'Full-Time') return 'Home';
+  if (normalizedType === 'Hybrid') return 'Hybrid';
+
+  return 'Unknown';
+};
+
 const JobsViewList = () => {
-  // Pedro's written code
   const [jobs, setJobs] = useState<Job[]>([]);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+  const [selectedDepartment, setSelectedDepartment] = useState<string | null>(
+    null
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLgUp, setIsLgUp] = useState<boolean>(() =>
     typeof window !== 'undefined' ? window.matchMedia(LG_QUERY).matches : true
   );
 
-  // Pedro's written code
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const mql = window.matchMedia(LG_QUERY);
@@ -39,13 +50,55 @@ const JobsViewList = () => {
     };
   }, []);
 
-  // Pedro's written code
-  const selectedJob = useMemo(
-    () => jobs.find((j) => j._id === selectedJobId) ?? null,
-    [jobs, selectedJobId]
+  const jobTypes = useMemo(() => {
+    const set = new Map<string, string>();
+    for (const j of jobs) {
+      if (j.type) {
+        // Use the already transformed type values
+        const norm = j.type.trim();
+        if (norm && !set.has(norm.toLowerCase()))
+          set.set(norm.toLowerCase(), norm);
+      }
+    }
+    return Array.from(set.values()).sort();
+  }, [jobs]);
+
+  // Derive list of unique departments
+  const jobDepartments = useMemo(() => {
+    const set = new Map<string, string>();
+    for (const j of jobs) {
+      if (j.department) {
+        const norm = j.department.trim();
+        if (norm && !set.has(norm.toLowerCase()))
+          set.set(norm.toLowerCase(), norm);
+      }
+    }
+    return Array.from(set.values()).sort();
+  }, [jobs]);
+
+  // Filter jobs by selectedType AND selectedDepartment if provided
+  const filteredJobs = useMemo(
+    () =>
+      jobs.filter((j) => {
+        const typeOk =
+          !selectedType ||
+          (j.type &&
+            j.type.trim().toLowerCase() === selectedType.trim().toLowerCase());
+        const deptOk =
+          !selectedDepartment ||
+          (j.department &&
+            j.department.trim().toLowerCase() ===
+              selectedDepartment.trim().toLowerCase());
+        return typeOk && deptOk;
+      }),
+    [jobs, selectedType, selectedDepartment]
   );
 
-  // Pedro's written code
+  const selectedJob = useMemo(
+    () => filteredJobs.find((j) => j._id === selectedJobId) ?? null,
+    [filteredJobs, selectedJobId]
+  );
+
   useEffect(() => {
     const controller = new AbortController();
     (async () => {
@@ -59,7 +112,14 @@ const JobsViewList = () => {
           throw new Error(`Error fetching jobs: ${response.statusText}`);
         const data: JobsApiEnvelope = await response.json();
         const list: Job[] = data?.result?.jobs || [];
-        setJobs(list);
+
+        // Transform job types according to business rules
+        const transformedList = list.map((job) => ({
+          ...job,
+          type: transformJobType(job.type),
+        }));
+
+        setJobs(transformedList);
         setError(null);
       } catch (e: any) {
         if (e.name !== 'AbortError')
@@ -71,25 +131,49 @@ const JobsViewList = () => {
     return () => controller.abort();
   }, []);
 
-  // Pedro's written code
   useEffect(() => {
-    if (isLgUp && !selectedJobId && jobs.length > 0)
-      setSelectedJobId(jobs[0]._id);
-  }, [jobs, selectedJobId, isLgUp]);
+    if (isLgUp && !selectedJobId && filteredJobs.length > 0)
+      setSelectedJobId(filteredJobs[0]._id);
+  }, [filteredJobs, selectedJobId, isLgUp]);
 
-  // Pedro's written code
+  // Expose dynamic types & departments via custom events so filters can subscribe without prop drilling
+  useEffect(() => {
+    const typeEvent = new CustomEvent('jobs:types', {
+      detail: { types: jobTypes, selectedType },
+    });
+    window.dispatchEvent(typeEvent);
+
+    const deptEvent = new CustomEvent('jobs:departments', {
+      detail: { departments: jobDepartments, selectedDepartment },
+    });
+    window.dispatchEvent(deptEvent);
+  }, [jobTypes, selectedType, jobDepartments, selectedDepartment]);
+
+  // Listen for type & department selection events from filter components
+  useEffect(() => {
+    const typeHandler = (e: Event) => {
+      const ce = e as CustomEvent<{ value: string | null }>;
+      setSelectedType(ce.detail.value);
+      setSelectedJobId(null);
+    };
+    const deptHandler = (e: Event) => {
+      const ce = e as CustomEvent<{ value: string | null }>;
+      setSelectedDepartment(ce.detail.value);
+      setSelectedJobId(null);
+    };
+    window.addEventListener('jobs:typeSelect', typeHandler);
+    window.addEventListener('jobs:departmentSelect', deptHandler);
+    return () => {
+      window.removeEventListener('jobs:typeSelect', typeHandler);
+      window.removeEventListener('jobs:departmentSelect', deptHandler);
+    };
+  }, []);
+
   const handleSelect = useCallback((id: string) => setSelectedJobId(id), []);
   const handleCloseMobile = useCallback(() => setSelectedJobId(null), []);
 
   return (
-    // auto generated by ChatGPT based on Pedro's design
-    // prompt: "Create a responsive two-panel layout with a list of jobs on the left (30% width on large screens,
-    //        full width on mobile) and job details on the right (70% width on large screens, hidden on mobile).
-    //        The list should be scrollable if it exceeds the viewport height.
-    //        The details panel should show a message when no job is selected.
-    //        On mobile, selecting a job from the list should open the details in a modal overlay.
-    //        Use CSS variables for colors and ensure accessibility with ARIA roles and keyboard navigation."
-    <div className="container-fluid w-100 d-flex flex-column flex-grow-1 min-h-0">
+    <div className="container-fluid w-100 d-flex flex-column flex-grow-1 min-h-0 pb-5">
       <div className="d-flex w-100 flex-column flex-lg-row flex-grow-1 min-h-0">
         {/* Left: list (30% on lg+, full width on mobile) */}
         <div
@@ -97,7 +181,6 @@ const JobsViewList = () => {
           style={{
             flexBasis: '100%',
             flex: '0 0 30%',
-            maxHeight: PANEL_MAX_HEIGHT,
             minHeight: 0,
             background: 'var(--surface-bg)',
             borderRight: '1px solid var(--surface-border-color)',
@@ -110,7 +193,17 @@ const JobsViewList = () => {
               borderBottom: '1px solid var(--surface-border-color)',
             }}
           >
-            <h2 className="m-0">Job Listings</h2>
+            <h5 className="m-0 d-flex align-items-center gap-2">
+              <span>Available Jobs</span>
+              <span
+                className="badge bg-info"
+                aria-label={`Total jobs${
+                  selectedType ? ' for selected type' : ''
+                }`}
+              >
+                {filteredJobs.length}
+              </span>
+            </h5>
           </div>
 
           {error && (
@@ -133,7 +226,7 @@ const JobsViewList = () => {
               role="listbox"
               aria-label="Job list"
             >
-              {jobs.map((job) => {
+              {filteredJobs.map((job) => {
                 const isActive = selectedJobId === job._id;
                 return (
                   <button
@@ -157,18 +250,21 @@ const JobsViewList = () => {
                   </button>
                 );
               })}
-              {!jobs.length && !error && (
-                <p className="text-muted m-3">No jobs found.</p>
+              {!filteredJobs.length && !error && (
+                <p className="text-muted m-3">
+                  No jobs found
+                  {selectedType ? ` for type "${selectedType}"` : ''}.
+                </p>
               )}
             </div>
           )}
         </div>
+
         <div
           className="job-details d-none d-lg-block flex-grow-1 overflow-auto p-3"
           style={{
             flexBasis: '100%',
             flex: '1 1 70%',
-            maxHeight: PANEL_MAX_HEIGHT,
             minHeight: 0,
             background: 'var(--surface-bg)',
             borderLeft: '1px solid var(--surface-border-color)',
@@ -190,7 +286,7 @@ const JobsViewList = () => {
 
       {selectedJob && (
         <div
-          className="d-lg-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50"
+          className="d-lg-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 job-modal"
           style={{ zIndex: 1050 }}
           role="dialog"
           aria-modal="true"

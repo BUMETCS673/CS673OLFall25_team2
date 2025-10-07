@@ -1,5 +1,6 @@
 package com.cs673.careerforge.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -17,5 +18,6 @@ import lombok.ToString;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class BaseRequest {
-    private long uid;
+    @JsonIgnore
+    private Long uid;
 }

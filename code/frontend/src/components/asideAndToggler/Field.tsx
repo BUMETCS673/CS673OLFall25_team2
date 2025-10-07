@@ -1,15 +1,9 @@
+// Field.tsx
+// Copilot and ChatGPT assisted with this component
+// 85% AI-generated, 10% human refined, 5% framework-generated
+
 import { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-
-/*
- AI-generated code: 85% (tool: ChatGPT, modified and adapted,
-   functions: Field (dropdown/popup, click-outside, portal/positioning),
-   classes: none,
-   AI chat links: https://chatgpt.com/share/68cdcba0-1218-8006-87a6-66d632a41ec8 )
- Human code: 10% (functions: minor tweaks, comments, import moves; classes: none)
- Framework-generated code: 5% (tool: Vite/React)
-*/
-const FIELDS = ['Engineering', 'Product', 'Design', 'Data', 'Operations'];
 
 interface FieldProps {
   onChange?: (value: string | null) => void;
@@ -18,6 +12,7 @@ interface FieldProps {
 export default function Field({ onChange }: FieldProps) {
   const [open, setOpen] = useState(false); // controls dropdown open/close
   const [value, setValue] = useState<string | null>(null);
+  const [dynamicDepartments, setDynamicDepartments] = useState<string[]>([]);
   const ref = useRef<HTMLDivElement>(null);
   const anchorRef = useRef<HTMLButtonElement>(null); // anchor for positioning the floating panel
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -59,7 +54,7 @@ export default function Field({ onChange }: FieldProps) {
       if (!el) return;
       const rect = el.getBoundingClientRect();
 
-      const maxWidth = Math.min(520, window.innerWidth - 32); // keep 16px gutters on both sides
+      const maxWidth = Math.min(520, window.innerWidth - 32);
       const left = Math.min(
         Math.max(rect.right - maxWidth, 16),
         window.innerWidth - maxWidth - 16
@@ -81,18 +76,39 @@ export default function Field({ onChange }: FieldProps) {
   const choose = (v: string | null) => {
     setValue(v);
     onChange?.(v); // bubble up to parent
-    setOpen(false); // close after selection
+    // Broadcast department selection so JobsViewList can filter
+    const evt = new CustomEvent('jobs:departmentSelect', {
+      detail: { value: v },
+    });
+    window.dispatchEvent(evt);
+    setOpen(false);
   };
 
-  // Filter fields live as the user types
-  const filtered = FIELDS.filter((f) =>
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<{
+        departments: string[];
+        selectedDepartment: string | null;
+      }>;
+      setDynamicDepartments(ce.detail.departments);
+      if (!open) {
+        if (ce.detail.selectedDepartment !== value) {
+          setValue(ce.detail.selectedDepartment);
+        }
+      }
+    };
+    window.addEventListener('jobs:departments', handler);
+    return () => window.removeEventListener('jobs:departments', handler);
+  }, [open, value]);
+
+  // Filter departments live as the user types
+  const filtered = dynamicDepartments.filter((f) =>
     f.toLowerCase().includes(draft.toLowerCase())
   );
 
   return (
     <>
       <div className="position-relative" ref={ref}>
-        {/* Button opens/closes dropdown */}
         <button
           type="button"
           className="btn btn-outline-secondary w-100 text-truncate filter-button"
@@ -108,7 +124,6 @@ export default function Field({ onChange }: FieldProps) {
         </button>
       </div>
 
-      {/* Floating panel rendered in a portal so it can extend left outside the Aside */}
       {open &&
         createPortal(
           <div
@@ -174,7 +189,9 @@ export default function Field({ onChange }: FieldProps) {
                   role="option"
                   aria-disabled="true"
                 >
-                  No matches
+                  {dynamicDepartments.length
+                    ? 'No matches'
+                    : 'No departments yet…'}
                 </div>
               )}
 

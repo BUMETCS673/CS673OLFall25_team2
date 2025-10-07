@@ -7,6 +7,7 @@ package com.cs673.careerforge.configs;
 */
 
 
+import com.cs673.careerforge.common.auth.UserPrincipal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +30,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import com.cs673.careerforge.security.JwtAuthenticationEntryPoint;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -37,9 +43,12 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            JwtRequestFilter jwtRequestFilter,
                                            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
+
+        System.out.println(">>> Using custom SecurityConfig filterChain <<<");
         //csrf.disable -> typical for stateless APIs
         return http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 // allow H2 console to render in a frame
                 .headers(h -> h.frameOptions(f -> f.sameOrigin()))
                 .authorizeHttpRequests(auth -> auth
@@ -49,18 +58,14 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/h2-console/**",
                                 "/public/**",
-                                "/authenticate", // change for login endpoint
-                                "/register"        // change for signup endpoint
+                                "/auth/login",
+                                "/auth/register"
                         ).permitAll()
-                        .requestMatchers("/secure").authenticated() // secure endpoint requires JWT
-                     //   .requestMatchers("/secure").hasRole("USER") // secure endpoint requires JWT, both USER and ADMIN get in
-                        .requestMatchers("/admin/**").hasRole("ADMIN") //only ADMIN. Not implemented yet. Just being used for tests
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // no HTTP sessions
                 )
-                // plug in the custom entrypoint
                 .exceptionHandling(ex ->
                         ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
@@ -68,31 +73,25 @@ public class SecurityConfig {
                 .build();
     }
 
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration configuration = new CorsConfiguration();
+                // Allow Vite dev server origin; add more origins as needed
+                configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+                configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Origin", "Accept"));
+                configuration.setExposedHeaders(List.of("Location"));
+                configuration.setAllowCredentials(true);
+                configuration.setMaxAge(3600L);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", configuration);
+                return source;
+        }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
         return cfg.getAuthenticationManager();
-    }
-
-    @Bean
-    public UserDetailsService users(
-            @Value("${app.security.user.name}") String userName,
-            @Value("${app.security.user.password}") String userPass,
-            @Value("${app.security.admin.name}") String adminName,
-            @Value("${app.security.admin.password}") String adminPass) {
-
-        PasswordEncoder encoder = passwordEncoder();
-
-        UserDetails user = User.withUsername(userName)
-                .password(encoder.encode(userPass))
-                .roles("USER")
-                .build();
-
-        UserDetails admin = User.withUsername(adminName)
-                .password(encoder.encode(adminPass))
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
     }
 
     @Bean

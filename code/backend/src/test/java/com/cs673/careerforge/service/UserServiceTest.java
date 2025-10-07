@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.cs673.careerforge.exceptions.InvalidParamException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,18 +36,18 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("UserService Tests")
 class UserServiceTest {
-    
+
     @Mock
     private UserRepository userRepository;
-    
+
     @Mock
     private PasswordEncoder passwordEncoder;
-    
+
     @InjectMocks
     private UserServiceImpl userService;
-    
+
     private User testUser;
-    
+
     @BeforeEach
     void setUp() {
         testUser = new User();
@@ -58,7 +59,7 @@ class UserServiceTest {
         testUser.setLastName("Doe");
         testUser.setUserType(UserType.EMPLOYEE);
         testUser.setIsActive(true);
-        
+
         // Set company owner fields for testing
         testUser.setCompanyName("TestCorp");
         testUser.setPhoto("https://example.com/logo.png");
@@ -70,126 +71,92 @@ class UserServiceTest {
         testUser.setIsClaimed(true);
         testUser.setSlug("testcorp");
         testUser.setLocationAddress("San Francisco, CA");
-        
+
         LocationCoordinates coords = new LocationCoordinates(37.7749, -122.4194);
         testUser.setLocationCoordinates(coords);
-        
+
         Benefits benefits = new Benefits("Employee Benefits", "[\"Health Insurance\", \"401K\"]");
         testUser.setBenefits(benefits);
-        
+
         Values values = new Values("Company Values", "[\"Innovation\", \"Collaboration\"]");
         testUser.setValues(values);
-        
+
         testUser.setBadges("[\"Tech Leader\", \"Great Place to Work\"]");
     }
-    
+
     @Test
     @DisplayName("Should create user successfully")
     void shouldCreateUserSuccessfully() {
         // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
         when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        
+
         // When
         User result = userService.createUser(testUser);
-        
+
         // Then
         assertNotNull(result);
-        assertEquals("testuser", result.getUsername());
         assertEquals("test@example.com", result.getEmail());
         verify(userRepository).save(testUser);
     }
-    
-    @Test
-    @DisplayName("Should throw exception when username already exists")
-    void shouldThrowExceptionWhenUsernameAlreadyExists() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(true);
-        
-        // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> userService.createUser(testUser)
-        );
-        
-        assertEquals("Username already exists: testuser", exception.getMessage());
-        verify(userRepository, never()).save(any(User.class));
-    }
-    
+
     @Test
     @DisplayName("Should throw exception when email already exists")
     void shouldThrowExceptionWhenEmailAlreadyExists() {
         // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
-        
+
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
             () -> userService.createUser(testUser)
         );
-        
+
         assertEquals("Email already exists: test@example.com", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
     }
-    
+
     @Test
     @DisplayName("Should find user by ID")
     void shouldFindUserById() {
         // Given
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        
+
         // When
         Optional<User> result = userService.findById(1L);
-        
+
         // Then
         assertTrue(result.isPresent());
         assertEquals(testUser, result.get());
     }
-    
-    @Test
-    @DisplayName("Should find user by username")
-    void shouldFindUserByUsername() {
-        // Given
-        when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(testUser));
-        
-        // When
-        Optional<User> result = userService.findByUsername("testuser");
-        
-        // Then
-        assertTrue(result.isPresent());
-        assertEquals(testUser, result.get());
-    }
-    
+
     @Test
     @DisplayName("Should find user by email")
     void shouldFindUserByEmail() {
         // Given
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
-        
+
         // When
         Optional<User> result = userService.findByEmail("test@example.com");
-        
+
         // Then
         assertTrue(result.isPresent());
         assertEquals(testUser, result.get());
     }
-    
+
     @Test
     @DisplayName("Should update user successfully")
     void shouldUpdateUserSuccessfully() {
         // Given
         User updatedUser = new User();
         updatedUser.setId(1L);
-        updatedUser.setUsername("updateduser");
         updatedUser.setEmail("updated@example.com");
         updatedUser.setFirstName("Jane");
         updatedUser.setLastName("Smith");
         updatedUser.setUserType(UserType.EMPLOYER);
         updatedUser.setIsActive(true);
-        
+
         // Set company owner fields for update test
         updatedUser.setCompanyName("UpdatedCorp");
         updatedUser.setPhoto("https://updated.com/logo.png");
@@ -201,95 +168,93 @@ class UserServiceTest {
         updatedUser.setIsClaimed(false);
         updatedUser.setSlug("updatedcorp");
         updatedUser.setLocationAddress("New York, NY");
-        
+
         LocationCoordinates updatedCoords = new LocationCoordinates(40.7128, -74.0060);
         updatedUser.setLocationCoordinates(updatedCoords);
-        
+
         Benefits updatedBenefits = new Benefits("Updated Benefits", "[\"Health\", \"Dental\"]");
         updatedUser.setBenefits(updatedBenefits);
-        
+
         Values updatedValues = new Values("Updated Values", "[\"Integrity\", \"Excellence\"]");
         updatedUser.setValues(updatedValues);
-        
+
         updatedUser.setBadges("[\"Innovative\", \"Fast Growing\"]");
-        
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(userRepository.existsByUsername("updateduser")).thenReturn(false);
         when(userRepository.existsByEmail("updated@example.com")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
-        
+
         // When
         User result = userService.updateUser(updatedUser);
-        
+
         // Then
         assertNotNull(result);
-        assertEquals("updateduser", result.getUsername());
         assertEquals("updated@example.com", result.getEmail());
         verify(userRepository).save(any(User.class));
     }
-    
+
     @Test
     @DisplayName("Should throw exception when updating non-existent user")
     void shouldThrowExceptionWhenUpdatingNonExistentUser() {
         // Given
         User updatedUser = new User();
         updatedUser.setId(999L);
-        
+
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
-        
+
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidParamException exception = assertThrows(
+            InvalidParamException.class,
             () -> userService.updateUser(updatedUser)
         );
-        
+
         assertEquals("User not found with ID: 999", exception.getMessage());
     }
-    
+
     @Test
     @DisplayName("Should delete user successfully")
     void shouldDeleteUserSuccessfully() {
         // Given
         when(userRepository.existsById(1L)).thenReturn(true);
-        
+
         // When
         userService.deleteUser(1L);
-        
+
         // Then
         verify(userRepository).deleteById(1L);
     }
-    
+
     @Test
     @DisplayName("Should throw exception when deleting non-existent user")
     void shouldThrowExceptionWhenDeletingNonExistentUser() {
         // Given
         when(userRepository.existsById(999L)).thenReturn(false);
-        
+
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
             () -> userService.deleteUser(999L)
         );
-        
+
         assertEquals("User not found with ID: 999", exception.getMessage());
         verify(userRepository, never()).deleteById(anyLong());
     }
-    
+
     @Test
     @DisplayName("Should deactivate user successfully")
     void shouldDeactivateUserSuccessfully() {
         // Given
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        
+
         // When
         userService.deactivateUser(1L);
-        
+
         // Then
         assertFalse(testUser.getIsActive());
         verify(userRepository).save(testUser);
     }
-    
+
     @Test
     @DisplayName("Should activate user successfully")
     void shouldActivateUserSuccessfully() {
@@ -297,60 +262,60 @@ class UserServiceTest {
         testUser.setIsActive(false);
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        
+
         // When
         userService.activateUser(1L);
-        
+
         // Then
         assertTrue(testUser.getIsActive());
         verify(userRepository).save(testUser);
     }
-    
+
     @Test
     @DisplayName("Should find all users")
     void shouldFindAllUsers() {
         // Given
         List<User> users = Arrays.asList(testUser);
         when(userRepository.findAll()).thenReturn(users);
-        
+
         // When
         List<User> result = userService.findAllUsers();
-        
+
         // Then
         assertEquals(1, result.size());
         assertEquals(testUser, result.get(0));
     }
-    
+
     @Test
     @DisplayName("Should find users by type")
     void shouldFindUsersByType() {
         // Given
         List<User> employees = Arrays.asList(testUser);
         when(userRepository.findByUserType(UserType.EMPLOYEE)).thenReturn(employees);
-        
+
         // When
         List<User> result = userService.findUsersByType(UserType.EMPLOYEE);
-        
+
         // Then
         assertEquals(1, result.size());
         assertEquals(testUser, result.get(0));
     }
-    
+
     @Test
     @DisplayName("Should find active users by type")
     void shouldFindActiveUsersByType() {
         // Given
         List<User> activeEmployees = Arrays.asList(testUser);
         when(userRepository.findByUserTypeAndIsActive(UserType.EMPLOYEE, true)).thenReturn(activeEmployees);
-        
+
         // When
         List<User> result = userService.findActiveUsersByType(UserType.EMPLOYEE);
-        
+
         // Then
         assertEquals(1, result.size());
         assertEquals(testUser, result.get(0));
     }
-    
+
     @Test
     @DisplayName("Should search users with criteria")
     void shouldSearchUsersWithCriteria() {
@@ -359,67 +324,54 @@ class UserServiceTest {
         Page<User> userPage = new PageImpl<>(Arrays.asList(testUser));
         when(userRepository.findByCriteria(UserType.EMPLOYEE, true, "test", pageable))
             .thenReturn(userPage);
-        
+
         // When
         Page<User> result = userService.searchUsers(UserType.EMPLOYEE, true, "test", pageable);
-        
+
         // Then
         assertEquals(1, result.getContent().size());
         assertEquals(testUser, result.getContent().get(0));
     }
-    
-    @Test
-    @DisplayName("Should check if username exists")
-    void shouldCheckIfUsernameExists() {
-        // Given
-        when(userRepository.existsByUsername("testuser")).thenReturn(true);
-        
-        // When
-        boolean exists = userService.existsByUsername("testuser");
-        
-        // Then
-        assertTrue(exists);
-    }
-    
+
     @Test
     @DisplayName("Should check if email exists")
     void shouldCheckIfEmailExists() {
         // Given
         when(userRepository.existsByEmail("test@example.com")).thenReturn(true);
-        
+
         // When
         boolean exists = userService.existsByEmail("test@example.com");
-        
+
         // Then
         assertTrue(exists);
     }
-    
+
     @Test
     @DisplayName("Should count users by type")
     void shouldCountUsersByType() {
         // Given
         when(userRepository.countByUserType(UserType.EMPLOYEE)).thenReturn(5L);
-        
+
         // When
         long count = userService.countByUserType(UserType.EMPLOYEE);
-        
+
         // Then
         assertEquals(5L, count);
     }
-    
+
     @Test
     @DisplayName("Should count active users by type")
     void shouldCountActiveUsersByType() {
         // Given
         when(userRepository.countByUserTypeAndIsActive(UserType.EMPLOYEE, true)).thenReturn(3L);
-        
+
         // When
         long count = userService.countActiveUsersByType(UserType.EMPLOYEE);
-        
+
         // Then
         assertEquals(3L, count);
     }
-    
+
     @Test
     @DisplayName("Should validate user data")
     void shouldValidateUserData() {
@@ -431,60 +383,60 @@ class UserServiceTest {
         validUser.setFirstName("John");
         validUser.setLastName("Doe");
         validUser.setUserType(UserType.EMPLOYEE);
-        
+
         // When & Then
         assertDoesNotThrow(() -> userService.validateUser(validUser));
     }
-    
+
     @Test
     @DisplayName("Should throw exception for invalid user data")
     void shouldThrowExceptionForInvalidUserData() {
         // Given
         User invalidUser = new User();
         invalidUser.setUsername(""); // Invalid: empty username
-        
+
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> userService.validateUser(invalidUser)
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
+                () -> userService.validateUser(invalidUser)
         );
-        
-        assertEquals("Username is required", exception.getMessage());
+
+        assertEquals("Email is required", exception.getMessage());
     }
-    
+
     @Test
     @DisplayName("Should change password successfully")
     void shouldChangePasswordSuccessfully() {
         // Given
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches("oldPassword", "password123")).thenReturn(true);
-        when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
+        when(passwordEncoder.encode("newPassword1")).thenReturn("encodedNewPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        
+
         // When
-        userService.changePassword(1L, "oldPassword", "newPassword");
-        
+        userService.changePassword(1L, "oldPassword", "newPassword1");
+
         // Then
         verify(userRepository).save(testUser);
     }
-    
+
     @Test
     @DisplayName("Should throw exception for incorrect old password")
     void shouldThrowExceptionForIncorrectOldPassword() {
         // Given
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(passwordEncoder.matches("wrongPassword", "password123")).thenReturn(false);
-        
+
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> userService.changePassword(1L, "wrongPassword", "newPassword")
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
+                () -> userService.changePassword(1L, "wrongPassword", "newPassword1") // make sure new password has a digit
         );
-        
+
         assertEquals("Old password is incorrect", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
     }
-    
+
     @Test
     @DisplayName("Should reset password successfully")
     void shouldResetPasswordSuccessfully() {
@@ -492,32 +444,33 @@ class UserServiceTest {
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(testUser));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedTempPassword");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
-        
+
         // When
         String tempPassword = userService.resetPassword("test@example.com");
-        
+
         // Then
         assertNotNull(tempPassword);
         assertFalse(tempPassword.isEmpty());
         verify(userRepository).save(testUser);
     }
-    
+
     @Test
     @DisplayName("Should throw exception for non-existent email during password reset")
     void shouldThrowExceptionForNonExistentEmailDuringPasswordReset() {
         // Given
         when(userRepository.findByEmail("nonexistent@example.com")).thenReturn(Optional.empty());
-        
+
         // When & Then
-        IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> userService.resetPassword("nonexistent@example.com")
+        InvalidParamException exception = assertThrows(
+                InvalidParamException.class,
+                () -> userService.resetPassword("nonexistent@example.com")
         );
-        
+
         assertEquals("User not found with email: nonexistent@example.com", exception.getMessage());
         verify(userRepository, never()).save(any(User.class));
     }
-    
+
+
     @Test
     @DisplayName("Should update company owner fields successfully")
     void shouldUpdateCompanyOwnerFieldsSuccessfully() {
@@ -531,7 +484,7 @@ class UserServiceTest {
         employerUser.setLastName("Manager");
         employerUser.setUserType(UserType.EMPLOYER);
         employerUser.setIsActive(true);
-        
+
         User updatedEmployer = new User();
         updatedEmployer.setId(2L);
         updatedEmployer.setUsername("employer");
@@ -541,7 +494,7 @@ class UserServiceTest {
         updatedEmployer.setLastName("Manager");
         updatedEmployer.setUserType(UserType.EMPLOYER);
         updatedEmployer.setIsActive(true);
-        
+
         // Set company owner fields
         updatedEmployer.setCompanyName("NewCorp");
         updatedEmployer.setPhoto("https://newcorp.com/logo.png");
@@ -553,26 +506,24 @@ class UserServiceTest {
         updatedEmployer.setIsClaimed(true);
         updatedEmployer.setSlug("newcorp");
         updatedEmployer.setLocationAddress("Boston, MA");
-        
+
         LocationCoordinates newCoords = new LocationCoordinates(42.3601, -71.0589);
         updatedEmployer.setLocationCoordinates(newCoords);
-        
+
         Benefits newBenefits = new Benefits("Comprehensive Benefits", "[\"Health\", \"Dental\", \"Vision\", \"401K\"]");
         updatedEmployer.setBenefits(newBenefits);
-        
+
         Values newValues = new Values("Core Values", "[\"Patient Care\", \"Innovation\", \"Excellence\"]");
         updatedEmployer.setValues(newValues);
-        
+
         updatedEmployer.setBadges("[\"Healthcare Leader\", \"Best Place to Work\"]");
-        
+
         when(userRepository.findById(2L)).thenReturn(Optional.of(employerUser));
-        when(userRepository.existsByUsername("employer")).thenReturn(false);
-        when(userRepository.existsByEmail("employer@company.com")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(updatedEmployer);
-        
+
         // When
         User result = userService.updateUser(updatedEmployer);
-        
+
         // Then
         assertNotNull(result);
         assertEquals("NewCorp", result.getCompanyName());
@@ -593,10 +544,10 @@ class UserServiceTest {
         assertNotNull(result.getValues());
         assertEquals("Core Values", result.getValues().getTitle());
         assertEquals("[\"Healthcare Leader\", \"Best Place to Work\"]", result.getBadges());
-        
+
         verify(userRepository).save(any(User.class));
     }
-    
+
     @Test
     @DisplayName("Should handle null company owner fields gracefully")
     void shouldHandleNullCompanyOwnerFieldsGracefully() {
@@ -610,17 +561,15 @@ class UserServiceTest {
         userWithNullFields.setLastName("Doe");
         userWithNullFields.setUserType(UserType.EMPLOYEE);
         userWithNullFields.setIsActive(true);
-        
+
         // All company owner fields are null by default
-        
+
         when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("test@example.com")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenReturn(userWithNullFields);
-        
+
         // When
         User result = userService.updateUser(userWithNullFields);
-        
+
         // Then
         assertNotNull(result);
         assertNull(result.getCompanyName());
@@ -637,7 +586,7 @@ class UserServiceTest {
         assertNull(result.getBenefits());
         assertNull(result.getValues());
         assertNull(result.getBadges());
-        
+
         verify(userRepository).save(any(User.class));
     }
 }
