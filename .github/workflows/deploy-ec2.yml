@@ -87,8 +87,6 @@ jobs:
             APP_JWT_SECRET=${{ secrets.APP_JWT_SECRET }}
             SPRING_PROFILES_ACTIVE=prod
             JDBC_URL=${{ secrets.Stacey_Test }}
-            JDBC_USER=${{ secrets.DB_USER }}
-            JDBC_PASS=${{ secrets.DB_PASS }}
             EOF
 
             # Install Docker if absent
