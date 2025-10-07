@@ -65,6 +65,14 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Fetch DB secret
+        id: dbsecret
+        run: |
+          SECRET=$(aws secretsmanager get-secret-value --secret-id careerforge-db-secret --query SecretString --output text)
+          echo "jdbcUrl=$(echo $SECRET | jq -r '.jdbcUrl')" >> "$GITHUB_OUTPUT"
+          echo "username=$(echo $SECRET | jq -r '.username')" >> "$GITHUB_OUTPUT"
+          echo "password=$(echo $SECRET | jq -r '.password')" >> "$GITHUB_OUTPUT"
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.2
         with:
@@ -81,25 +89,11 @@ jobs:
             SERVICE="${SERVICE_NAME}"
             PORT="${APP_PORT}"
             
-            # Install jq if missing
-            if ! command -v jq >/dev/null 2>&1; then
-            sudo apt-get update -y && sudo apt-get install -y jq
-            fi
+            JDBC_URL="${{ steps.dbsecret.outputs.jdbcUrl }}"
+            DB_USER="${{ steps.dbsecret.outputs.username }}"
+            DB_PASS="${{ steps.dbsecret.outputs.password }}"
 
-            # Write env file
             sudo mkdir -p /etc
-                    
-            echo "[INFO] Fetching DB secret from Secrets Manager..."
-            DB_SECRET=$(aws secretsmanager get-secret-value --secret-id careerforge-db-secret --query SecretString --output text)
-                    
-            JDBC_URL=$(echo $DB_SECRET | jq -r '.jdbcUrl')
-            DB_USER=$(echo $DB_SECRET | jq -r '.username')
-            DB_PASS=$(echo $DB_SECRET | jq -r '.password')
-                    
-            echo "[INFO] JDBC_URL=$JDBC_URL"
-            echo "[INFO] DB_USER=$DB_USER"
-            echo "[INFO] DB_PASS=********"   # don’t print the actual password
-                    
             sudo tee /etc/careerforge.env > /dev/null <<EOF
             APP_JWT_SECRET=${{ secrets.APP_JWT_SECRET }}
             SPRING_PROFILES_ACTIVE=prod
