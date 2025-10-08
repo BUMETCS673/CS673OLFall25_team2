@@ -16,3 +16,17 @@ if (typeof (global as any).TextDecoder === 'undefined') {
   // @ts-ignore
   (global as any).TextDecoder = TextDecoder as unknown as new () => TextDecoder;
 }
+
+// Provide a minimal window.matchMedia implementation for components relying on it
+if (!(window as any).matchMedia) {
+  (window as any).matchMedia = (query: string) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: () => {}, // deprecated API
+    removeListener: () => {}, // deprecated API
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  });
+}

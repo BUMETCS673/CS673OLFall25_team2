@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   server: {
+    // Dev-only proxy: when VITE_API_BASE_URL is not set, this allows calling /api/* locally
+    // In production builds we expect VITE_API_BASE_URL (or fallback in http.ts) to point to deployed backend
     proxy: { '/api': { target: 'http://localhost:8080', changeOrigin: true } },
   },
 });
