@@ -43,12 +43,12 @@ export default function Aside({ myJobsView, onMyJobsViewChange }: AsideProps) {
         <Field />
         <Type />
         <button
-          type="button"
-          className={`${buttonClass} filter-button`}
-          onClick={onButtonClick}
-        >
-          {buttonLabel}
-        </button>
+  type="button"
+  className={`${buttonClass} filter-button d-none d-lg-block`}
+  onClick={onButtonClick}
+>
+  {buttonLabel}
+</button>
         {showMyJobsControls && (
           <div className="mb-1" role="group" aria-label="My Jobs view"></div>
         )}

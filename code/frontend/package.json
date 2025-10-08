@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "jest"
+    "test": "jest",
+    "test:ci": "jest --ci --runInBand"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
@@ -19,7 +20,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
-    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
     "@types/jest": "^30.0.0",

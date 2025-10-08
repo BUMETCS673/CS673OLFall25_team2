@@ -33,7 +33,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Memoized context value so components can call toggle()
+  // Memorized context value so components can call toggle()
   const value = useMemo(
     () => ({
       theme,

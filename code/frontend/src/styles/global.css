@@ -27,6 +27,18 @@ body {
   background-color: #f8f9fa;
 }
 
+/* Ensure main section fills available space (mobile) */
+@media (max-width: 991.98px) {
+  section[role="main"] {
+    height: calc(100dvh - 60px); /* adjust if needed */
+    overflow: hidden;
+  }
+
+  section[role="main"] > .flex-grow-1 {
+    overflow-y: auto;
+  }
+}
+
 /* Utility used throughout the layout */
 .min-h-0 {
   min-height: 0 !important;
@@ -58,6 +70,19 @@ body {
   --selected-border: rgb(98, 216, 255);
   --selected-bg: rgb(98, 216, 255);
   --selected-color: #000000;
+}
+
+/* Offcanvas width tuned for filters */
+.offcanvas-start {
+  width: 80%;
+  max-width: 320px;
+}
+
+/* Prevent layout shifts on small screens */
+@media (max-width: 991.98px) {
+  aside.bg-body {
+    display: none !important;
+  }
 }
 
 /* Dark Theme Variables (keep the new color scheme) */
@@ -92,6 +117,35 @@ body {
   /* Override form input colors */
   --bs-form-control-bg: #212529;
   --bs-form-control-color: var(--fg);
+}
+/* Theme for Aside mobile version */
+.theme-btn {
+  /* outline-style button that references theme colors */
+  background: transparent;
+  color: var(--fg) !important;
+  border: 1.5px solid var(--fg) !important;
+  font-weight: 600;
+}
+.theme-btn:hover,
+.theme-btn:focus {
+  /* invert on hover/focus for clear affordance */
+  background: var(--fg) !important;
+  color: var(--bg) !important;
+}
+.theme-btn:active {
+  opacity: 0.9;
+}
+.theme-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Ensure the sticky container blends with the current theme */
+@media (max-width: 991.98px) {
+  section[role="main"] .sticky-top.bg-body {
+    background-color: var(--surface) !important;
+    border-color: var(--surface-border-color) !important;
+  }
 }
 
 /* Placeholder color in dark mode */
