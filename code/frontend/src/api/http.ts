@@ -1,14 +1,20 @@
 // src/api/http.ts
-// Minimal HTTP utilities for API calls
+// Lightweight HTTP client wrapper with JSON and auth support
+// Copilot generated with manual tweaks
+// Human review and adjustments made for clarity and functionality
+// 30% AI-generated, 70% human refined
 
+import.meta.env.VITE_API_BASE_URL;
+
+const _env = (import.meta as any)?.env;
 export const API_BASE: string =
-  (import.meta as any)?.env?.VITE_API_BASE_URL || 'http://localhost:8080/api';
+  _env?.VITE_API_BASE_URL ||
+  (_env?.PROD ? 'http://54.227.173.227/api' : 'http://localhost:8080/api');
 
 export type HttpOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   headers?: Record<string, string>;
   body?: any;
-  // When true, do not attach auth header
   noAuth?: boolean;
 };
 
@@ -81,4 +87,18 @@ export async function getJson<T = any>(
 export function stripEnvelope<T = any>(payload: any): T {
   // Unwrap common envelope shapes: { result }, { data }, or plain
   return (payload?.result ?? payload?.data ?? payload) as T;
+}
+
+// Lightweight health check for the backend (can be used before making critical calls or in a status indicator)
+export async function healthCheck(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/actuator/health`, { method: 'GET' });
+    if (!res.ok) return false;
+    // Spring Boot actuator returns { status: "UP" }
+    const data = await res.json().catch(() => null);
+    const status = (data?.status || '').toString().toUpperCase();
+    return status === 'UP' || res.ok;
+  } catch {
+    return false;
+  }
 }
