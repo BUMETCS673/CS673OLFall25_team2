@@ -1,8 +1,13 @@
 // src/api/http.ts
 // Minimal HTTP utilities for API calls
 
+// Determine API base URL with the following precedence:
+// 1. Explicit VITE_API_BASE_URL env variable (recommended)
+// 2. If build is production and no env provided, default to the deployed backend IP
+// 3. Fallback to local backend for developer machines
+const _env = (import.meta as any)?.env;
 export const API_BASE: string =
-  (import.meta as any)?.env?.VITE_API_BASE_URL || 'http://localhost:8080/api';
+  _env?.VITE_API_BASE_URL || (_env?.PROD ? 'http://54.227.173.227/api' : 'http://localhost:8080/api');
 
 export type HttpOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -82,3 +87,20 @@ export function stripEnvelope<T = any>(payload: any): T {
   // Unwrap common envelope shapes: { result }, { data }, or plain
   return (payload?.result ?? payload?.data ?? payload) as T;
 }
+
+// Lightweight health check for the backend (can be used before making critical calls or in a status indicator)
+export async function healthCheck(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/actuator/health`, { method: 'GET' });
+    if (!res.ok) return false;
+    // Spring Boot actuator returns { status: "UP" }
+    const data = await res.json().catch(() => null);
+    const status = (data?.status || '').toString().toUpperCase();
+    return status === 'UP' || res.ok;
+  } catch {
+    return false;
+  }
+}
+
+// For debugging – uncomment if you need to verify the resolved API base at runtime
+// console.debug('[HTTP] Using API_BASE =', API_BASE);
