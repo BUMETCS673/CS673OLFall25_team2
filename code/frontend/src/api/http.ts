@@ -1,4 +1,9 @@
 // src/api/http.ts
+// Lightweight HTTP client wrapper with JSON and auth support
+// Copilot generated with manual tweaks
+// Human review and adjustments made for clarity and functionality
+// 30% AI-generated, 70% human refined
+
 import.meta.env.VITE_API_BASE_URL;
 
 const _env = (import.meta as any)?.env;
@@ -6,13 +11,10 @@ export const API_BASE: string =
   _env?.VITE_API_BASE_URL ||
   (_env?.PROD ? 'http://54.227.173.227/api' : 'http://localhost:8080/api');
 
-console.debug('[HTTP] Using API_BASE =', API_BASE);
-
 export type HttpOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   headers?: Record<string, string>;
   body?: any;
-  // When true, do not attach auth header
   noAuth?: boolean;
 };
 
@@ -100,6 +102,3 @@ export async function healthCheck(): Promise<boolean> {
     return false;
   }
 }
-
-// For debugging – uncomment if you need to verify the resolved API base at runtime
-// console.debug('[HTTP] Using API_BASE =', API_BASE);
