@@ -46,9 +46,14 @@ jobs:
       - name: Collect Coverage %
         id: coverage
         run: |
-          LINES=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
-          echo "lines=$LINES" >> $GITHUB_OUTPUT
-          echo "Line coverage: $LINES%"
+          if [ ! -f ./coverage/coverage-summary.json ]; then
+            echo "No coverage summary found (possibly no tests ran). Setting lines=0";
+            echo "lines=0" >> $GITHUB_OUTPUT;
+          else
+            LINES=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
+            echo "lines=$LINES" >> $GITHUB_OUTPUT
+            echo "Line coverage: $LINES%"
+          fi
 
       - name: Build
         run: npm run build
