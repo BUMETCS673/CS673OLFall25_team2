@@ -1,13 +1,12 @@
 // src/api/http.ts
-// Minimal HTTP utilities for API calls
+import.meta.env.VITE_API_BASE_URL;
 
-// Determine API base URL with the following precedence:
-// 1. Explicit VITE_API_BASE_URL env variable (recommended)
-// 2. If build is production and no env provided, default to the deployed backend IP
-// 3. Fallback to local backend for developer machines
 const _env = (import.meta as any)?.env;
 export const API_BASE: string =
-  _env?.VITE_API_BASE_URL || (_env?.PROD ? 'http://54.227.173.227/api' : 'http://localhost:8080/api');
+  _env?.VITE_API_BASE_URL ||
+  (_env?.PROD ? 'http://54.227.173.227/api' : 'http://localhost:8080/api');
+
+console.debug('[HTTP] Using API_BASE =', API_BASE);
 
 export type HttpOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
