@@ -6,7 +6,8 @@ import tseslint from 'typescript-eslint';
 import { globalIgnores } from 'eslint/config';
 
 export default tseslint.config([
-  globalIgnores(['dist']),
+  // Ignore build & generated artifact folders
+  globalIgnores(['dist', 'coverage']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
