@@ -46,9 +46,14 @@ jobs:
       - name: Collect Coverage %
         id: coverage
         run: |
-          LINES=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
-          echo "lines=$LINES" >> $GITHUB_OUTPUT
-          echo "Line coverage: $LINES%"
+          if [ ! -f ./coverage/coverage-summary.json ]; then
+            echo "No coverage summary found (possibly no tests ran). Setting lines=0";
+            echo "lines=0" >> $GITHUB_OUTPUT;
+          else
+            LINES=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
+            echo "lines=$LINES" >> $GITHUB_OUTPUT
+            echo "Line coverage: $LINES%"
+          fi
 
       - name: Build
         run: npm run build
@@ -66,6 +71,19 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && needs.quality.result == 'success'
     steps:
+      - name: Backend Smoke Test
+        run: |
+          HEALTH_URL="http://54.227.173.227/api/actuator/health"
+          echo "Performing backend smoke test against $HEALTH_URL"
+          success=0
+          for i in {1..6}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || true)
+            if [ "$code" = "200" ]; then
+              echo "Health check passed (HTTP 200)."; success=1; break; fi
+            echo "Attempt $i: got HTTP $code - retrying in 5s"; sleep 5;
+          done
+          if [ $success -ne 1 ]; then
+            echo "Backend health check failed after retries."; exit 1; fi
       - name: Trigger Render Deploy Hook
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
