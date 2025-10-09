@@ -1,8 +1,42 @@
 // src/api/http.ts
 // Minimal HTTP utilities for API calls
 
-export const API_BASE: string =
-  (import.meta as any)?.env?.VITE_API_BASE_URL || 'http://localhost:8080/api';
+// Get API base URL with proper validation and fallbacks
+const getApiBaseUrl = (): string => {
+  // Primary source: Environment variable
+  const envApiBase = import.meta.env.VITE_API_BASE_URL;
+
+  // Validate and sanitize the URL
+  if (envApiBase && typeof envApiBase === 'string') {
+    // Normalize URL (remove trailing slashes for consistency)
+    const normalizedUrl = envApiBase.replace(/\/+$/, '');
+
+    // Validate that it's a proper URL (or at least starts with http)
+    if (
+      normalizedUrl.startsWith('http://') ||
+      normalizedUrl.startsWith('https://')
+    ) {
+      return normalizedUrl;
+    } else {
+      console.warn(
+        `[API] Invalid API base URL format: ${normalizedUrl}. Using fallback.`
+      );
+    }
+  }
+
+  // Fallback to localhost for development
+  const fallbackUrl = 'http://localhost:8080/api';
+  console.warn(`[API] Using fallback URL: ${fallbackUrl}`);
+  return fallbackUrl;
+};
+
+// Export the validated API base URL
+export const API_BASE: string = getApiBaseUrl();
+
+// Log current configuration (but hide in production)
+if (import.meta.env.DEV) {
+  console.log('[API] Base URL configured as:', API_BASE);
+}
 
 export type HttpOptions = {
   method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
