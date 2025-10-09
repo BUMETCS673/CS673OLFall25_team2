@@ -47,15 +47,8 @@ export default function SaveJobButton({ job, detailed }: SaveJobButtonProps) {
 
       // Regular save flow
       setState('saving');
-      const token =
-        (() => {
-          try {
-            return localStorage.getItem('jwt');
-          } catch {
-            return null;
-          }
-        })() || undefined;
-      const res = await saveJob(job, token);
+      // No need to manually pass token anymore - handled by http.ts
+      const res = await saveJob(job);
       const ok = !!(
         (res && res.success === true) ||
         (res &&
