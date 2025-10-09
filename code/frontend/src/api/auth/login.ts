@@ -24,9 +24,10 @@ export async function login(
   const trimmedEmail = (username || '').trim();
   console.log('Attempting login with:', { email: trimmedEmail });
 
-  // IMPORTANT: ensure we never send a stale JWT on the login call
+  // IMPORTANT: ensure we never send stale tokens on the login call
   try {
     localStorage.removeItem('jwt');
+    localStorage.removeItem('csrfToken'); // Also clear any stale CSRF token
   } catch {}
 
   try {

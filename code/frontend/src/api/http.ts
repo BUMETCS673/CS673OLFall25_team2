@@ -39,6 +39,7 @@ export type HttpOptions = {
   headers?: Record<string, string>;
   body?: any;
   noAuth?: boolean;
+  noCsrf?: boolean;
 };
 
 export function getAuthToken(): string | null {
@@ -49,9 +50,31 @@ export function getAuthToken(): string | null {
   }
 }
 
+export function getCsrfToken(): string | null {
+  try {
+    return localStorage.getItem('csrfToken');
+  } catch {
+    return null;
+  }
+}
+
+export function setCsrfToken(token: string | null): void {
+  try {
+    if (token) {
+      localStorage.setItem('csrfToken', token);
+    } else {
+      localStorage.removeItem('csrfToken');
+    }
+  } catch {
+    // Ignore storage errors
+  }
+}
+
 export function buildHeaders(
   headers?: Record<string, string>,
-  noAuth?: boolean
+  noAuth?: boolean,
+  noCsrf?: boolean,
+  method: string = 'GET'
 ): HeadersInit {
   const base: Record<string, string> = {
     'Content-Type': 'application/json',
@@ -61,18 +84,29 @@ export function buildHeaders(
     const token = getAuthToken();
     if (token) base['Authorization'] = `Bearer ${token}`;
   }
+  if (!noCsrf && method !== 'GET') {
+    const csrfToken = getCsrfToken();
+    if (csrfToken) base['X-XSRF-TOKEN'] = csrfToken;
+  }
   return base;
 }
 
 export async function http<T = any>(
   path: string,
-  { method = 'GET', headers, body, noAuth }: HttpOptions = {}
+  { method = 'GET', headers, body, noAuth, noCsrf }: HttpOptions = {}
 ): Promise<{ data: T; response: Response }> {
   const res = await fetch(`${API_BASE}${path}`, {
     method,
-    headers: buildHeaders(headers, noAuth),
+    headers: buildHeaders(headers, noAuth, noCsrf, method),
     body: body != null ? JSON.stringify(body) : undefined,
+    credentials: 'include', // This is needed for CSRF cookies
   });
+
+  // Store CSRF token if present in response headers
+  const csrfToken = res.headers.get('X-XSRF-TOKEN');
+  if (csrfToken) {
+    setCsrfToken(csrfToken);
+  }
 
   let data: any = null;
   try {

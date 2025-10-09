@@ -6,7 +6,6 @@ package com.cs673.careerforge.configs;
  * Human code: 10%
  */
 
-import com.cs673.careerforge.common.auth.UserPrincipal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,24 +14,15 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import com.cs673.careerforge.security.JwtRequestFilter;
-import com.cs673.careerforge.security.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.cs673.careerforge.security.JwtAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
-import com.cs673.careerforge.security.JwtAuthenticationEntryPoint;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 import java.util.List;
 
 @Configuration
@@ -46,20 +36,29 @@ public class SecurityConfig {
                 System.out.println(">>> Using custom SecurityConfig filterChain <<<");
 
                 /*
-                 * CSRF protection is safely disabled for this API because:
-                 * 1. We use JWT tokens for authentication instead of cookies
-                 * 2. The API is stateless (SessionCreationPolicy.STATELESS)
-                 * 3. All state-changing operations require a valid JWT token
-                 * 4. Authorization is handled via Bearer token, not session cookies
-                 * 5. JWT tokens cannot be stolen via CSRF (no automatic browser inclusion)
-                 * 
-                 * This security model prevents CSRF attacks by design:
-                 * - No session cookies to steal
-                 * - JWTs must be explicitly included in Authorization header
-                 * - Attacker cannot forge valid JWTs without the secret key
+                 * CSRF protection configuration:
+                 * 1. Enable CSRF protection by default for safety
+                 * 2. Disable it only for:
+                 * - Public endpoints that don't modify state
+                 * - Authentication endpoints that use JWT
+                 * - API endpoints that require valid JWT token
+                 * 3. Maintain CSRF protection for:
+                 * - Any endpoints that might use cookies
+                 * - H2 console and actuator endpoints
                  */
+                HttpSessionCsrfTokenRepository tokenRepository = new HttpSessionCsrfTokenRepository();
+                tokenRepository.setHeaderName("X-XSRF-TOKEN");
+
                 return http
-                                .csrf(AbstractHttpConfigurer::disable) // Safe because we use JWT tokens
+                                .csrf(csrf -> csrf
+                                                .ignoringRequestMatchers(
+                                                                "/auth/login", // Login endpoint
+                                                                "/auth/register", // Registration endpoint
+                                                                "/api/public/**", // Public read-only endpoints
+                                                                "/actuator/health", // Health check endpoint
+                                                                "/h2-console/**" // H2 console (if used)
+                                                )
+                                                .csrfTokenRepository(tokenRepository))
                                 .cors(Customizer.withDefaults())
                                 // allow H2 console to render in a frame
                                 .headers(h -> h.frameOptions(f -> f.sameOrigin()))

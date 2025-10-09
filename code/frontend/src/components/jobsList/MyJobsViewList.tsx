@@ -95,8 +95,17 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
         setJobs(transformedData);
       } catch (e: any) {
         console.error(`Error fetching ${view} jobs:`, e);
-        if (e.name !== 'AbortError')
-          setError(e?.message || 'Failed to fetch jobs');
+        if (e.name !== 'AbortError') {
+          if (e.status === 401 || e.status === 403) {
+            setError('Session expired. Please log in again.');
+            // Redirect to login after a short delay
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 2000);
+          } else {
+            setError(e?.message || 'Failed to fetch jobs');
+          }
+        }
       } finally {
         setLoading(false);
       }
@@ -166,7 +175,20 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
       } catch (e: any) {
         console.error(`Error deleting ${label} job:`, e);
         setJobs(prev); // rollback
-        setError(e?.message || `Failed to delete ${label} job`);
+        if (e.status === 401 || e.status === 403) {
+          setError('Session expired. Please log in again.');
+          // Redirect to login after a short delay
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else if (e.status === 419) {
+          // CSRF token mismatch
+          setError(
+            'Security token expired. Please refresh the page and try again.'
+          );
+        } else {
+          setError(e?.message || `Failed to delete ${label} job`);
+        }
       }
     },
     [jobs, selectedJobId, view]
@@ -189,7 +211,20 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
         setShowSuccessAlert(false);
       }, 5000);
     } catch (e: any) {
-      setError(e?.message || 'Failed to delete all saved jobs');
+      console.error('Error deleting all saved jobs:', e);
+      if (e.status === 401 || e.status === 403) {
+        setError('Session expired. Please log in again.');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+      } else if (e.status === 419) {
+        // CSRF token mismatch
+        setError(
+          'Security token expired. Please refresh the page and try again.'
+        );
+      } else {
+        setError(e?.message || 'Failed to delete all saved jobs');
+      }
     }
   }, [jobs.length]);
 
@@ -210,7 +245,20 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
         setShowSuccessAlert(false);
       }, 5000);
     } catch (e: any) {
-      setError(e?.message || 'Failed to delete all applied jobs');
+      console.error('Error deleting all applied jobs:', e);
+      if (e.status === 401 || e.status === 403) {
+        setError('Session expired. Please log in again.');
+        setTimeout(() => {
+          window.location.href = '/login';
+        }, 2000);
+      } else if (e.status === 419) {
+        // CSRF token mismatch
+        setError(
+          'Security token expired. Please refresh the page and try again.'
+        );
+      } else {
+        setError(e?.message || 'Failed to delete all applied jobs');
+      }
     }
   }, [jobs.length]);
 
