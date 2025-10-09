@@ -4,34 +4,41 @@
 // Human review and adjustments made for clarity and functionality
 // 30% AI-generated, 70% human refined
 
-import.meta.env.VITE_API_BASE_URL;
+// Get API base URL with proper validation and fallbacks
+const getApiBaseUrl = (): string => {
+  // Primary source: Environment variable
+  const envApiBase = import.meta.env.VITE_API_BASE_URL;
 
-const _env = (import.meta as any)?.env;
+  // Validate and sanitize the URL
+  if (envApiBase && typeof envApiBase === 'string') {
+    // Normalize URL (remove trailing slashes for consistency)
+    const normalizedUrl = envApiBase.replace(/\/+$/, '');
 
-// Enforce explicit configuration in production. We remove the silent HTTP fallback to avoid Mixed Content regressions.
-let derivedApiBase = _env?.VITE_API_BASE_URL;
-if (_env?.DEV && !derivedApiBase) {
-  // In dev you can still rely on a local proxy or backend; default to local proxy first then backend.
-  derivedApiBase = 'http://localhost:5179/api';
-}
-
-export const API_BASE: string = derivedApiBase || '';
-
-if (_env?.PROD) {
-  if (!API_BASE) {
-    console.error(
-      'VITE_API_BASE_URL is REQUIRED in production builds. API calls will fail.'
-    );
-  } else if (API_BASE.startsWith('http://')) {
-    console.warn('[Mixed Content Risk] Production API_BASE is HTTP:', API_BASE);
+    // Validate that it's a proper URL (or at least starts with http)
+    if (
+      normalizedUrl.startsWith('http://') ||
+      normalizedUrl.startsWith('https://')
+    ) {
+      return normalizedUrl;
+    } else {
+      console.warn(
+        `[API] Invalid API base URL format: ${normalizedUrl}. Using fallback.`
+      );
+    }
   }
-} else {
-  // Dev guard for visibility
-  if (!API_BASE) {
-    console.warn(
-      'Dev: API_BASE unset; set VITE_API_BASE_URL for clarity. Using empty string will break requests.'
-    );
-  }
+
+  // Fallback to localhost for development
+  const fallbackUrl = 'http://localhost:8080/api';
+  console.warn(`[API] Using fallback URL: ${fallbackUrl}`);
+  return fallbackUrl;
+};
+
+// Export the validated API base URL
+export const API_BASE: string = getApiBaseUrl();
+
+// Log current configuration (but hide in production)
+if (import.meta.env.DEV) {
+  console.log('[API] Base URL configured as:', API_BASE);
 }
 
 export type HttpOptions = {
