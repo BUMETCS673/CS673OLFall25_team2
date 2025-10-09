@@ -1,10 +1,10 @@
 package com.cs673.careerforge.configs;
 
 /*
- Stacey contributed to this class, but didn't create it. What I added is as follows:
- AI-generated code: 90% (tool: ChatGPT, modified and adapted, functions: filterChain, users)
- Human code: 10%
-*/
+ * Stacey contributed to this class, but didn't create it. What I added is as follows:
+ * AI-generated code: 90% (tool: ChatGPT, modified and adapted, functions: filterChain, users)
+ * Human code: 10%
+ */
 
 import com.cs673.careerforge.common.auth.UserPrincipal;
 import org.springframework.context.annotation.Bean;
@@ -44,9 +44,22 @@ public class SecurityConfig {
                         JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
 
                 System.out.println(">>> Using custom SecurityConfig filterChain <<<");
-                // csrf.disable -> typical for stateless APIs
+
+                /*
+                 * CSRF protection is safely disabled for this API because:
+                 * 1. We use JWT tokens for authentication instead of cookies
+                 * 2. The API is stateless (SessionCreationPolicy.STATELESS)
+                 * 3. All state-changing operations require a valid JWT token
+                 * 4. Authorization is handled via Bearer token, not session cookies
+                 * 5. JWT tokens cannot be stolen via CSRF (no automatic browser inclusion)
+                 * 
+                 * This security model prevents CSRF attacks by design:
+                 * - No session cookies to steal
+                 * - JWTs must be explicitly included in Authorization header
+                 * - Attacker cannot forge valid JWTs without the secret key
+                 */
                 return http
-                                .csrf(AbstractHttpConfigurer::disable)
+                                .csrf(AbstractHttpConfigurer::disable) // Safe because we use JWT tokens
                                 .cors(Customizer.withDefaults())
                                 // allow H2 console to render in a frame
                                 .headers(h -> h.frameOptions(f -> f.sameOrigin()))
