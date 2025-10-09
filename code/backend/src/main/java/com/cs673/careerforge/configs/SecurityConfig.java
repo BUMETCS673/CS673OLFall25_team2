@@ -50,16 +50,8 @@ public class SecurityConfig {
                 tokenRepository.setHeaderName("X-XSRF-TOKEN");
 
                 return http
-                                .csrf(csrf -> csrf
-                                                .ignoringRequestMatchers(
-                                                                "/auth/login", // Login endpoint
-                                                                "/auth/register", // Registration endpoint
-                                                                "/api/public/**", // Public read-only endpoints
-                                                                "/actuator/health", // Health check endpoint
-                                                                "/h2-console/**" // H2 console (if used)
-                                                )
-                                                .csrfTokenRepository(tokenRepository))
-                                .cors(Customizer.withDefaults())
+                        .csrf(csrf -> csrf.disable())
+                        .cors(Customizer.withDefaults())
                                 // allow H2 console to render in a frame
                                 .headers(h -> h.frameOptions(f -> f.sameOrigin()))
                                 .authorizeHttpRequests(auth -> auth
