@@ -32,7 +32,7 @@ const JobsViewList = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLgUp, setIsLgUp] = useState<boolean>(() =>
-    typeof window !== 'undefined' ? window.matchMedia(LG_QUERY).matches : true
+    typeof window !== 'undefined' ? window.matchMedia(LG_QUERY).matches : false
   );
 
   useEffect(() => {
@@ -131,10 +131,13 @@ const JobsViewList = () => {
     return () => controller.abort();
   }, []);
 
+// Auto-select the first job on desktop only
   useEffect(() => {
-    if (isLgUp && !selectedJobId && filteredJobs.length > 0)
-      setSelectedJobId(filteredJobs[0]._id);
-  }, [filteredJobs, selectedJobId, isLgUp]);
+  if (!isLgUp) return;
+  if (!selectedJobId && filteredJobs.length > 0) {
+    setSelectedJobId(filteredJobs[0]._id);
+  }
+}, [filteredJobs, selectedJobId, isLgUp]);
 
   // Expose dynamic types & departments via custom events so filters can subscribe without prop drilling
   useEffect(() => {

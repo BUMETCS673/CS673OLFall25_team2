@@ -47,7 +47,7 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [isLgUp, setIsLgUp] = useState<boolean>(() =>
-    typeof window !== 'undefined' ? window.matchMedia(LG_QUERY).matches : true
+    typeof window !== 'undefined' ? window.matchMedia(LG_QUERY).matches : false
   );
 
   // Add CSS for fadeIn animation
@@ -104,12 +104,13 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
     return () => controller.abort();
   }, [view]);
 
-  // Auto-select the first job on desktop
+  // Auto-select the first job on desktop only
   useEffect(() => {
-    if (isLgUp && !selectedJobId && jobs.length > 0) {
-      setSelectedJobId(jobs[0].id);
-    }
-  }, [jobs, selectedJobId, isLgUp]);
+  if (!isLgUp) return;
+  if (!selectedJobId && jobs.length > 0) {
+    setSelectedJobId(jobs[0].id);
+  }
+}, [jobs, selectedJobId, isLgUp]);
 
   const selectedJob = useMemo(
     () => jobs.find((j) => j.id === selectedJobId) ?? null,
