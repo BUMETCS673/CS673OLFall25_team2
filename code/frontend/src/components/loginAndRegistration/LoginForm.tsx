@@ -88,6 +88,8 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
       );
 
       localStorage.setItem('jwt', token);
+      // Clear any existing CSRF token when logging in
+      localStorage.removeItem('csrfToken');
       try {
         localStorage.setItem('auth', JSON.stringify(raw));
         console.log('Auth data saved to localStorage');
