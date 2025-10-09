@@ -29,8 +29,6 @@ export async function register(
   const location = response.headers.get('Location') || undefined;
   console.log('Register response data:', data);
 
-  console.log('Register response data:', data);
-
   // Backend returns { token: string, user: RegisteredUser }
   const unwrapped = stripEnvelope<any>(data);
   const user = unwrapped?.user || {};

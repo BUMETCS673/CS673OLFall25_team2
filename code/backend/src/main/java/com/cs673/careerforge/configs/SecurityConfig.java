@@ -6,7 +6,6 @@ package com.cs673.careerforge.configs;
  Human code: 10%
 */
 
-
 import com.cs673.careerforge.common.auth.UserPrincipal;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,47 +38,52 @@ import java.util.List;
 @Configuration
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http,
-                                           JwtRequestFilter jwtRequestFilter,
-                                           JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http,
+                        JwtRequestFilter jwtRequestFilter,
+                        JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) throws Exception {
 
-        System.out.println(">>> Using custom SecurityConfig filterChain <<<");
-        //csrf.disable -> typical for stateless APIs
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
-                // allow H2 console to render in a frame
-                .headers(h -> h.frameOptions(f -> f.sameOrigin()))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                //For testing uncomment out the first line below to allow all endpoints to be unauthenticated
-                                //"/",
-                                "/actuator/health",
-                                "/h2-console/**",
-                                "/public/**",
-                                "/auth/login",
-                                "/auth/register"
-                        ).permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // no HTTP sessions
-                )
-                .exceptionHandling(ex ->
-                        ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                )
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
-    }
+                System.out.println(">>> Using custom SecurityConfig filterChain <<<");
+                // csrf.disable -> typical for stateless APIs
+                return http
+                                .csrf(AbstractHttpConfigurer::disable)
+                                .cors(Customizer.withDefaults())
+                                // allow H2 console to render in a frame
+                                .headers(h -> h.frameOptions(f -> f.sameOrigin()))
+                                .authorizeHttpRequests(auth -> auth
+                                                .requestMatchers(
+                                                                // For testing uncomment out the first line below to
+                                                                // allow all endpoints to be unauthenticated
+                                                                // "/",
+                                                                "/actuator/health",
+                                                                "/h2-console/**",
+                                                                "/public/**",
+                                                                "/auth/login",
+                                                                "/auth/register")
+                                                .permitAll()
+                                                .anyRequest().authenticated())
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // no HTTP
+                                                                                                        // sessions
+                                )
+                                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+                                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class)
+                                .build();
+        }
 
         @Bean
         public CorsConfigurationSource corsConfigurationSource() {
                 CorsConfiguration configuration = new CorsConfiguration();
-                // Allow Vite dev server origin; add more origins as needed
-                configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+                // Allow all our known origins
+                configuration.setAllowedOrigins(List.of(
+                                "http://localhost:5173",
+                                "http://localhost:4173",
+                                "https://cs673olfall25-team2.onrender.com",
+                                "http://cs673olfall25-team2.onrender.com",
+                                "https://cs673olfall25-team2-proxy.onrender.com"));
                 configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-                configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Origin", "Accept"));
+                configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Origin",
+                                "Accept", "Access-Control-Allow-Origin"));
                 configuration.setExposedHeaders(List.of("Location"));
                 configuration.setAllowCredentials(true);
                 configuration.setMaxAge(3600L);
@@ -89,14 +93,13 @@ public class SecurityConfig {
                 return source;
         }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
-        return cfg.getAuthenticationManager();
-    }
+        @Bean
+        public AuthenticationManager authenticationManager(AuthenticationConfiguration cfg) throws Exception {
+                return cfg.getAuthenticationManager();
+        }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 }
-
