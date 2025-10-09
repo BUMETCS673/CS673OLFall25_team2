@@ -49,12 +49,8 @@ function normalizeJobs(payload: any): SavedAppliedJob[] {
 
 // Fetch current user's saved jobs (POST /jobs/saved/list)
 export async function getMySaved(): Promise<SavedAppliedJob[]> {
-  const token = getAuthToken();
   const body = { size: 10, page: 0 };
-  const { data } = await postJson<any>('/jobs/saved/list', body, {
-    noAuth: false,
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+  const { data } = await postJson<any>('/jobs/saved/list', body);
 
   console.log('getMySaved response data:', data);
   return normalizeJobs(data);
@@ -62,12 +58,8 @@ export async function getMySaved(): Promise<SavedAppliedJob[]> {
 
 // Fetch current user's applied jobs (POST /jobs/applied/list)
 export async function getMyApplied(): Promise<SavedAppliedJob[]> {
-  const token = getAuthToken();
   const body = { size: 10, page: 0 };
-  const { data } = await postJson<any>('/jobs/applied/list', body, {
-    noAuth: false,
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+  const { data } = await postJson<any>('/jobs/applied/list', body);
 
   console.log('getMyApplied response data:', data);
   return normalizeJobs(data);
@@ -93,23 +85,15 @@ function extractUserIdFromToken(token: string | null): number | undefined {
 
 // Delete a single saved job by id
 export async function deleteSavedJob(id: string | number): Promise<void> {
-  const token = getAuthToken();
   const jobId = Number(id); // Ensure it's a number
-
   // Get the user ID from the JWT token
-  const uid = extractUserIdFromToken(token);
+  const uid = extractUserIdFromToken(getAuthToken());
 
   // Use the specified endpoint /jobs/saved/delete with the correct request body format
-  const { data, response } = await postJson(
-    '/jobs/saved/delete',
-    {
-      jobIds: [jobId],
-      uid: uid, // Include the user ID which is required by the backend
-    },
-    {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    }
-  );
+  const { data, response } = await postJson('/jobs/saved/delete', {
+    jobIds: [jobId],
+    uid: uid, // Include the user ID which is required by the backend
+  });
 
   console.log('deleteSavedJob response:', response?.status, data);
 
@@ -126,11 +110,9 @@ export async function deleteSavedJob(id: string | number): Promise<void> {
 
 // Delete a single applied job by id
 export async function deleteAppliedJob(id: string | number): Promise<void> {
-  const token = getAuthToken();
   const jobId = Number(id); // Ensure it's a number
-
   // Get the user ID from the JWT token
-  const uid = extractUserIdFromToken(token);
+  const uid = extractUserIdFromToken(getAuthToken());
 
   // Prepare the request body in the exact format expected by the backend
   const requestBody = {
@@ -143,10 +125,7 @@ export async function deleteAppliedJob(id: string | number): Promise<void> {
     // Use the specified endpoint /jobs/applied/delete with the correct request body format
     const { data, response } = await postJson(
       '/jobs/applied/delete',
-      requestBody,
-      {
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      }
+      requestBody
     );
 
     console.log('deleteAppliedJob response:', response?.status, data);
@@ -175,23 +154,15 @@ export async function deleteAllSaved(): Promise<void> {
   const savedJobs = await getMySaved();
   if (!savedJobs.length) return; // No jobs to delete
 
-  const token = getAuthToken();
   const jobIds = savedJobs.map((job) => job.id);
-
   // Get the user ID from the JWT token
-  const uid = extractUserIdFromToken(token);
+  const uid = extractUserIdFromToken(getAuthToken());
 
   // Use the same endpoint as single deletion but with multiple IDs
-  const { data, response } = await postJson(
-    '/jobs/saved/delete',
-    {
-      jobIds,
-      uid, // Include the user ID which is required by the backend
-    },
-    {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    }
-  );
+  const { data, response } = await postJson('/jobs/saved/delete', {
+    jobIds,
+    uid, // Include the user ID which is required by the backend
+  });
 
   console.log('deleteAllSaved response:', response?.status, data);
 
@@ -212,23 +183,15 @@ export async function deleteAllApplied(): Promise<void> {
   const appliedJobs = await getMyApplied();
   if (!appliedJobs.length) return; // No jobs to delete
 
-  const token = getAuthToken();
   const jobIds = appliedJobs.map((job) => job.id);
-
   // Get the user ID from the JWT token
-  const uid = extractUserIdFromToken(token);
+  const uid = extractUserIdFromToken(getAuthToken());
 
   // Use the same endpoint as single deletion but with multiple IDs
-  const { data, response } = await postJson(
-    '/jobs/applied/delete',
-    {
-      jobIds,
-      uid, // Include the user ID which is required by the backend
-    },
-    {
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-    }
-  );
+  const { data, response } = await postJson('/jobs/applied/delete', {
+    jobIds,
+    uid, // Include the user ID which is required by the backend
+  });
 
   console.log('deleteAllApplied response:', response?.status, data);
 

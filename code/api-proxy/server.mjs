@@ -32,7 +32,9 @@ app.use(morgan('tiny'));
 const defaultAllowedOrigins = [
   'http://localhost:5173', // Vite dev
   'http://localhost:4173', // Vite preview
-  'https://cs673olfall25-team2.onrender.com', // Render Static Site (adjust if different)
+  'https://cs673olfall25-team2.onrender.com', // Render Static Site
+  'http://cs673olfall25-team2.onrender.com', // HTTP version
+  'https://cs673olfall25-team2-proxy.onrender.com', // Our proxy domain
 ];
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((s) => s.trim())
@@ -53,6 +55,9 @@ const corsOptions = {
     'Authorization',
     'X-Requested-With',
     'Accept',
+    'Origin',
+    'Access-Control-Request-Method',
+    'Access-Control-Request-Headers',
   ],
   maxAge: 86400, // cache preflight for a day
 };
@@ -76,25 +81,36 @@ const proxyOptions = {
   timeout: Number(process.env.CLIENT_SOCKET_TIMEOUT_MS || 15000), // client socket timeout
   // Ensure headers needed for CORS/credentials survive
   onProxyReq(proxyReq, req) {
+    // Store the original headers we might need later
+    const originalHeaders = { ...req.headers };
+
+    // Clear all headers first
+    Object.keys(proxyReq.getHeaders()).forEach((header) => {
+      proxyReq.removeHeader(header);
+    });
+
+    // Set proxy identification
     proxyReq.setHeader('x-forwarded-by', 'careerforge-proxy');
-    // If the browser sends an Origin header, many backends (e.g., Spring Security) re-apply
-    // their own CORS checks and may return 403. Since the proxy already handles CORS
-    // for the browser, normalize the Origin header so the backend treats it as same-origin.
-    try {
-      if (req.headers.origin) {
-        proxyReq.setHeader('origin', targetBackend);
-        // Optionally normalize Referer too
-        proxyReq.setHeader('referer', `${targetBackend}/`);
+
+    // Forward essential headers
+    const headersToForward = {
+      authorization: originalHeaders['authorization'],
+      'content-type': originalHeaders['content-type'],
+      accept: originalHeaders['accept'],
+      origin: originalHeaders['origin'],
+      referer: originalHeaders['referer'],
+      'user-agent': originalHeaders['user-agent'],
+      host: targetBackend.replace(/^https?:\/\//, ''),
+      connection: 'keep-alive',
+    };
+
+    // Set each header if it exists
+    Object.entries(headersToForward).forEach(([key, value]) => {
+      if (value) {
+        proxyReq.setHeader(key, value);
+        console.debug(`[proxy:debug] Setting header ${key}:`, value);
       }
-    } catch (_) {
-      // ignore header set errors
-    }
-    const auth = req.headers['authorization'];
-    if (auth) proxyReq.setHeader('authorization', auth);
-    const contentType = req.headers['content-type'];
-    if (contentType) proxyReq.setHeader('content-type', contentType);
-    const accept = req.headers['accept'];
-    if (accept) proxyReq.setHeader('accept', accept);
+    });
     // eslint-disable-next-line no-console
     console.debug?.(
       '[proxy:req]',
@@ -106,22 +122,32 @@ const proxyOptions = {
     );
   },
   onProxyRes(proxyRes, req, res) {
-    // eslint-disable-next-line no-console
     console.debug?.(
       '[proxy:res]',
       req.method,
       req.url,
       'status',
-      proxyRes.statusCode
+      proxyRes.statusCode,
+      'headers:',
+      proxyRes.headers
     );
-    // Echo CORS headers for browsers when possible
-    if (req.headers.origin) {
+
+    // Set CORS headers in response
+    if (req.headers.origin && allowedOrigins.includes(req.headers.origin)) {
       try {
         res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
-        res.setHeader('Vary', 'Origin');
         res.setHeader('Access-Control-Allow-Credentials', 'true');
-      } catch (_) {
-        // ignore header set errors
+        res.setHeader(
+          'Access-Control-Allow-Methods',
+          'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS'
+        );
+        res.setHeader(
+          'Access-Control-Allow-Headers',
+          'Content-Type,Authorization,X-Requested-With,Accept,Origin'
+        );
+        res.setHeader('Vary', 'Origin');
+      } catch (e) {
+        console.error('[proxy:error] Failed to set CORS headers:', e);
       }
     }
   },

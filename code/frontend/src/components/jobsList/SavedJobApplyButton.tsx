@@ -5,7 +5,6 @@ import React from 'react';
 import { applyJob } from '../../api/savedAndApplied/savedAndApplied';
 import type { SavedAppliedJob } from '../../api/pages/myJobs';
 import { deleteSavedJob } from '../../api/pages/myJobs';
-import { getAuthToken } from '../../api/http';
 import type { Job } from '../../types/job';
 
 interface SavedJobApplyButtonProps {
@@ -135,8 +134,8 @@ export default function SavedJobApplyButton({
         },
       } as Job;
 
-      const token = getAuthToken() || undefined;
-      const res = await applyJob(jobData, token);
+      // No need to manually pass token anymore - handled by http.ts
+      const res = await applyJob(jobData);
 
       const ok = !!(
         (res && res.success === true) ||

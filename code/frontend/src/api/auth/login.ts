@@ -20,15 +20,22 @@ export async function login(
   username: string,
   password: string
 ): Promise<{ token: string; raw: LoginResponseEnvelope }> {
-  // Trim the email to remove any whitespace
-  const trimmedEmail = username.trim();
+  // Normalize input
+  const trimmedEmail = (username || '').trim();
   console.log('Attempting login with:', { email: trimmedEmail });
+
+  // IMPORTANT: ensure we never send stale tokens on the login call
+  try {
+    localStorage.removeItem('jwt');
+    localStorage.removeItem('csrfToken'); // Also clear any stale CSRF token
+  } catch {}
 
   try {
     const { data } = await postJson<LoginResponseEnvelope>(
       '/auth/login',
       { email: trimmedEmail, password },
       {
+        // forces http.ts to skip Authorization header
         noAuth: true,
         headers: { 'Content-Type': 'application/json' },
       }
@@ -40,16 +47,25 @@ export async function login(
       throw new Error('JWT not found in response');
     }
 
+    // Persist fresh token
+    try {
+      localStorage.setItem('jwt', token);
+    } catch {}
+
     console.log('Login response data:', data);
     return { token, raw: unwrapped };
   } catch (error: any) {
     console.error('Login error:', error);
-    if (error.status === 401) {
+
+    // Map common statuses to friendly messages
+    if (error?.status === 401) {
       throw new Error('Invalid email or password');
-    } else if (error.status === 403) {
-      throw new Error('Account is not active');
-    } else {
-      throw error;
     }
+    if (error?.status === 403) {
+      // Most common cause in browsers is a stray Authorization/Cookie;
+      // we already cleared JWT above, so if this persists check proxy logs.
+      throw new Error('Account is not active or request was rejected');
+    }
+    throw error;
   }
 }
