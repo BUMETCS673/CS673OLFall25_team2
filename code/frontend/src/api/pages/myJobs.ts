@@ -47,7 +47,6 @@ function normalizeJobs(payload: any): SavedAppliedJob[] {
   return [];
 }
 
-// Fetch current user's saved jobs (POST /jobs/saved/list)
 export async function getMySaved(): Promise<SavedAppliedJob[]> {
   const body = { size: 10, page: 0 };
   const { data } = await postJson<any>('/jobs/saved/list', body);
@@ -56,7 +55,6 @@ export async function getMySaved(): Promise<SavedAppliedJob[]> {
   return normalizeJobs(data);
 }
 
-// Fetch current user's applied jobs (POST /jobs/applied/list)
 export async function getMyApplied(): Promise<SavedAppliedJob[]> {
   const body = { size: 10, page: 0 };
   const { data } = await postJson<any>('/jobs/applied/list', body);
