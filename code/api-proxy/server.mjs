@@ -27,7 +27,39 @@ const proxyLogLevel = process.env.PROXY_LOG || 'warn';
 const app = express();
 app.disable('x-powered-by');
 app.use(morgan('tiny'));
-app.use(cors({ origin: true, credentials: true }));
+
+// CORS configuration: explicitly allow local preview and the Render static site by default
+const defaultAllowedOrigins = [
+  'http://localhost:5173', // Vite dev
+  'http://localhost:4173', // Vite preview
+  'https://cs673olfall25-team2.onrender.com', // Render Static Site (adjust if different)
+];
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((s) => s.trim())
+  : defaultAllowedOrigins;
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser requests (no Origin) and known allowed origins
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS: origin not allowed: ${origin}`));
+  },
+  credentials: true,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+  ],
+  maxAge: 86400, // cache preflight for a day
+};
+
+app.use(cors(corsOptions));
+// Ensure preflight requests are handled by Express (not proxied)
+app.options('/api/*', cors(corsOptions));
 
 // Basic health endpoint
 app.get('/health', (req, res) => {
@@ -39,8 +71,30 @@ const proxyOptions = {
   target: targetWithApi,
   changeOrigin: true,
   logLevel: proxyLogLevel,
+  // Timeouts to avoid premature gateway errors on slower endpoints
+  proxyTimeout: Number(process.env.PROXY_TIMEOUT_MS || 15000), // backend response timeout
+  timeout: Number(process.env.CLIENT_SOCKET_TIMEOUT_MS || 15000), // client socket timeout
+  // Ensure headers needed for CORS/credentials survive
   onProxyReq(proxyReq, req) {
     proxyReq.setHeader('x-forwarded-by', 'careerforge-proxy');
+    // If the browser sends an Origin header, many backends (e.g., Spring Security) re-apply
+    // their own CORS checks and may return 403. Since the proxy already handles CORS
+    // for the browser, normalize the Origin header so the backend treats it as same-origin.
+    try {
+      if (req.headers.origin) {
+        proxyReq.setHeader('origin', targetBackend);
+        // Optionally normalize Referer too
+        proxyReq.setHeader('referer', `${targetBackend}/`);
+      }
+    } catch (_) {
+      // ignore header set errors
+    }
+    const auth = req.headers['authorization'];
+    if (auth) proxyReq.setHeader('authorization', auth);
+    const contentType = req.headers['content-type'];
+    if (contentType) proxyReq.setHeader('content-type', contentType);
+    const accept = req.headers['accept'];
+    if (accept) proxyReq.setHeader('accept', accept);
     // eslint-disable-next-line no-console
     console.debug?.(
       '[proxy:req]',
@@ -51,7 +105,7 @@ const proxyOptions = {
       proxyReq.path
     );
   },
-  onProxyRes(proxyRes, req) {
+  onProxyRes(proxyRes, req, res) {
     // eslint-disable-next-line no-console
     console.debug?.(
       '[proxy:res]',
@@ -60,14 +114,36 @@ const proxyOptions = {
       'status',
       proxyRes.statusCode
     );
+    // Echo CORS headers for browsers when possible
+    if (req.headers.origin) {
+      try {
+        res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
+        res.setHeader('Vary', 'Origin');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+      } catch (_) {
+        // ignore header set errors
+      }
+    }
   },
   onError(err, req, res) {
     // eslint-disable-next-line no-console
-    console.error('[proxy:error]', err.message);
+    console.error('[proxy:error]', {
+      message: err.message,
+      code: err.code,
+      stack: process.env.PROXY_LOG === 'debug' ? err.stack : undefined,
+      method: req.method,
+      url: req.url,
+    });
     if (!res.headersSent) {
       res.writeHead(502, { 'Content-Type': 'application/json' });
     }
-    res.end(JSON.stringify({ error: 'Bad Gateway', detail: err.message }));
+    res.end(
+      JSON.stringify({
+        error: 'Bad Gateway',
+        detail: err.message,
+        code: err.code,
+      })
+    );
   },
 };
 
