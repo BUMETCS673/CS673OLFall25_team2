@@ -24,11 +24,10 @@ export async function register(
 ): Promise<{ user: RegisteredUser; location?: string; raw?: any }> {
   const { data, response } = await postJson<any>('/auth/register', payload, {
     noAuth: true,
+    noCsrf: true, // Registration endpoint is CSRF-exempt
   });
 
   const location = response.headers.get('Location') || undefined;
-  console.log('Register response data:', data);
-
   console.log('Register response data:', data);
 
   // Backend returns { token: string, user: RegisteredUser }
