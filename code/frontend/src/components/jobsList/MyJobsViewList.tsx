@@ -160,8 +160,6 @@ const MyJobsViewList: React.FC<MyJobsViewListProps> = ({
         const updatedJobs =
           view === 'saved' ? await getMySaved() : await getMyApplied();
 
-        console.log(`Updated ${label} jobs list:`, updatedJobs);
-
         // Check if the job was actually deleted
         const jobStillExists = updatedJobs.some((job) => job.id === id);
         if (jobStillExists) {

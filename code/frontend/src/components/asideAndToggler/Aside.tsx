@@ -40,8 +40,10 @@ export default function Aside({ myJobsView, onMyJobsViewChange }: AsideProps) {
         role="group"
         aria-label="Filters"
       >
-        <Field />
-        <Type />
+        {/* Hide Field and Type components on MyJobs page */}
+        {!isMyJobs && <div className="fw-semibold mb-1">FILTERS</div>}
+        {!isMyJobs && <Field />}
+        {!isMyJobs && <Type />}
         <button
           type="button"
           className={`${buttonClass} filter-button`}

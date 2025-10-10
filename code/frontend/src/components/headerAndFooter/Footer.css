@@ -12,6 +12,7 @@
   text-align: center;
   padding: 1rem;
   color: #717273;
+  transition: background-color 0.3s ease;
 }
 
 /* Dark theme override */

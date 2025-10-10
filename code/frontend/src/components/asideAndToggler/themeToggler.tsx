@@ -11,23 +11,28 @@ export default function ThemeToggler() {
 
   return (
     <div
-      className="w-100 d-flex justify-content-end"
       onClick={toggle}
       aria-label="Toggle color theme"
+      style={{
+        cursor: 'pointer',
+        width: 'fit-content',
+        float: 'right',
+        marginBottom: '1.5rem',
+      }}
     >
       {theme === 'light' ? (
         <img
           src={moonImage}
           alt="Switch to dark mode"
-          style={{ width: '47px', height: '47px' }}
-          className="user-select-none me-3"
+          style={{ width: '40px', height: '40px' }}
+          className="user-select-none"
         />
       ) : (
         <img
           src={sunImage}
           alt="Switch to light mode"
-          style={{ width: '47px', height: '47px' }}
-          className="user-select-none me-3"
+          style={{ width: '40px', height: '40px' }}
+          className="user-select-none"
         />
       )}
     </div>
