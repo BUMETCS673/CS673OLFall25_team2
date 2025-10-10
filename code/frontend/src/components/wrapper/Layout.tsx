@@ -12,6 +12,7 @@ type LayoutProps = {
   mainContent?: ReactNode;
   footer?: ReactNode;
   children?: ReactNode;
+  hideFiltersToggle?: boolean;
 };
 
 export default function Layout({
@@ -20,6 +21,7 @@ export default function Layout({
   aside,
   footer,
   children,
+  hideFiltersToggle = false,
 }: LayoutProps) {
   const main = mainContent ?? children;
 
@@ -46,6 +48,30 @@ export default function Layout({
     };
   }, []);
 
+  // Effect to ensure button styling is correct on theme change
+  useEffect(() => {
+    if (!isMounted) return;
+
+    // Force button styling update when theme changes
+    const observer = new MutationObserver(() => {
+      const buttons = document.querySelectorAll('.filters-toggle-button');
+      buttons.forEach((button) => {
+        if (document.documentElement.getAttribute('data-theme') === 'dark') {
+          button.setAttribute('style', 'color: #f8f9fa !important');
+        } else {
+          button.setAttribute('style', 'color: #000000 !important');
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+
+    return () => observer.disconnect();
+  }, [isMounted]);
+
   // Only conditionally render after component is mounted in client
   // This prevents hydration errors due to SSR vs client-side differences
   if (!isMounted) {
@@ -53,18 +79,25 @@ export default function Layout({
     return (
       <div id="mobile-layout-container">
         {header}
-        <div className="filters-toggle-container">
-          <button
-            className="filters-toggle-button btn btn-sm btn-outline-secondary"
-            aria-expanded={false}
-            aria-controls="filters-dropdown"
+        {!hideFiltersToggle && aside && (
+          <div className="filters-toggle-container">
+            <button
+              className="filters-toggle-button btn btn-sm btn-outline-secondary"
+              aria-expanded={false}
+              aria-controls="filters-dropdown"
+            >
+              Show Filters
+            </button>
+          </div>
+        )}
+        {aside && (
+          <div
+            id="filters-dropdown"
+            className="mobile-filters-container closed"
           >
-            Show Filters
-          </button>
-        </div>
-        <div id="filters-dropdown" className="mobile-filters-container closed">
-          <div id="layout-aside">{aside}</div>
-        </div>
+            <div id="layout-aside">{aside}</div>
+          </div>
+        )}
         <div id="layout-main">{main}</div>
         <div id="layout-footer">{footer}</div>
       </div>
@@ -102,24 +135,36 @@ export default function Layout({
   ) : (
     <div id="mobile-layout-container">
       {header}
-      <div className="filters-toggle-container">
-        <button
-          className="filters-toggle-button btn btn-sm btn-outline-secondary"
-          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-          aria-expanded={isFiltersOpen}
-          aria-controls="filters-dropdown"
+      {!hideFiltersToggle && aside && (
+        <div className="filters-toggle-container">
+          <button
+            className={`filters-toggle-button btn btn-sm btn-outline-secondary ${
+              isFiltersOpen ? 'active' : ''
+            }`}
+            onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+            aria-expanded={isFiltersOpen}
+            aria-controls="filters-dropdown"
+            style={{
+              color:
+                document.documentElement.getAttribute('data-theme') === 'dark'
+                  ? '#f8f9fa'
+                  : '#000000',
+            }}
+          >
+            {isFiltersOpen ? 'Hide Filters' : 'Show Filters'}
+          </button>
+        </div>
+      )}
+      {aside && (
+        <div
+          id="filters-dropdown"
+          className={`mobile-filters-container ${
+            isFiltersOpen ? 'open' : 'closed'
+          }`}
         >
-          {isFiltersOpen ? 'Hide Filters' : 'Show Filters'}
-        </button>
-      </div>
-      <div
-        id="filters-dropdown"
-        className={`mobile-filters-container ${
-          isFiltersOpen ? 'open' : 'closed'
-        }`}
-      >
-        <div id="layout-aside">{aside}</div>
-      </div>
+          <div id="layout-aside">{aside}</div>
+        </div>
+      )}
       <div id="layout-main">{main}</div>
       <div id="layout-footer">{footer}</div>
     </div>

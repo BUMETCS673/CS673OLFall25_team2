@@ -12,20 +12,27 @@ const STORAGE_KEY = 'appTheme';
 
 /**
  * Reads the saved theme from localStorage (if available),
- * otherwise falls back to system preference.
+ * otherwise defaults to light theme.
  */
 function getInitialTheme(): Theme {
   const saved = localStorage.getItem(STORAGE_KEY) as Theme | null;
   if (saved === 'light' || saved === 'dark') return saved;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
+  return 'light'; // Always default to light theme for new users
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
+
+  // Ensure theme is set on initial load
+  useEffect(() => {
+    // For first-time users, ensure light theme is set as default
+    if (!localStorage.getItem(STORAGE_KEY)) {
+      localStorage.setItem(STORAGE_KEY, 'light');
+      setTheme('light');
+    }
+  }, []);
 
   useEffect(() => {
     // Save theme across reloads and add it to <html> for CSS overrides
