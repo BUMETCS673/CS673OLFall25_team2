@@ -12,6 +12,7 @@ export default function Register() {
       header={<Header />}
       mainContent={<RegisterForm showSubmitButton={true} />}
       footer={<Footer />}
+      hideFiltersToggle={true}
     />
   );
 }

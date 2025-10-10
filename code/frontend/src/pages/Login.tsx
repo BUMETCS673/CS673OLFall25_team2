@@ -12,6 +12,7 @@ export default function Login() {
       header={<Header />}
       mainContent={<LoginForm showSubmitButton={true} />}
       footer={<Footer />}
+      hideFiltersToggle={true}
     />
   );
 }
