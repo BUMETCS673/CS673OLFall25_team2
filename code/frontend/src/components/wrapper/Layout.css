@@ -9,6 +9,38 @@ Copilot-generated code: ~40%, Human code: ~60%
   min-height: 100vh;
 }
 
+/* Filters dropdown styles */
+.filters-toggle-container {
+  padding: 0.5rem;
+  text-align: center;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.filters-toggle-button {
+  width: 90%;
+  max-width: 300px;
+}
+
+.mobile-filters-container {
+  display: flex;
+  flex-direction: column;
+  transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  overflow: hidden;
+}
+
+.mobile-filters-container.open {
+  max-height: 1000px; /* Large enough to contain content */
+  opacity: 1;
+}
+
+.mobile-filters-container.closed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0;
+  margin: 0;
+}
+
 #layout-aside {
   width: 100%;
 }

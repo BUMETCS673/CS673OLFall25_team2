@@ -26,6 +26,7 @@ export default function Layout({
   // State to track viewport width with SSR safety
   const [isDesktop, setIsDesktop] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   // Effect to handle window resize and initialize
   useEffect(() => {
@@ -52,7 +53,18 @@ export default function Layout({
     return (
       <div id="mobile-layout-container">
         {header}
-        <div id="layout-aside">{aside}</div>
+        <div className="filters-toggle-container">
+          <button
+            className="filters-toggle-button btn btn-sm btn-outline-secondary"
+            aria-expanded={false}
+            aria-controls="filters-dropdown"
+          >
+            Show Filters
+          </button>
+        </div>
+        <div id="filters-dropdown" className="mobile-filters-container closed">
+          <div id="layout-aside">{aside}</div>
+        </div>
         <div id="layout-main">{main}</div>
         <div id="layout-footer">{footer}</div>
       </div>
@@ -90,7 +102,24 @@ export default function Layout({
   ) : (
     <div id="mobile-layout-container">
       {header}
-      <div id="layout-aside">{aside}</div>
+      <div className="filters-toggle-container">
+        <button
+          className="filters-toggle-button btn btn-sm btn-outline-secondary"
+          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+          aria-expanded={isFiltersOpen}
+          aria-controls="filters-dropdown"
+        >
+          {isFiltersOpen ? 'Hide Filters' : 'Show Filters'}
+        </button>
+      </div>
+      <div
+        id="filters-dropdown"
+        className={`mobile-filters-container ${
+          isFiltersOpen ? 'open' : 'closed'
+        }`}
+      >
+        <div id="layout-aside">{aside}</div>
+      </div>
       <div id="layout-main">{main}</div>
       <div id="layout-footer">{footer}</div>
     </div>
