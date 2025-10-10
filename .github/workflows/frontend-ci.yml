@@ -1,0 +1,93 @@
+name: Frontend CI/CD
+
+on:
+  pull_request:
+    paths:
+      - 'code/frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - 'code/frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+
+jobs:
+  quality:
+    name: Lint • Typecheck • Test • Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: code/frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: code/frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type Check
+        run: npm run typecheck
+
+      - name: Test (CI + Coverage)
+        run: npm run test:ci
+
+      - name: Collect Coverage %
+        id: coverage
+        run: |
+          if [ ! -f ./coverage/coverage-summary.json ]; then
+            echo "No coverage summary found (possibly no tests ran). Setting lines=0";
+            echo "lines=0" >> $GITHUB_OUTPUT;
+          else
+            LINES=$(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)")
+            echo "lines=$LINES" >> $GITHUB_OUTPUT
+            echo "Line coverage: $LINES%"
+          fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload dist (PR only)
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: code/frontend/dist
+
+  deploy:
+    name: Deploy to Render (main only)
+    needs: quality
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && needs.quality.result == 'success'
+    steps:
+      - name: Backend Smoke Test
+        run: |
+          HEALTH_URL="http://54.227.173.227/api/actuator/health"
+          echo "Performing backend smoke test against $HEALTH_URL"
+          success=0
+          for i in {1..6}; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL" || true)
+            if [ "$code" = "200" ]; then
+              echo "Health check passed (HTTP 200)."; success=1; break; fi
+            echo "Attempt $i: got HTTP $code - retrying in 5s"; sleep 5;
+          done
+          if [ $success -ne 1 ]; then
+            echo "Backend health check failed after retries."; exit 1; fi
+      - name: Trigger Render Deploy Hook
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "RENDER_DEPLOY_HOOK secret not set. Skipping deploy."; exit 0; fi
+          curl -f -X POST "$RENDER_DEPLOY_HOOK" && echo 'Deploy triggered.'

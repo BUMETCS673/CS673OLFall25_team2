@@ -1,4 +1,6 @@
 // src/types/job.ts
+// TypeScript types for Job and related entities
+// 100% human written
 
 export type Coordinates = {
   lat: number;
@@ -17,8 +19,8 @@ export type JobOwner = {
   funding: string;
   isClaimed: boolean;
   locationAddress: string;
-  photo: string; // e.g. "https://.../photo.png"
-  rating: string; // e.g. "3.1"
+  photo: string;
+  rating: string;
   slug: string;
   teamSize: number;
   _id: string;

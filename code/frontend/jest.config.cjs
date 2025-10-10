@@ -20,4 +20,6 @@ module.exports = {
     // Optionally mock styles if imported in components
     '\\.(css|less|scss|sass)$': '<rootDir>/src/tests/__mocks__/fileMock.js',
   },
+  // Ensure the JSON summary is generated so CI can read coverage percentage safely.
+  coverageReporters: ['text', 'lcov', 'json-summary'],
 };

@@ -18,7 +18,10 @@ if (typeof (global as any).TextDecoder === 'undefined') {
 }
 // Polyfill for window.matchMedia used by CSS/media-query based code (e.g. theme detection).
 // Some components call window.matchMedia(...) which is not implemented in the jsdom used by Jest.
-if (typeof window !== 'undefined' && typeof (window as any).matchMedia === 'undefined') {
+if (
+  typeof window !== 'undefined' &&
+  typeof (window as any).matchMedia === 'undefined'
+) {
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     configurable: true,
@@ -36,7 +39,10 @@ if (typeof window !== 'undefined' && typeof (window as any).matchMedia === 'unde
 }
 
 // Provide a no-op for window.scrollTo (some libs call it during rendering)
-if (typeof window !== 'undefined' && typeof (window as any).scrollTo === 'undefined') {
+if (
+  typeof window !== 'undefined' &&
+  typeof (window as any).scrollTo === 'undefined'
+) {
   // @ts-ignore
   window.scrollTo = () => {};
 }

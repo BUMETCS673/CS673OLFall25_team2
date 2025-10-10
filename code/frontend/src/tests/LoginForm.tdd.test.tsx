@@ -1,12 +1,13 @@
 // TDD test for LoginForm component
 // Copilot generated initial test structure and logic
-// Human (Pedro) refined the test, added mocks, and ensured it covers login flow
+// Human refined the test, added mocks, and ensured it covers login flow
 // 60% AI-generated, 40% human refined
 
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import LoginForm from '../components/loginAndRegistration/LoginForm';
+import { ThemeProvider } from '../theme/ThemeContext';
 
 // Mock the API helper
 jest.mock('../api/auth/login', () => ({
@@ -35,12 +36,14 @@ describe('LoginForm (TDD)', () => {
   it('logs in with username/password, saves jwt, and navigates to /content', async () => {
     render(
       <MemoryRouter>
-        <LoginForm showSubmitButton />
+        <ThemeProvider>
+          <LoginForm showSubmitButton />
+        </ThemeProvider>
       </MemoryRouter>
     );
 
     // Fill username and password
-    await userEvent.type(screen.getByLabelText(/username/i), 'pedrotest');
+    await userEvent.type(screen.getByLabelText(/email address/i), 'pedrotest');
     await userEvent.type(screen.getByLabelText(/password/i), 'pedro123');
 
     // Submit

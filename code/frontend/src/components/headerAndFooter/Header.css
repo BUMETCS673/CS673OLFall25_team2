@@ -17,6 +17,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 576px) {
+  .header-inner {
+    justify-content: center;
+    gap: 0.5rem;
+  }
 }
 
 .logo-container {
@@ -25,11 +33,18 @@
 }
 
 .logo-image {
-  height: 94px;
-  width: 154px;
+  height: auto;
+  width: 120px; /* Smaller default size for mobile */
+}
+
+/* Make logo larger on desktop */
+@media (min-width: 992px) {
+  .logo-image {
+    width: 154px;
+  }
 }
 
 .welcome-text {
   font-size: 1.1rem;
-  color: rgb(145, 144, 144);
+  color: rgb(99, 98, 98);
 }
