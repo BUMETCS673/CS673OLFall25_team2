@@ -31,10 +31,16 @@ jobs:
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
 
-      - name: Run tests with Maven
+      - name: Debug Directory Info
         run: |
+          pwd
+          ls -R
+
+      - name: Run Selenium Tests
+        run: |
+          cd src
+          ls -l
           mvn clean test
-          working-directory: src
 
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
