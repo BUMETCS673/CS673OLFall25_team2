@@ -16,10 +16,9 @@ jest.mock('react-router-dom', () => {
   const actual = jest.requireActual('react-router-dom');
   return {
     ...actual,
-    useNavigate: () => mockNavigate
+    useNavigate: () => mockNavigate,
   };
 });
-
 
 test('shows "My Jobs" on non-MyJobs routes and navigates to /myJobs', () => {
   render(
@@ -34,8 +33,7 @@ test('shows "My Jobs" on non-MyJobs routes and navigates to /myJobs', () => {
   expect(mockNavigate).toHaveBeenCalledWith('/myJobs');
 });
 
-
-test('shows "Home" on /myJobs and navigates to /content', () => {
+test('shows "Jobs List" on /myJobs and navigates to /content', () => {
   mockNavigate.mockClear();
   render(
     <MemoryRouter initialEntries={['/myJobs']}>
@@ -44,7 +42,7 @@ test('shows "Home" on /myJobs and navigates to /content', () => {
       </ThemeProvider>
     </MemoryRouter>
   );
-  const btn = screen.getByRole('button', { name: /home/i });
+  const btn = screen.getByRole('button', { name: /jobs list/i });
   fireEvent.click(btn);
   expect(mockNavigate).toHaveBeenCalledWith('/content');
 });

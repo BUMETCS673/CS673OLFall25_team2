@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Field from '../components/asideAndToggler/Field';
 
@@ -13,18 +13,33 @@ test('opens field menu and selects an option, calling onChange', () => {
   const onChange = jest.fn();
   render(<Field onChange={onChange} />);
 
+  // Dispatch the departments event to simulate available departments
+  act(() => {
+    window.dispatchEvent(
+      new CustomEvent('jobs:departments', {
+        detail: {
+          departments: ['Engineering', 'Marketing', 'Sales'],
+          selectedDepartment: null,
+        },
+      })
+    );
+  });
 
   // Open
   const openBtn = screen.getByRole('button', { name: /field/i });
-  fireEvent.click(openBtn);
-
+  act(() => {
+    fireEvent.click(openBtn);
+  });
 
   // Choose "Engineering"
   const opt = screen.getByRole('option', { name: /engineering/i });
-  fireEvent.click(opt);
-
+  act(() => {
+    fireEvent.click(opt);
+  });
 
   expect(onChange).toHaveBeenCalledWith('Engineering');
   // Button label should now reflect the selection
-  expect(screen.getByRole('button', { name: /engineering/i })).toBeInTheDocument();
+  expect(
+    screen.getByRole('button', { name: /engineering/i })
+  ).toBeInTheDocument();
 });
