@@ -7,7 +7,7 @@ on:
     tags:
       - 'v*'
   pull_request:
-    branches: [ main ]
+    branches: [ "dev" , "main", "stacey-dev"]
 
 
 jobs:
@@ -39,4 +39,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ExtentReport
-          path: test-output/ExtentReports.html
+          path: test-output/
