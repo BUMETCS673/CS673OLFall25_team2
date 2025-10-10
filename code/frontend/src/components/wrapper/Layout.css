@@ -13,13 +13,110 @@ Copilot-generated code: ~40%, Human code: ~60%
 .filters-toggle-container {
   padding: 0.5rem;
   text-align: center;
-  background-color: #f8f9fa;
+  background-color: #ffffff; /* Pure white background */
   border-bottom: 1px solid #dee2e6;
+}
+
+/* Dark theme styles for filters */
+[data-theme='dark'] .filters-toggle-container {
+  background-color: #212529;
+  border-color: #495057;
+}
+
+[data-theme='dark'] .filters-toggle-button {
+  color: #f8f9fa;
+  border-color: #6c757d;
 }
 
 .filters-toggle-button {
   width: 90%;
   max-width: 300px;
+  font-weight: 500;
+}
+
+/* Light theme button styles (default) */
+#mobile-layout-container .filters-toggle-button.btn-outline-secondary {
+  color: #000000 !important; /* Force black text in light mode */
+  border-color: #6c757d;
+  background-color: #f8f9fa; /* Light gray background for the button */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Light theme button hover/active states */
+#mobile-layout-container .filters-toggle-button.btn-outline-secondary:hover {
+  color: #000000 !important; /* Force black text on hover */
+  background-color: #e9ecef; /* Slightly darker on hover for better visibility */
+  border-color: #6c757d;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+/* Initial click state */
+#mobile-layout-container .filters-toggle-button.btn-outline-secondary:active,
+#mobile-layout-container .filters-toggle-button.btn-outline-secondary:focus {
+  color: #000000 !important; /* Force black text */
+  background-color: #f8f9fa !important;
+}
+
+/* Override all button states with maximum specificity for light theme */
+html:not([data-theme='dark'])
+  #mobile-layout-container
+  .filters-toggle-button.btn.btn-outline-secondary.active,
+html:not([data-theme='dark'])
+  #mobile-layout-container
+  .filters-toggle-button.btn.btn-outline-secondary:active,
+html:not([data-theme='dark'])
+  #mobile-layout-container
+  .filters-toggle-button.btn.btn-outline-secondary.btn-sm:hover {
+  color: #000000 !important;
+  background-color: #e2e6ea !important; /* Slightly darker background when active */
+  border-color: #6c757d !important;
+  font-weight: 600;
+  text-shadow: none !important;
+  box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125) !important; /* Inset shadow for "pressed" effect */
+}
+
+/* Use direct nth-child selector for maximum specificity */
+html:not([data-theme='dark'])
+  #mobile-layout-container
+  > div:nth-child(2)
+  .filters-toggle-button {
+  color: #000000 !important;
+}
+
+/* Active button styles with high specificity for dark mode */
+[data-theme='dark']
+  #mobile-layout-container
+  .filters-toggle-button.btn-outline-secondary.active,
+[data-theme='dark']
+  #mobile-layout-container
+  .filters-toggle-button.btn-outline-secondary:active,
+[data-theme='dark']
+  #mobile-layout-container
+  .filters-toggle-button.btn-outline-secondary:hover {
+  color: #212529 !important;
+  background-color: #f8f9fa !important;
+  border-color: #f8f9fa !important;
+}
+
+/* Override bootstrap focus styles */
+.filters-toggle-button:focus,
+.filters-toggle-button:active,
+.filters-toggle-button.active {
+  box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25) !important;
+}
+
+/* Dark theme button overrides */
+[data-theme='dark'] .filters-toggle-button.btn-outline-secondary {
+  color: #f8f9fa;
+  border-color: #6c757d;
+}
+
+[data-theme='dark'] .filters-toggle-button.btn-outline-secondary:hover,
+[data-theme='dark'] .filters-toggle-button.btn-outline-secondary:active,
+[data-theme='dark'] .filters-toggle-button.btn-outline-secondary:focus {
+  color: #212529;
+  background-color: #f8f9fa;
+  border-color: #f8f9fa;
 }
 
 .mobile-filters-container {
@@ -27,11 +124,15 @@ Copilot-generated code: ~40%, Human code: ~60%
   flex-direction: column;
   transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
   overflow: hidden;
+  background-color: #f8f9fa;
+  color: #212529;
 }
 
 .mobile-filters-container.open {
   max-height: 1000px; /* Large enough to contain content */
   opacity: 1;
+  padding: 0.5rem;
+  border-bottom: 1px solid #dee2e6;
 }
 
 .mobile-filters-container.closed {
@@ -39,6 +140,13 @@ Copilot-generated code: ~40%, Human code: ~60%
   opacity: 0;
   padding: 0;
   margin: 0;
+}
+
+/* Dark theme for filter content */
+[data-theme='dark'] .mobile-filters-container {
+  background-color: #212529;
+  color: #f8f9fa;
+  border-color: #495057;
 }
 
 #layout-aside {
@@ -63,6 +171,25 @@ Copilot-generated code: ~40%, Human code: ~60%
   /* Styles for layout-mobile-aside-filters */
   width: 70%;
   margin: 1rem;
+}
+
+/* Form controls inside filters */
+.mobile-filters-container select,
+.mobile-filters-container input,
+.mobile-filters-container button:not(.filters-toggle-button) {
+  color: #212529;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+}
+
+[data-theme='dark'] .mobile-filters-container select,
+[data-theme='dark'] .mobile-filters-container input,
+[data-theme='dark']
+  .mobile-filters-container
+  button:not(.filters-toggle-button) {
+  color: #f8f9fa;
+  background-color: #343a40;
+  border-color: #6c757d;
 }
 
 #layout-footer {
