@@ -36,6 +36,12 @@ jobs:
           pwd
           ls -R
 
+      - name: Show directory structure
+        run: |
+          pwd
+          ls -R
+
+
       - name: Run Selenium Tests
         working-directory: ./CS673OLFall
         run: |
