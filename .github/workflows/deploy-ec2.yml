@@ -2,7 +2,7 @@ name: deploy-ec2
 
 on:
   push:
-    branches: [ "dev" , "main"]
+    branches: [ "dev" , "main", "stacey-dev"]
 
 permissions:
   id-token: write

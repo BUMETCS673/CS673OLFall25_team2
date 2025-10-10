@@ -10,11 +10,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.chrome.ChromeOptions;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,21 +18,9 @@ public class LoginTest {
     private WebDriver driver;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() {
         WebDriverManager.chromedriver().setup();
-
-        // Create a unique temporary profile directory for Chrome
-        Path tempProfile = Files.createTempDirectory("chrome-profile");
-
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--user-data-dir=" + tempProfile.toAbsolutePath());
-
-        driver = new ChromeDriver(options);
+        driver = new ChromeDriver();
     }
 
     @Test

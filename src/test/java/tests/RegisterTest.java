@@ -9,13 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,21 +21,9 @@ public class RegisterTest {
     private WebDriver driver;
 
     @BeforeEach
-    public void setUp() throws IOException {
+    public void setUp() {
         WebDriverManager.chromedriver().setup();
-
-        // Create unique temporary Chrome profile for each run
-        Path tempProfile = Files.createTempDirectory("chrome-profile");
-
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--remote-allow-origins=*");
-        options.addArguments("--user-data-dir=" + tempProfile.toAbsolutePath());
-
-        driver = new ChromeDriver(options);
+        driver = new ChromeDriver();
     }
 
     @Test
