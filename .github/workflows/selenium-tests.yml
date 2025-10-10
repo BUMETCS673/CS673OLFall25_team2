@@ -41,6 +41,9 @@ jobs:
         run: |
           ls -l
           mvn clean test -Dtest=tests.LoginTest,tests.RegisterTest
+        env:
+          JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.16-8/x64
+          JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.16-8/x64
 
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
