@@ -24,13 +24,12 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Google Chrome
+      - name: Install Chrome
         run: |
-          sudo apt-get update
-          sudo apt-get install -y wget gnupg unzip xvfb libxi6 libgconf-2-4 libnss3 libappindicator3-1 libxss1
+          sudo apt update
+          sudo apt install -y wget unzip xvfb libxi6
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
-          google-chrome --version
 
       - name: Run Selenium Tests
         run: |
