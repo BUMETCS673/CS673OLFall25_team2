@@ -34,7 +34,7 @@ jobs:
       - name: Run tests with Maven
         run: |
           mvn clean test
-          working-directory: code/backend
+          working-directory: src/test
 
       - name: Upload Extent Report
         uses: actions/upload-artifact@v4
