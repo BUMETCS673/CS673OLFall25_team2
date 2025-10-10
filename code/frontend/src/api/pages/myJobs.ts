@@ -52,7 +52,6 @@ export async function getMySaved(): Promise<SavedAppliedJob[]> {
   const body = { size: 10, page: 0 };
   const { data } = await postJson<any>('/jobs/saved/list', body);
 
-  console.log('getMySaved response data:', data);
   return normalizeJobs(data);
 }
 
@@ -61,7 +60,6 @@ export async function getMyApplied(): Promise<SavedAppliedJob[]> {
   const body = { size: 10, page: 0 };
   const { data } = await postJson<any>('/jobs/applied/list', body);
 
-  console.log('getMyApplied response data:', data);
   return normalizeJobs(data);
 }
 
@@ -95,8 +93,6 @@ export async function deleteSavedJob(id: string | number): Promise<void> {
     uid: uid, // Include the user ID which is required by the backend
   });
 
-  console.log('deleteSavedJob response:', response?.status, data);
-
   // Check if the deletion was successful
   const success =
     data?.success ||
@@ -119,7 +115,6 @@ export async function deleteAppliedJob(id: string | number): Promise<void> {
     jobIds: [jobId],
     uid: uid, // Include the user ID which is required by the backend
   };
-  console.log('deleteAppliedJob request body:', requestBody);
 
   try {
     // Use the specified endpoint /jobs/applied/delete with the correct request body format
@@ -127,8 +122,6 @@ export async function deleteAppliedJob(id: string | number): Promise<void> {
       '/jobs/applied/delete',
       requestBody
     );
-
-    console.log('deleteAppliedJob response:', response?.status, data);
 
     // Check if the deletion was successful
     const success =
@@ -164,8 +157,6 @@ export async function deleteAllSaved(): Promise<void> {
     uid, // Include the user ID which is required by the backend
   });
 
-  console.log('deleteAllSaved response:', response?.status, data);
-
   // Check if the deletion was successful
   const success =
     data?.success ||
@@ -192,8 +183,6 @@ export async function deleteAllApplied(): Promise<void> {
     jobIds,
     uid, // Include the user ID which is required by the backend
   });
-
-  console.log('deleteAllApplied response:', response?.status, data);
 
   // Check if the deletion was successful
   const success =
