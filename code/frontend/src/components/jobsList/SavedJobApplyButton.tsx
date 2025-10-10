@@ -203,9 +203,6 @@ export default function SavedJobApplyButton({
 
         // Add the alert to the container
         container.appendChild(alertDiv);
-
-        // Log to confirm alert is triggered
-        console.log('Job applied successfully, showing alert');
       } else {
         throw new Error('Apply did not succeed');
       }

@@ -1,5 +1,8 @@
 // src/api/auth/login.ts
 // Centralized login request helper
+// Copilot generated initial structure and logic
+// Human refined error handling, types, and token management
+// 40% AI-generated, 60% human refined
 
 import { postJson, stripEnvelope } from '../http';
 
@@ -22,7 +25,6 @@ export async function login(
 ): Promise<{ token: string; raw: LoginResponseEnvelope }> {
   // Normalize input
   const trimmedEmail = (username || '').trim();
-  console.log('Attempting login with:', { email: trimmedEmail });
 
   // IMPORTANT: ensure we never send stale tokens on the login call
   try {
@@ -52,7 +54,6 @@ export async function login(
       localStorage.setItem('jwt', token);
     } catch {}
 
-    console.log('Login response data:', data);
     return { token, raw: unwrapped };
   } catch (error: any) {
     console.error('Login error:', error);

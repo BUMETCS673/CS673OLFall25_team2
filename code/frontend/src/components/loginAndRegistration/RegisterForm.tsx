@@ -90,7 +90,6 @@ const RegisterForm: React.FC<Props> = ({
 
     try {
       setLoading(true);
-      console.log('Submitting registration with:', values);
 
       const payload: RegisterPayload = {
         name: values.name,
@@ -99,7 +98,6 @@ const RegisterForm: React.FC<Props> = ({
       };
 
       try {
-        console.log('Sending registration request with payload:', payload);
         const result = await registerRequest(payload);
         console.log('Registration successful:', result);
 

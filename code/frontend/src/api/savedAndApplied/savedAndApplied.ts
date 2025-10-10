@@ -126,7 +126,7 @@ export function buildSavedJobPayload(job: Job): SavedJobPayload {
 export async function saveJob(job: Job): Promise<SaveJobResponse> {
   const payload = buildSavedJobPayload(job);
   const { data } = await postJson<SaveJobResponse>('/jobs/saved/save', payload);
-  console.log('Save job response data:', data);
+
   return data;
 }
 
@@ -136,6 +136,6 @@ export async function applyJob(job: Job): Promise<SaveJobResponse> {
     '/jobs/applied/apply',
     payload
   );
-  console.log('Apply job response data:', data);
+
   return data;
 }
