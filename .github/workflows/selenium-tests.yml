@@ -37,8 +37,8 @@ jobs:
           ls -R
 
       - name: Run Selenium Tests
+        working-directory: ./CS673OLFall
         run: |
-          cd src
           ls -l
           mvn clean test -Dtest=tests.LoginTest,tests.RegisterTest
 
