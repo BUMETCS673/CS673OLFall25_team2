@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
     "preview": "vite preview",
     "test": "jest",
-    "test:ci": "jest --ci --runInBand"
+    "test:ci": "jest --ci --coverage --runInBand"
   },
   "dependencies": {
     "bootstrap": "^5.3.8",
+    "dotenv": "^17.2.3",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.1",
