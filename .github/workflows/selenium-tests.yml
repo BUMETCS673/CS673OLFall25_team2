@@ -24,23 +24,28 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Chrome
+      - name: Install Google Chrome
         run: |
-          sudo apt update
-          sudo apt install -y wget unzip xvfb libxi6
+          sudo apt-get update
+          sudo apt-get install -y wget gnupg unzip xvfb libxi6 libgconf-2-4 libnss3 libappindicator3-1 libxss1
           wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
           sudo apt install -y ./google-chrome-stable_current_amd64.deb
+          google-chrome --version
 
       - name: Run Selenium Tests
         run: |
+          echo "Current directory:"
+          pwd
+          echo "Listing files:"
           ls -l
           mvn clean test -Dtest=tests.LoginTest,tests.RegisterTest
         env:
           JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.16-8/x64
           JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.16-8/x64
-
+          DISPLAY: :99
 
       - name: Upload Extent Report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ExtentReport
