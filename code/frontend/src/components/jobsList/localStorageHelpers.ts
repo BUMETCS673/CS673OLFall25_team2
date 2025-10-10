@@ -10,7 +10,6 @@ export const clearSavedAppliedJobs = (): string => {
   localStorage.removeItem(SAVED_JOBS_KEY);
   localStorage.removeItem(APPLIED_JOBS_KEY);
 
-  console.log('Cleared saved and applied jobs from localStorage');
   return 'Cleared';
 };
 

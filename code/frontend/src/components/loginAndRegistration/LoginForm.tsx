@@ -81,7 +81,6 @@ const LoginForm: React.FC<Props> = ({ onSubmit, showSubmitButton = false }) => {
 
     try {
       setLoading(true);
-      console.log('Login attempt with:', { email: values.username });
       const { token, raw } = await loginRequest(
         values.username.trim(),
         values.password
