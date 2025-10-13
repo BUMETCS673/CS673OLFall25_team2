@@ -16,33 +16,32 @@ The app uses the **Rise Jobs API** to fetch live listings and provides a simple,
 
 ## Overview
 
-This project is a job search application aimed at helping individuals stay organized in their career search by saving, applying to, and tracking jobs in one place. The motivation is to provide users with a simple system to lead on applied jobs instead of relying on scattered tools. Its purpose is to connect employers and employees, with potential users being anyone on the job market. Core functionality includes creating user accounts, viewing and searching job posts, saving and applying to jobs, and tracking the status of applications. The proposed technology stack for the system is React with TypeScript for building the user interface, supported by a Java backend that manages job posts, authentication, and application tracking.
+This project is a job search application aimed at helping individuals stay organized in their career search by saving, applying to, and tracking jobs in one place. The motivation is to provide users with a simple system to manage applied jobs instead of relying on scattered tools. Its purpose is to connect employers and employees, with potential users being anyone on the job market. Core functionality includes creating user accounts, viewing and searching job posts, saving and applying to jobs, and tracking the status of applications.
 
 ## Tech Stack
 
-- **Frontend:** React, TypeScript, Vite
-- **Backend:** Java (framework TBD; e.g., Spring Boot)
-- **Database:** SQL RDBMS (e.g., PostgreSQL/MySQL – TBD)
+- **Frontend:** React 19, TypeScript 5.8, Vite 7
+- **Backend:** Java with Spring Boot
+- **Database:** MySQL 8.4
 - **Data Source:** [Rise Jobs API](https://pitchwall.co/product/rise-jobs-api)
-- **Styling:** TBD (CSS Modules / Tailwind / Bootstrap)
+- **Styling:** Bootstrap 5, React Bootstrap
 
-## Features (MVP)
+## Features
 
 - Fetch and display real job postings from Rise Jobs API
-- Keyword search and basic filters (job type, location)
-- User accounts & authentication (Java backend)
-- Save applied jobs and delete old ones
-- Pagination (optional in MVP)
+- Keyword search and filtering (job type, location)
+- User accounts & authentication
+- Save jobs and track application status
+- Responsive design for desktop and mobile
 
-## Architecture (high level)
+## Architecture
 
 ```
-
-React (client)
-└── Java Backend (REST)
-├── Rise Jobs API (read-only)
-└── SQL Database (users, saved jobs, applications)
-
+Frontend (React + TypeScript)
+└── API Proxy (Express.js) - In production
+    └── Java Spring Boot Backend (REST)
+        ├── Rise Jobs API (external data)
+        └── MySQL Database (users, saved jobs, applications)
 ```
 
 ## Getting Started
@@ -51,19 +50,61 @@ React (client)
 
 - Node.js 18+ and npm
 - Java 17+
-- A local SQL database (PostgreSQL/MySQL). Connection details will be added once the backend is scaffolded.
+- Docker and Docker Compose (optional, for containerized setup)
+- MySQL 8+ (if running locally without Docker)
 
 ### Setup (Frontend)
 
 ```bash
-# install dependencies
+# Navigate to frontend directory
+cd code/frontend
+
+# Install dependencies
 npm install
 
-# start dev server
+# Start development server
 npm run dev
 ```
 
-> Backend and database setup instructions will be added when the Java service and schema are initialized. An `.env.example` will be included for DB credentials and any API keys.
+The development server will run on http://localhost:5173 by default.
+
+### Environment Configuration
+
+The frontend application uses the following environment variables:
+
+- `VITE_API_BASE_URL`: Points to the backend API URL (default: http://localhost:8080/api)
+
+You can create a `.env.local` file in the `code/frontend` directory to override these settings:
+
+```
+# Example .env.local
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+
+### Frontend Commands
+
+```bash
+# Run development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Type checking
+npm run typecheck
+
+# Lint code
+npm run lint
+
+# Run tests
+npm run test
+
+# Run tests with coverage
+npm run test:ci
+```
 
 ### Running Frontend Tests (Jest + RTL)
 
@@ -91,13 +132,64 @@ Notes:
 - `src/tests/setupTests.ts` sets up jest-dom and polyfills TextEncoder/Decoder used by react-router.
 - The Docker image for tests is defined by `code/frontend/Dockerfile.test` and invoked via the `frontend-tests` service in `docker-compose.yml`.
 
-## Database connection Setup
+### Full Stack Setup with Docker
 
-### Connecting remote database
+You can run the entire application stack (frontend, backend, and database) using Docker Compose:
 
-To connect to remote database, you will need to download access key `EC2 Access.pem` (ask Gopi for the file).
+```bash
+# From the repository root
+docker compose up -d
+```
+
+This will start:
+
+- MySQL database on port 3306
+- Spring Boot backend on port 8080
+- Frontend tests can be run separately with `docker compose run --rm frontend-tests`
+
+### API Proxy for Development
+
+The project includes an API proxy in the `code/api-proxy` directory that helps with:
+
+- CORS issues during development
+- Routing requests to the deployed backend
+
+To use it:
+
+```bash
+cd code/api-proxy
+npm install
+npm start
+```
+
+The API proxy runs on port 5179 by default and forwards requests to the backend.
+
+## Database Connection Setup
+
+### Local Development
+
+When running the application with Docker Compose, the MySQL database is automatically configured. You can connect to it using:
+
+- Host: localhost
+- Port: 3306
+- Username: cf_user
+- Password: secret
+- Database: careerforge
+
+### Connecting to Remote Database
+
+To connect to the remote database, you will need to download access key `EC2 Access.pem` (ask Gopi for the file).
 
 1. Run the command `ssh -i "address_to_pem_file" -N -L 13306:careerforgedb.ckt4mmg2etgw.us-east-1.rds.amazonaws.com:3306 ubuntu@54.227.173.227`. Or you can run the script `aws_rds_connection.ps1` under `scripts` if you are using Windows. By running this command, you should put your pem file under `scripts` folder.
+
+## Deployment
+
+The application is deployed on Render:
+
+- Frontend: https://cs673olfall25-team2.onrender.com
+- API Proxy: https://cs673olfall25-team2-proxy.onrender.com
+- Backend: Deployed on EC2 (accessed through the API proxy)
+
 2. Now you are all set.
 
 ### Connecting local database

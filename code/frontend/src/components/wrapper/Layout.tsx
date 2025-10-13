@@ -57,7 +57,7 @@ export default function Layout({
       const buttons = document.querySelectorAll('.filters-toggle-button');
       buttons.forEach((button) => {
         if (document.documentElement.getAttribute('data-theme') === 'dark') {
-          button.setAttribute('style', 'color: #f8f9fa !important');
+          button.setAttribute('style', 'color: #212529 !important');
         } else {
           button.setAttribute('style', 'color: #000000 !important');
         }
@@ -147,7 +147,7 @@ export default function Layout({
             style={{
               color:
                 document.documentElement.getAttribute('data-theme') === 'dark'
-                  ? '#f8f9fa'
+                  ? '#212529'
                   : '#000000',
             }}
           >
