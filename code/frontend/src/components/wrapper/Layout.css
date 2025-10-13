@@ -24,8 +24,9 @@ Copilot-generated code: ~40%, Human code: ~60%
 }
 
 [data-theme='dark'] .filters-toggle-button {
-  color: #f8f9fa;
+  color: #212529;
   border-color: #6c757d;
+  background-color: #f8f9fa;
 }
 
 .filters-toggle-button {
@@ -96,6 +97,7 @@ html:not([data-theme='dark'])
   color: #212529 !important;
   background-color: #f8f9fa !important;
   border-color: #f8f9fa !important;
+  font-weight: 600;
 }
 
 /* Override bootstrap focus styles */
@@ -107,13 +109,15 @@ html:not([data-theme='dark'])
 
 /* Dark theme button overrides */
 [data-theme='dark'] .filters-toggle-button.btn-outline-secondary {
-  color: #f8f9fa;
+  color: #212529;
   border-color: #6c757d;
+  background-color: #f8f9fa;
 }
 
 [data-theme='dark'] .filters-toggle-button.btn-outline-secondary:hover,
 [data-theme='dark'] .filters-toggle-button.btn-outline-secondary:active,
-[data-theme='dark'] .filters-toggle-button.btn-outline-secondary:focus {
+[data-theme='dark'] .filters-toggle-button.btn-outline-secondary:focus,
+[data-theme='dark'] .filters-toggle-button.btn-outline-secondary.active {
   color: #212529;
   background-color: #f8f9fa;
   border-color: #f8f9fa;
